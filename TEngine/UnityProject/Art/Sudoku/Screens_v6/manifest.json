@@ -1,0 +1,33 @@
+{
+  "version": 6,
+  "tool": "Built-in image_gen",
+  "purpose": "Visual review",
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "images": [
+    {
+      "key": "00_Home_DistinctIcons",
+      "title": "首页·区分功能图标",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-85e8c9d0-b245-4292-8b9e-c148ba99f0e7.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v6/00_Home_DistinctIcons_1080x1920.png"
+    },
+    {
+      "key": "03_DailyChallenge_Clean",
+      "title": "每日挑战·精简版",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-89857e78-0ef1-4b13-b6bd-c949e52a1f5e.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v6/03_DailyChallenge_Clean_1080x1920.png"
+    }
+  ],
+  "changes": {
+    "calendarLegend": "removed; date status markers retained",
+    "monthlyThemeBadge": "removed",
+    "icons": {
+      "signIn": "calendar with check; existing icon_sign_in",
+      "dailyTasks": "clipboard checklist; existing icon_daily_tasks",
+      "dailyChallenge": "digit-free 3x3 Sudoku grid with upper-right star; shared by home card, nav, and selected-day card"
+    }
+  },
+  "promptSet": "prompts.md"
+}

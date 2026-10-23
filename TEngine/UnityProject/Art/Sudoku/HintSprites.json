@@ -1,0 +1,54 @@
+[
+    {
+        "name":  "icon_hint_video",
+        "width":  32,
+        "height":  26,
+        "left":  0,
+        "bottom":  0,
+        "right":  0,
+        "top":  0,
+        "tint":  true,
+        "recommendedWidth":  32,
+        "recommendedHeight":  26,
+        "source":  "approved-hint-states"
+    },
+    {
+        "name":  "icon_hint_loading",
+        "width":  36,
+        "height":  36,
+        "left":  0,
+        "bottom":  0,
+        "right":  0,
+        "top":  0,
+        "tint":  true,
+        "recommendedWidth":  36,
+        "recommendedHeight":  36,
+        "source":  "approved-hint-states"
+    },
+    {
+        "name":  "icon_hint_coin",
+        "width":  28,
+        "height":  28,
+        "left":  0,
+        "bottom":  0,
+        "right":  0,
+        "top":  0,
+        "tint":  false,
+        "recommendedWidth":  28,
+        "recommendedHeight":  28,
+        "source":  "approved-hint-states"
+    },
+    {
+        "name":  "bg_hint_badge_9s",
+        "width":  44,
+        "height":  44,
+        "left":  21,
+        "bottom":  21,
+        "right":  21,
+        "top":  21,
+        "tint":  true,
+        "recommendedWidth":  44,
+        "recommendedHeight":  44,
+        "source":  "approved-hint-states"
+    }
+]

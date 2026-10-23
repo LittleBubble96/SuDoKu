@@ -1,0 +1,1357 @@
+{
+  "seed": 20261022,
+  "ratingVersion": 1,
+  "countPerDifficulty": 20,
+  "elapsedSeconds": 2.5353732,
+  "records": [
+    {
+      "difficulty": "Quick",
+      "index": 0,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 1,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 2,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 3,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 4,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 5,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 6,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 7,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 8,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 9,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 10,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 11,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 12,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 13,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 14,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 15,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 16,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 17,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 18,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Quick",
+      "index": 19,
+      "givens": 66,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 15
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 0,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 1,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 2,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 3,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 4,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 5,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 6,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 7,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 8,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 9,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 10,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 11,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 12,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 13,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 14,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 15,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 16,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 17,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 18,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Beginner",
+      "index": 19,
+      "givens": 50,
+      "highestRank": 0,
+      "techniques": {
+        "NakedSingle": 31
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 0,
+      "givens": 23,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 46,
+        "HiddenSingle": 12,
+        "LockedCandidate": 2
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 1,
+      "givens": 24,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 39,
+        "HiddenSingle": 18,
+        "LockedCandidate": 2
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 2,
+      "givens": 30,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 32,
+        "HiddenSingle": 19,
+        "LockedCandidate": 2
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 3,
+      "givens": 27,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 37,
+        "HiddenSingle": 17,
+        "LockedCandidate": 2
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 4,
+      "givens": 29,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 38,
+        "HiddenSingle": 14,
+        "LockedCandidate": 1
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 5,
+      "givens": 29,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 36,
+        "HiddenSingle": 16,
+        "LockedCandidate": 4
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 6,
+      "givens": 29,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 39,
+        "HiddenSingle": 13,
+        "LockedCandidate": 5
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 7,
+      "givens": 25,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 52,
+        "HiddenSingle": 4,
+        "LockedCandidate": 1
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 8,
+      "givens": 33,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 38,
+        "HiddenSingle": 10,
+        "LockedCandidate": 1
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 9,
+      "givens": 26,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 37,
+        "HiddenSingle": 18,
+        "LockedCandidate": 6
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 10,
+      "givens": 24,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 39,
+        "HiddenSingle": 18,
+        "LockedCandidate": 7,
+        "NakedPair": 1
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 11,
+      "givens": 24,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 46,
+        "HiddenSingle": 11,
+        "LockedCandidate": 2,
+        "NakedPair": 1
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 12,
+      "givens": 25,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 42,
+        "HiddenSingle": 14,
+        "LockedCandidate": 2
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 13,
+      "givens": 25,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 35,
+        "HiddenSingle": 21,
+        "LockedCandidate": 4
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 14,
+      "givens": 29,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 40,
+        "HiddenSingle": 12,
+        "LockedCandidate": 4
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 15,
+      "givens": 31,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 41,
+        "HiddenSingle": 9,
+        "LockedCandidate": 3,
+        "NakedPair": 1
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 16,
+      "givens": 28,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 44,
+        "HiddenSingle": 9,
+        "LockedCandidate": 4
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 17,
+      "givens": 25,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 43,
+        "HiddenSingle": 13,
+        "LockedCandidate": 6,
+        "NakedPair": 1
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 18,
+      "givens": 27,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 41,
+        "HiddenSingle": 13,
+        "LockedCandidate": 3
+      }
+    },
+    {
+      "difficulty": "Intermediate",
+      "index": 19,
+      "givens": 26,
+      "highestRank": 2,
+      "techniques": {
+        "NakedSingle": 42,
+        "HiddenSingle": 13,
+        "LockedCandidate": 2
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 0,
+      "givens": 31,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 42,
+        "HiddenSingle": 8,
+        "LockedCandidate": 7,
+        "HiddenPair": 2
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 1,
+      "givens": 26,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 42,
+        "HiddenSingle": 13,
+        "LockedCandidate": 5,
+        "NakedPair": 3,
+        "HiddenPair": 2
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 2,
+      "givens": 29,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 42,
+        "HiddenSingle": 10,
+        "LockedCandidate": 6,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 3,
+      "givens": 24,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 51,
+        "HiddenSingle": 6,
+        "LockedCandidate": 13,
+        "NakedPair": 1,
+        "HiddenPair": 3,
+        "NakedTriple": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 4,
+      "givens": 25,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 48,
+        "HiddenSingle": 8,
+        "LockedCandidate": 3,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 5,
+      "givens": 28,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 43,
+        "HiddenSingle": 10,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 6,
+      "givens": 25,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 45,
+        "HiddenSingle": 11,
+        "LockedCandidate": 4,
+        "HiddenPair": 2
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 7,
+      "givens": 25,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 47,
+        "HiddenSingle": 9,
+        "LockedCandidate": 1,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 8,
+      "givens": 28,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 40,
+        "HiddenSingle": 13,
+        "LockedCandidate": 3,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 9,
+      "givens": 29,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 46,
+        "HiddenSingle": 6,
+        "LockedCandidate": 4,
+        "NakedPair": 1,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 10,
+      "givens": 25,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 51,
+        "HiddenSingle": 5,
+        "LockedCandidate": 7,
+        "NakedPair": 1,
+        "NakedTriple": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 11,
+      "givens": 25,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 38,
+        "HiddenSingle": 18,
+        "LockedCandidate": 1,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 12,
+      "givens": 23,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 43,
+        "HiddenSingle": 15,
+        "LockedCandidate": 6,
+        "NakedPair": 1,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 13,
+      "givens": 30,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 39,
+        "HiddenSingle": 12,
+        "LockedCandidate": 3,
+        "NakedPair": 1,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 14,
+      "givens": 24,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 37,
+        "HiddenSingle": 20,
+        "LockedCandidate": 10,
+        "NakedPair": 1,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 15,
+      "givens": 24,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 45,
+        "HiddenSingle": 12,
+        "LockedCandidate": 5,
+        "NakedPair": 1,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 16,
+      "givens": 27,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 38,
+        "HiddenSingle": 16,
+        "LockedCandidate": 3,
+        "NakedPair": 1,
+        "HiddenPair": 3
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 17,
+      "givens": 29,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 38,
+        "HiddenSingle": 14,
+        "LockedCandidate": 2,
+        "NakedPair": 1,
+        "NakedTriple": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 18,
+      "givens": 27,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 37,
+        "HiddenSingle": 17,
+        "LockedCandidate": 4,
+        "NakedPair": 1,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Advanced",
+      "index": 19,
+      "givens": 26,
+      "highestRank": 3,
+      "techniques": {
+        "NakedSingle": 43,
+        "HiddenSingle": 12,
+        "LockedCandidate": 3,
+        "HiddenPair": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 0,
+      "givens": 28,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 35,
+        "HiddenSingle": 18,
+        "LockedCandidate": 2,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 1,
+      "givens": 36,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 41,
+        "HiddenSingle": 4,
+        "LockedCandidate": 1,
+        "NakedPair": 1,
+        "XWing": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 2,
+      "givens": 26,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 35,
+        "HiddenSingle": 20,
+        "LockedCandidate": 5,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 3,
+      "givens": 30,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 46,
+        "HiddenSingle": 5,
+        "LockedCandidate": 4,
+        "NakedPair": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 4,
+      "givens": 29,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 48,
+        "HiddenSingle": 4,
+        "NakedPair": 1,
+        "HiddenPair": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 5,
+      "givens": 26,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 34,
+        "HiddenSingle": 21,
+        "LockedCandidate": 1,
+        "XYWing": 2
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 6,
+      "givens": 26,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 38,
+        "HiddenSingle": 17,
+        "LockedCandidate": 5,
+        "NakedTriple": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 7,
+      "givens": 25,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 46,
+        "HiddenSingle": 10,
+        "NakedPair": 1,
+        "HiddenPair": 1,
+        "XYWing": 2
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 8,
+      "givens": 28,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 40,
+        "HiddenSingle": 13,
+        "LockedCandidate": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 9,
+      "givens": 26,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 44,
+        "HiddenSingle": 11,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 10,
+      "givens": 23,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 49,
+        "HiddenSingle": 9,
+        "LockedCandidate": 1,
+        "HiddenPair": 1,
+        "XWing": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 11,
+      "givens": 26,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 45,
+        "HiddenSingle": 10,
+        "LockedCandidate": 1,
+        "NakedPair": 3,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 12,
+      "givens": 29,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 44,
+        "HiddenSingle": 8,
+        "LockedCandidate": 4,
+        "HiddenPair": 1,
+        "XWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 13,
+      "givens": 26,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 45,
+        "HiddenSingle": 10,
+        "LockedCandidate": 2,
+        "XWing": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 14,
+      "givens": 35,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 42,
+        "HiddenSingle": 4,
+        "HiddenPair": 1,
+        "XWing": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 15,
+      "givens": 31,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 39,
+        "HiddenSingle": 11,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 16,
+      "givens": 31,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 32,
+        "HiddenSingle": 18,
+        "LockedCandidate": 2,
+        "XYWing": 2
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 17,
+      "givens": 25,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 43,
+        "HiddenSingle": 13,
+        "LockedCandidate": 1,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 18,
+      "givens": 29,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 40,
+        "HiddenSingle": 12,
+        "LockedCandidate": 4,
+        "NakedPair": 1,
+        "HiddenPair": 2,
+        "XYWing": 1
+      }
+    },
+    {
+      "difficulty": "Expert",
+      "index": 19,
+      "givens": 33,
+      "highestRank": 4,
+      "techniques": {
+        "NakedSingle": 35,
+        "HiddenSingle": 13,
+        "LockedCandidate": 1,
+        "XWing": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 0,
+      "givens": 27,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 35,
+        "HiddenSingle": 19,
+        "LockedCandidate": 6,
+        "HiddenPair": 1,
+        "XYWing": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 1,
+      "givens": 36,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 31,
+        "HiddenSingle": 14,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 2,
+      "givens": 28,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 35,
+        "HiddenSingle": 18,
+        "LockedCandidate": 3,
+        "NakedPair": 1,
+        "XYWing": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 3,
+      "givens": 28,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 42,
+        "HiddenSingle": 11,
+        "XYWing": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 4,
+      "givens": 27,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 34,
+        "HiddenSingle": 20,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 5,
+      "givens": 32,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 33,
+        "HiddenSingle": 16,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 6,
+      "givens": 29,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 34,
+        "HiddenSingle": 18,
+        "LockedCandidate": 3,
+        "NakedPair": 1,
+        "Coloring": 2
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 7,
+      "givens": 25,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 51,
+        "HiddenSingle": 5,
+        "LockedCandidate": 1,
+        "NakedPair": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 8,
+      "givens": 26,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 40,
+        "HiddenSingle": 15,
+        "LockedCandidate": 7,
+        "NakedPair": 1,
+        "HiddenPair": 1,
+        "XYWing": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 9,
+      "givens": 26,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 42,
+        "HiddenSingle": 13,
+        "LockedCandidate": 6,
+        "HiddenPair": 1,
+        "XWing": 1,
+        "XYWing": 4,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 10,
+      "givens": 25,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 40,
+        "HiddenSingle": 16,
+        "LockedCandidate": 3,
+        "XYWing": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 11,
+      "givens": 28,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 34,
+        "HiddenSingle": 19,
+        "LockedCandidate": 4,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 12,
+      "givens": 31,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 29,
+        "HiddenSingle": 21,
+        "LockedCandidate": 2,
+        "NakedPair": 2,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 13,
+      "givens": 28,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 38,
+        "HiddenSingle": 15,
+        "LockedCandidate": 3,
+        "NakedPair": 1,
+        "HiddenPair": 2,
+        "Coloring": 2
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 14,
+      "givens": 28,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 37,
+        "HiddenSingle": 16,
+        "LockedCandidate": 3,
+        "NakedPair": 1,
+        "XYWing": 1,
+        "Swordfish": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 15,
+      "givens": 26,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 34,
+        "HiddenSingle": 21,
+        "LockedCandidate": 5,
+        "HiddenPair": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 16,
+      "givens": 26,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 41,
+        "HiddenSingle": 14,
+        "LockedCandidate": 5,
+        "NakedPair": 2,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 17,
+      "givens": 33,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 37,
+        "HiddenSingle": 11,
+        "NakedPair": 1,
+        "XYWing": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 18,
+      "givens": 30,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 24,
+        "HiddenSingle": 27,
+        "LockedCandidate": 1,
+        "XYWing": 1,
+        "Coloring": 1
+      }
+    },
+    {
+      "difficulty": "Master",
+      "index": 19,
+      "givens": 30,
+      "highestRank": 5,
+      "techniques": {
+        "NakedSingle": 36,
+        "HiddenSingle": 15,
+        "LockedCandidate": 1,
+        "NakedPair": 1,
+        "HiddenPair": 1,
+        "XYWing": 1,
+        "Swordfish": 1
+      }
+    }
+  ]
+}

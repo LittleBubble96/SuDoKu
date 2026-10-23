@@ -1,0 +1,1 @@
+PASS: 37 new PNG sprites; pure white tint RGB; real transparent backgrounds and padding; 12 distinct full-color trophy files plus 12 alpha-identical grayscale states; hollow progress ring. Total PNG bytes=2776097.

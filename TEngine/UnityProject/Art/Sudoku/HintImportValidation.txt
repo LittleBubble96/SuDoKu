@@ -1,0 +1,1 @@
+PASS: four approved hint-state components imported; badge border 21/21/21/21; video 32x26, spinner 36x36 with centered pivot, coin 28x28; single sprites/alpha/full rect/PPU100/no mipmaps/uncompressed; existing bulb reused; no UI prefab or gameplay edits.

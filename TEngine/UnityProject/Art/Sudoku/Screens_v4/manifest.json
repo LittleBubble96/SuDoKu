@@ -1,0 +1,41 @@
+{
+  "version": 4,
+  "tool": "Built-in image_gen",
+  "purpose": "Daily challenge date-button visual review",
+  "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v4/03_DailyChallenge_States_1080x1920.png",
+  "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-2eca62ba-992a-46eb-b7c1-c6a0988114ad.png",
+  "width": 1080,
+  "height": 1920,
+  "progressStates": [
+    "not started: numeral only",
+    "started: partial circular progress",
+    "complete: original check treatment"
+  ],
+  "selection": "independent solid-blue background and white numeral; retain status overlay",
+  "examples": {
+    "completed": [
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      12,
+      15,
+      17,
+      20,
+      22
+    ],
+    "inProgress": {
+      "13": 0.35,
+      "16": 0.65,
+      "23": 0.5
+    },
+    "selected": 23
+  },
+  "promptSet": [
+    "prompts.md",
+    "refinement.md"
+  ]
+}

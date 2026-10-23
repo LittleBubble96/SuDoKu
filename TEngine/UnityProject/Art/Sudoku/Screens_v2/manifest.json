@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "tool": "Built-in image_gen",
+  "purpose": "visual review",
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "images": [
+    {
+      "key": "01_Difficulty_BottomSheet",
+      "title": "难度选择·底部弹层",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-fe2ae8b8-d4a0-4711-b3c0-36a312d16b3e.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v2/01_Difficulty_BottomSheet_1080x1920.png"
+    },
+    {
+      "key": "03_DailyChallenge_Zodiac",
+      "title": "每日挑战·星座月度奖杯",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-2a863d7d-8e51-4722-bf44-6955d41da88d.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v2/03_DailyChallenge_Zodiac_1080x1920.png"
+    },
+    {
+      "key": "04_DailySignIn_Popup",
+      "title": "每日签到·简版弹窗",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-903b98de-09a8-4f56-8665-90d0fe8305da.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v2/04_DailySignIn_Popup_1080x1920.png"
+    },
+    {
+      "key": "05_DailyGift_Tasks_Popup",
+      "title": "每日礼包·每日任务弹窗",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-ec471c34-a4ee-4354-9ba1-29db4983a08f.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v2/05_DailyGift_Tasks_Popup_1080x1920.png"
+    }
+  ],
+  "promptSet": "prompts.md",
+  "monthlyTrophy": {
+    "artExample": "Libra / 天秤之杯",
+    "unlock": "Complete every daily challenge in the selected month",
+    "twelveMonthMapping": "Pending design review"
+  },
+  "rewardValues": "illustrative"
+}

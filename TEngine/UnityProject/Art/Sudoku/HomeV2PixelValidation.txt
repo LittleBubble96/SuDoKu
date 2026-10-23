@@ -1,0 +1,1 @@
+PASS: new pure-white RGBA logo 166x164, 16261 PNG bytes; transparent cell interiors and outer border; original grid and 1/5/9 retained; all 40 existing sprite PNG hashes unchanged; selected smaller-logo home reference is 1080x1920.

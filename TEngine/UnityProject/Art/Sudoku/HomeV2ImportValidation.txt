@@ -1,0 +1,1 @@
+PASS: 41 single sprites verified; 11 existing nine-slice borders retained; new icon_sudoku_logo imported with alpha, centered pivot, FullRect, PPU100, no mipmaps, NPOT None, uncompressed. Only the new logo importer was configured; no UI prefab or gameplay changes.

@@ -1,0 +1,14 @@
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\bin\Debug\net8.0\SudokuTool.exe
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\bin\Debug\net8.0\SudokuTool.deps.json
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\bin\Debug\net8.0\SudokuTool.runtimeconfig.json
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\bin\Debug\net8.0\SudokuTool.dll
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\bin\Debug\net8.0\SudokuTool.pdb
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\SudokuTool.GeneratedMSBuildEditorConfig.editorconfig
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\SudokuTool.AssemblyInfoInputs.cache
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\SudokuTool.AssemblyInfo.cs
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\SudokuTool.csproj.CoreCompileInputs.cache
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\SudokuTool.dll
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\refint\SudokuTool.dll
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\SudokuTool.pdb
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\SudokuTool.genruntimeconfig.cache
+E:\xx\Sudoku\TEngine\Tools\SudokuTool\obj\Debug\net8.0\ref\SudokuTool.dll

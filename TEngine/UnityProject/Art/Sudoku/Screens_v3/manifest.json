@@ -1,0 +1,37 @@
+{
+  "version": 3,
+  "tool": "Built-in image_gen",
+  "purpose": "Visual review; not runtime implementation",
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "images": [
+    {
+      "key": "06_TrophyGallery",
+      "title": "星座奖杯馆",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-93a2f636-bf65-46a9-a4aa-f8f757811467.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v3/06_TrophyGallery_1080x1920.png"
+    },
+    {
+      "key": "04_DailySignIn_AdDouble",
+      "title": "每日签到·广告双倍",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-102089a1-b3db-46f2-bb04-7c483e20b32c.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v3/04_DailySignIn_AdDouble_1080x1920.png"
+    },
+    {
+      "key": "05_DailyGift_FreeAndTasks",
+      "title": "每日礼包·免费奖励与任务",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-da8f6bf8-0f08-4a39-bc81-507813bf8c27.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v3/05_DailyGift_FreeAndTasks_1080x1920.png"
+    }
+  ],
+  "promptSet": "prompts.md",
+  "adRewardRules": {
+    "signIn": "Choose standard claim or rewarded-ad double for today's sign-in reward",
+    "dailyFree": "Choose free claim or rewarded-ad double for the daily free reward only",
+    "tasks": "Standard per-task claims; no ad multiplier"
+  },
+  "zodiacTrophies": "Twelve monthly theme designs; month assignment proposed for review",
+  "rewardValues": "Illustrative"
+}

@@ -1,0 +1,1 @@
+PASS: all 41 existing PNGs and 41 matching meta files are byte-for-byte unchanged.

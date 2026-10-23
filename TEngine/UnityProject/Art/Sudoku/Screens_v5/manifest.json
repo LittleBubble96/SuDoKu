@@ -1,0 +1,74 @@
+{
+  "version": 5,
+  "tool": "Built-in image_gen",
+  "purpose": "Visual review; no runtime code changes",
+  "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v5/03_DailyChallenge_SixRows_1080x1920.png",
+  "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-c6f40c51-023a-4ac1-b319-b03008016a67.png",
+  "width": 1080,
+  "height": 1920,
+  "calendar": {
+    "rows": 6,
+    "columns": 7,
+    "weekStartsOn": "Monday",
+    "exampleYear": 2026,
+    "exampleMonth": 8,
+    "firstDay": "Saturday",
+    "dateSlots": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
+        2
+      ],
+      [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      [
+        31,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ]
+  },
+  "promptSet": "prompts.md"
+}

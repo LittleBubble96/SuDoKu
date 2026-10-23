@@ -1,0 +1,1 @@
+PASS: one independent white RGB sprite; real transparent background; soft alpha levels=249; max alpha=250; visible pixels=6845; transparent pixels=4995; dimensions=320x37; PNG bytes=7235.

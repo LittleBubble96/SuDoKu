@@ -1,0 +1,15 @@
+[
+    {
+        "name":  "icon_sudoku_logo",
+        "width":  166,
+        "height":  164,
+        "left":  0,
+        "bottom":  0,
+        "right":  0,
+        "top":  0,
+        "tint":  true,
+        "recommendedWidth":  166,
+        "recommendedHeight":  164,
+        "source":  "approved-home-v2"
+    }
+]

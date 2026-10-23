@@ -1,0 +1,1 @@
+PASS: 41 PNGs; 38 pure-white tintable PNGs; 3 colored coin PNGs; all dimensions match manifest; selected homepage reference 1080x1920; total sprite PNG bytes 140155.

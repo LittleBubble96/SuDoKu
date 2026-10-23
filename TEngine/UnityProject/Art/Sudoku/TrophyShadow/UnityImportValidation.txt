@@ -1,0 +1,1 @@
+PASS: Single Sprite, 320x37, full rectangle, PPU100, center pivot, no borders, transparent alpha, no mipmaps, uncompressed, bilinear, clamp.

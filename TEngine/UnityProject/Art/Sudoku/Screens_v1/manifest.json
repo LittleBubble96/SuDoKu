@@ -1,0 +1,46 @@
+{
+  "tool": "Built-in image_gen",
+  "kind": "visual concepts for review",
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "rewardAmounts": "illustrative; confirm before implementation",
+  "images": [
+    {
+      "key": "01_Difficulty",
+      "title": "难度选择",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-98952e04-3b0e-49ae-baec-072a5bf87394.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v1/01_Difficulty_1080x1920.png"
+    },
+    {
+      "key": "02_Settings",
+      "title": "设置",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-e14f11ac-2b9e-44c5-b481-241bab3dd01d.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v1/02_Settings_1080x1920.png"
+    },
+    {
+      "key": "03_DailyChallenge",
+      "title": "每日挑战",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-9f5e1247-f90e-4573-974a-07278fb9d657.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v1/03_DailyChallenge_1080x1920.png"
+    },
+    {
+      "key": "04_DailySignIn",
+      "title": "每日签到",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-f25c2850-e08e-4cb5-a3ef-3c2351227464.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v1/04_DailySignIn_1080x1920.png"
+    },
+    {
+      "key": "05_DailyGift",
+      "title": "每日礼包",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a15e3f-7c63-7f03-9f89-a2e541656310\\exec-f4a2c676-f16d-4ddf-a1e0-44fda2bbe319.png",
+      "target": "E:/xx/Sudoku/TEngine/UnityProject/Art/Sudoku/Screens_v1/05_DailyGift_1080x1920.png"
+    }
+  ],
+  "styleReferences": [
+    "Art/Sudoku/Home_Classic_v2_1080x1920.png",
+    "Art/Sudoku/Game_Classic_1080x1920.png"
+  ],
+  "promptSet": "prompts.md"
+}
