@@ -13,6 +13,7 @@ namespace GameLogic
         private TMP_Text _coins, _continueInfo, _dailyInfo;
         private XYButton _continue;
         private bool _openingDifficulty;
+        private DateTime _displayDate;
 
         protected override void ScriptGenerator()
         {
@@ -22,6 +23,7 @@ namespace GameLogic
             _dailyInfo = FindChildComponent<TMP_Text>(Cards + "DailyChallengeBtn/m_des");
             _continue = CreateWidget<XYButton>(Cards + "ContinueGameBtn");
             _continue.OnAddListener(() => SudokuPresenter.ContinueGameAsync().Forget());
+            CreateWidget<XYButton>(Cards + "DailyChallengeBtn").OnAddListener(() => (OwnerWindow as UIHome)?.SelectDailyDate(SudokuPresenter.Current.Today));
             CreateWidget<XYButton>(Cards + "NewGameBtn").OnAddListener(() => OpenDifficultyAsync().Forget());
             CreateWidget<XYButton>("Top/Right/Layout/ColorTheme/Btn").OnAddListener(() =>
             {
@@ -45,9 +47,14 @@ namespace GameLogic
             var game = SudokuPresenter.Current;
             if (game == null) return;
             _coins.text = game.Props.coinCount.ToString();
-            _continueInfo.text = SudokuUIFormatting.Difficulty(game.Session.Difficulty) + " · " + SudokuUIFormatting.Time(game.ElapsedSeconds);
-            _continue.Interactable = game.Session.HasLevel && !game.Session.IsComplete;
-            _dailyInfo.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_incomplete), DateTime.Now.Month, DateTime.Now.Day);
+            _continueInfo.text = SudokuUIFormatting.Difficulty(game.NormalDifficulty) + " · " + SudokuUIFormatting.Time(game.NormalIsComplete ? 0 : game.NormalElapsedSeconds);
+            _continue.Interactable = game.HasNormalGame;
+            _displayDate = game.Today;
+            var daily = game.GetDaily(_displayDate);
+            _dailyInfo.text = daily == null ? string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_incomplete), _displayDate.Month, _displayDate.Day) :
+                string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_selected_info), _displayDate.Month, _displayDate.Day,
+                    daily.completed ? LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_complete) :
+                    string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_progress), daily.progressPercent));
             Label("Top/Right/Layout/SignIn/Btn/m_text", LanguageKey.home_check_in);
             Label("Top/Right/Layout/DailyTask/Btn/m_text", LanguageKey.home_daily_tasks);
             Label("Center/Layout/Top/m_text", LanguageKey.sudoku_title);
@@ -56,6 +63,11 @@ namespace GameLogic
             Label(Cards + "DailyChallengeBtn/Go/m_text", LanguageKey.challenge_btn);
             Label(Cards + "ContinueGameBtn/m_text", LanguageKey.continue_btn);
             Label(Cards + "NewGameBtn/m_text", LanguageKey.new_game_btn);
+        }
+
+        protected override void OnUpdate()
+        {
+            if (Visible && OwnerWindow.IsOpen && SudokuPresenter.Current != null && _displayDate != SudokuPresenter.Current.Today) RefreshDisplay();
         }
 
         private async UniTaskVoid OpenDifficultyAsync()

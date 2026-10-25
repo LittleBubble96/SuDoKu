@@ -14,7 +14,7 @@ namespace SudokuEditor
     {
         public const string GamePrefabPath = "Assets/AssetRaw/UI/Sudoku/UISudoku.prefab";
         private const string PackDirectory = "Assets/AssetRaw/Configs/Sudoku";
-        public const string FontPath = "Assets/AssetRaw/Fonts/FeiHuaSongTi-2 SDF.asset";
+        public const string FontPath = "Assets/AssetRaw/Fonts/GeourceSansCHS-Medium SDF.asset";
         private const string PreviousScene = "TEngine.SudokuDemo.PreviousStartScene";
         private const string PreviousMode = "TEngine.SudokuDemo.PreviousResourceMode";
         private const string PlayRequestKey = "TEngine.SudokuDemo.PlayRequested";
@@ -61,7 +61,7 @@ namespace SudokuEditor
 
         public static void ValidateUIAssets()
         {
-            if (AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontPath) == null) throw new FileNotFoundException("缺少 FeiHuaSongTi-2 SDF，请通过 Language.xlsx 导表生成。");
+            if (AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontPath) == null) throw new FileNotFoundException("缺少 GeourceSansCHS-Medium SDF，请通过 Language.xlsx 导表生成。");
             var game = AssetDatabase.LoadAssetAtPath<GameObject>(GamePrefabPath);
             if (game == null) throw new InvalidOperationException("请先创建并保存 UISudoku 正式预制体。");
             if (game.transform.Find("Panel/Layout/Board/m_rect_Board/SudoCell") == null || game.transform.Find("Panel/Layout/Bottom/Layout/Num1") == null)

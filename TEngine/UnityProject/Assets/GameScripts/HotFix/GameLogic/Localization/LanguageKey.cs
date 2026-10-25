@@ -8,7 +8,7 @@
 namespace GameLogic.Localization
 {
     /// <summary>
-    /// 多语言 Key 常量类（共 158 个 Key）。
+    /// 多语言 Key 常量类（共 194 个 Key）。
     /// </summary>
     public static class LanguageKey
     {
@@ -170,5 +170,41 @@ namespace GameLogic.Localization
         public const string home_new_game_des = "home_new_game_des";
         public const string home_new_game_diff_des = "home_new_game_diff_des";
         public const string home_new_game_start_game = "home_new_game_start_game";
+        public const string daily_trophy_hall = "daily_trophy_hall";
+        public const string daily_monthly_trophy = "daily_monthly_trophy";
+        public const string daily_trophy_leo = "daily_trophy_leo";
+        public const string daily_trophy_unlock_desc = "daily_trophy_unlock_desc";
+        public const string daily_calendar_month = "daily_calendar_month";
+        public const string daily_weekday_monday = "daily_weekday_monday";
+        public const string daily_weekday_tuesday = "daily_weekday_tuesday";
+        public const string daily_weekday_wednesday = "daily_weekday_wednesday";
+        public const string daily_weekday_thursday = "daily_weekday_thursday";
+        public const string daily_weekday_friday = "daily_weekday_friday";
+        public const string daily_weekday_saturday = "daily_weekday_saturday";
+        public const string daily_weekday_sunday = "daily_weekday_sunday";
+        public const string daily_selected_info = "daily_selected_info";
+        public const string daily_progress = "daily_progress";
+        public const string daily_continue_today = "daily_continue_today";
+        public const string trophy_year = "trophy_year";
+        public const string trophy_collected = "trophy_collected";
+        public const string trophy_gallery_desc = "trophy_gallery_desc";
+        public const string trophy_month_name = "trophy_month_name";
+        public const string trophy_obtained = "trophy_obtained";
+        public const string trophy_not_obtained = "trophy_not_obtained";
+        public const string trophy_not_started = "trophy_not_started";
+        public const string trophy_progress = "trophy_progress";
+        public const string trophy_gallery_footer = "trophy_gallery_footer";
+        public const string trophy_zodiac_capricorn = "trophy_zodiac_capricorn";
+        public const string trophy_zodiac_aquarius = "trophy_zodiac_aquarius";
+        public const string trophy_zodiac_pisces = "trophy_zodiac_pisces";
+        public const string trophy_zodiac_aries = "trophy_zodiac_aries";
+        public const string trophy_zodiac_taurus = "trophy_zodiac_taurus";
+        public const string trophy_zodiac_gemini = "trophy_zodiac_gemini";
+        public const string trophy_zodiac_cancer = "trophy_zodiac_cancer";
+        public const string trophy_zodiac_leo = "trophy_zodiac_leo";
+        public const string trophy_zodiac_virgo = "trophy_zodiac_virgo";
+        public const string trophy_zodiac_libra = "trophy_zodiac_libra";
+        public const string trophy_zodiac_scorpio = "trophy_zodiac_scorpio";
+        public const string trophy_zodiac_sagittarius = "trophy_zodiac_sagittarius";
     }
 }

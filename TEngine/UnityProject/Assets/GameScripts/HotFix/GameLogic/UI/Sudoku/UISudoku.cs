@@ -116,7 +116,8 @@ namespace GameLogic
         private void RefreshState()
         {
             if (_game == null || !IsBoardReady) return;
-            _level.text = SudokuUIFormatting.Difficulty(Session.Difficulty);
+            _level.text = _game.IsDaily ? string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_selected_info),
+                _game.DailyDate.Month, _game.DailyDate.Day, SudokuUIFormatting.Difficulty(Session.Difficulty)) : SudokuUIFormatting.Difficulty(Session.Difficulty);
             int filled = 0;
             for (int i = 0; i < 81; i++) if (Session.Value(i) != 0) filled++;
             _progress.text = Session.IsComplete ? LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_complete) : string.Format(LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_progress), filled);

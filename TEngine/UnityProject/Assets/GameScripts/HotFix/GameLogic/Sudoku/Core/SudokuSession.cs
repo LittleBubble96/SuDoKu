@@ -13,6 +13,8 @@ namespace GameLogic.Sudoku
         private readonly bool[] _debugUnlocked = new bool[6];
 #endif
         private byte[] _puzzle, _board, _solution;
+        private string _sourceSignature;
+        private bool _countsForUnlock = true;
         private readonly int[] _notes = new int[81];
         private readonly List<UndoState> _undo = new List<UndoState>();
         private sealed class UndoState { public byte[] Board; public int[] Notes; }
@@ -21,6 +23,17 @@ namespace GameLogic.Sudoku
         public int LevelIndex { get; private set; }
         public bool IsComplete { get; private set; }
         public bool HasLevel => _board != null;
+        public int ProgressPercent
+        {
+            get
+            {
+                if (!HasLevel) return 0;
+                int empty = 0, correct = 0;
+                for (int i = 0; i < 81; i++)
+                    if (_puzzle[i] == 0) { empty++; if (_board[i] == _solution[i]) correct++; }
+                return IsComplete ? 100 : empty == 0 ? 0 : Math.Min(99, correct * 100 / empty);
+            }
+        }
         public int LevelCount(SudokuDifficulty difficulty) => _packs[(int)difficulty].Count;
         public int CompletedCount(SudokuDifficulty difficulty) => _completed[(int)difficulty].Count;
         public bool WasCompleted(SudokuDifficulty difficulty, int index) => _completed[(int)difficulty].Contains(index);
@@ -52,10 +65,21 @@ namespace GameLogic.Sudoku
         public void BeginLevel(SudokuDifficulty difficulty, int index)
         {
             if (!IsUnlocked(difficulty)) throw new InvalidOperationException("前一难度需完成两道不同题。");
-            // Only commit the new level after decoding and uniqueness checking succeed.
-            var puzzle = _packs[(int)difficulty].GetPuzzle(index);
+            BeginPuzzle(difficulty, index, _packs[(int)difficulty].GetPuzzle(index), _packs[(int)difficulty].Signature, true);
+        }
+
+        public void BeginDailyLevel(SudokuDifficulty difficulty, int index)
+        {
+            if ((int)difficulty < 0 || (int)difficulty >= 6) throw new ArgumentOutOfRangeException(nameof(difficulty));
+            BeginPuzzle(difficulty, index, _packs[(int)difficulty].GetPuzzle(index), _packs[(int)difficulty].Signature, false);
+        }
+
+        private void BeginPuzzle(SudokuDifficulty difficulty, int index, byte[] puzzle, string signature, bool countsForUnlock)
+        {
+            // 解析及唯一解检查成功后再提交，失败不会覆盖旧对局。
             if (SudokuSolver.Solve(puzzle, out var solution) != 1) throw new InvalidOperationException("该关卡没有唯一答案。");
             Difficulty = difficulty; LevelIndex = index;
+            _sourceSignature = signature; _countsForUnlock = countsForUnlock;
             _puzzle = puzzle; _board = (byte[])puzzle.Clone(); _solution = solution;
             Array.Clear(_notes, 0, 81); _undo.Clear(); IsComplete = false;
         }
@@ -82,7 +106,7 @@ namespace GameLogic.Sudoku
             if (digit != 0) foreach (int peer in SudokuBoard.Peers[index]) _notes[peer] &= ~(1 << digit);
             for (int i = 0; i < 81; i++) if (_board[i] != _solution[i]) return true;
             IsComplete = true;
-            _completed[(int)Difficulty].Add(LevelIndex);
+            if (_countsForUnlock) _completed[(int)Difficulty].Add(LevelIndex);
             return true;
         }
 
@@ -123,11 +147,12 @@ namespace GameLogic.Sudoku
             var data = new SudokuSaveData
             {
                 difficulty = (int)Difficulty, puzzleIndex = LevelIndex,
-                packSignature = _packs[(int)Difficulty].Signature,
-                values = new int[81], notes = (int[])_notes.Clone(), completed = new SudokuCompletedData[6]
+                packSignature = _sourceSignature,
+                puzzle = new int[81], values = new int[81], notes = (int[])_notes.Clone(),
+                completed = _countsForUnlock ? new SudokuCompletedData[6] : null
             };
-            for (int i = 0; i < 81; i++) data.values[i] = _board[i];
-            for (int d = 0; d < 6; d++)
+            for (int i = 0; i < 81; i++) { data.puzzle[i] = _puzzle[i]; data.values[i] = _board[i]; }
+            for (int d = 0; _countsForUnlock && d < 6; d++)
             {
                 var indices = new int[_completed[d].Count];
                 _completed[d].CopyTo(indices); Array.Sort(indices);
@@ -139,21 +164,55 @@ namespace GameLogic.Sudoku
         public bool TryRestore(SudokuSaveData data)
         {
             if (data == null) return false;
+            RestoreCompleted(data.completed);
+            return TryRestoreBoard(data, false);
+        }
+
+        public void RestoreCompleted(SudokuCompletedData[] completed)
+        {
             // 题库内容变化时，只丢弃受影响档位的旧题号，避免把新题当成已通关。
             for (int d = 0; d < 6; d++)
             {
                 _completed[d].Clear();
-                var progress = data.completed != null && d < data.completed.Length ? data.completed[d] : null;
+                var progress = completed != null && d < completed.Length ? completed[d] : null;
                 if (progress?.packSignature != _packs[d].Signature || progress.indices == null) continue;
                 foreach (int index in progress.indices) if (index >= 0 && index < _packs[d].Count) _completed[d].Add(index);
             }
-            if (data.difficulty < 0 || data.difficulty > 5 || !IsUnlocked((SudokuDifficulty)data.difficulty)) return false;
+        }
+
+        public void CopyProgressFrom(SudokuSession other)
+        {
+            for (int d = 0; d < 6; d++)
+            {
+                _completed[d].Clear(); _completed[d].UnionWith(other._completed[d]);
+#if !TE_RELEASE
+                _debugUnlocked[d] = other._debugUnlocked[d];
+#endif
+            }
+        }
+
+        public bool TryRestoreDaily(SudokuSaveData data) => TryRestoreBoard(data, true);
+
+        private bool TryRestoreBoard(SudokuSaveData data, bool daily)
+        {
+            if (data == null || data.difficulty < 0 || data.difficulty > 5 || (!daily && !IsUnlocked((SudokuDifficulty)data.difficulty))) return false;
             var pack = _packs[data.difficulty];
-            if (data.packSignature != pack.Signature || data.puzzleIndex < 0 || data.puzzleIndex >= pack.Count || data.values?.Length != 81 || data.notes?.Length != 81) return false;
-            var puzzle = pack.GetPuzzle(data.puzzleIndex);
+            if (data.puzzleIndex < 0 || data.values?.Length != 81 || data.notes?.Length != 81) return false;
+            byte[] puzzle;
+            if (daily && data.puzzle?.Length == 81)
+            {
+                puzzle = new byte[81];
+                for (int i = 0; i < 81; i++) { if (data.puzzle[i] < 0 || data.puzzle[i] > 9) return false; puzzle[i] = (byte)data.puzzle[i]; }
+            }
+            else
+            {
+                if (data.packSignature != pack.Signature || data.puzzleIndex >= pack.Count) return false;
+                puzzle = pack.GetPuzzle(data.puzzleIndex);
+            }
             for (int i = 0; i < 81; i++)
                 if (data.values[i] < 0 || data.values[i] > 9 || (puzzle[i] != 0 && data.values[i] != puzzle[i]) || (data.notes[i] & ~1022) != 0) return false;
-            BeginLevel((SudokuDifficulty)data.difficulty, data.puzzleIndex);
+            try { BeginPuzzle((SudokuDifficulty)data.difficulty, data.puzzleIndex, puzzle, data.packSignature, !daily); }
+            catch (InvalidOperationException) { return false; }
             IsComplete = true;
             for (int i = 0; i < 81; i++)
             {
@@ -161,7 +220,7 @@ namespace GameLogic.Sudoku
                 _notes[i] = _board[i] == 0 ? data.notes[i] : 0;
                 if (_board[i] != _solution[i]) IsComplete = false;
             }
-            if (IsComplete) _completed[(int)Difficulty].Add(LevelIndex);
+            if (IsComplete && _countsForUnlock) _completed[(int)Difficulty].Add(LevelIndex);
             return true;
         }
 

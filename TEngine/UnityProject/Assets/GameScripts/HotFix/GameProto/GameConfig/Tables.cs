@@ -151,6 +151,36 @@ public partial class Tables
         m_TbReward = new reward.TbReward(await defaultLoaderAsync("reward_tbreward"));
         m_TbReward.ResolveRef(this);
     }
+    /// <summary>
+    /// 月度每日挑战奖杯
+    /// </summary>
+    private trophy.TbTrophy m_TbTrophy;
+    public trophy.TbTrophy TbTrophy 
+    {
+        get
+        {
+            if (m_TbTrophy == null)
+            {
+                m_TbTrophy = new trophy.TbTrophy(defaultLoader("trophy_tbtrophy"));
+                m_TbTrophy.ResolveRef(this);
+            }
+            return m_TbTrophy;
+        }
+        set
+        {
+            m_TbTrophy = value;
+            m_TbTrophy.ResolveRef(this);
+        }
+    }
+    public async UniTask TbTrophyAsync() 
+    {
+        if (m_TbTrophy != null)
+        {
+            return;
+        }
+        m_TbTrophy = new trophy.TbTrophy(await defaultLoaderAsync("trophy_tbtrophy"));
+        m_TbTrophy.ResolveRef(this);
+    }
 
     #endregion
 

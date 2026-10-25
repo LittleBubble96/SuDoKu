@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GameLogic.Sudoku;
 
 namespace GameLogic.Data
@@ -24,12 +25,18 @@ namespace GameLogic.Data
         public const int CurrentVersion = 1;
         public int version = CurrentVersion;
         public SudokuSaveData sudokuSaveData;
+        public SudokuPoolCursor[] sudokuPools;
+        public List<SudokuDailySaveData> dailyChallenges = new List<SudokuDailySaveData>();
+        public List<SudokuTrophyAward> trophyAwards = new List<SudokuTrophyAward>();
+        public string activeDailyDate;
         public GamePropData gamePropData = new GamePropData();
         public GameSettingsData gameSettingsData = new GameSettingsData();
 
         public void InitAll()
         {
             if (gamePropData == null) gamePropData = new GamePropData();
+            if (dailyChallenges == null) dailyChallenges = new List<SudokuDailySaveData>();
+            if (trophyAwards == null) trophyAwards = new List<SudokuTrophyAward>();
             if (gameSettingsData == null) gameSettingsData = new GameSettingsData();
             gamePropData.coinCount = Math.Max(0, gamePropData.coinCount);
             gamePropData.tipCount = Math.Max(0, gamePropData.tipCount);

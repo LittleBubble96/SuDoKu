@@ -21,7 +21,8 @@ namespace GameLogic.Sudoku
             var packs = await UniTask.WhenAll(tasks);
             Cache = new GameCacheManager();
             await Cache.LoadAsync();
-            Current = new SudokuGameController(packs, Cache);
+            await ConfigSystem.Instance.Tables.TbTrophyAsync();
+            Current = new SudokuGameController(packs, Cache, trophyConfigs: ConfigSystem.Instance.Tables.TbTrophy.DataList);
             SudokuThemeManager.Initialize(Cache, Current.SaveGameProgress);
             ApplyAudioSettings();
             _bridge = new GameObject("[SudokuAppBridge]");
@@ -50,6 +51,8 @@ namespace GameLogic.Sudoku
                 {
                     var home = await GameModule.UI.ShowUIAsyncAwait<UIHome>();
                     if (home == null) throw new InvalidOperationException("首页加载失败。");
+                    if (game.IsDaily) home.SelectDailyDate(game.DailyDate);
+                    else home.SelectTab(0);
                     await home.WaitForContentAsync(token);
                     token.ThrowIfCancellationRequested();
                     GameModule.UI.CloseUI<UISudoku>();
@@ -67,15 +70,23 @@ namespace GameLogic.Sudoku
             }
         }
 
-        public static UniTask ContinueGameAsync() => OpenGameAsync(null);
-        public static UniTask StartNewGameAsync(SudokuDifficulty difficulty) => OpenGameAsync(difficulty);
+        public static UniTask ContinueGameAsync() => OpenGameAsync(null, null);
+        public static UniTask StartNewGameAsync(SudokuDifficulty difficulty) => OpenGameAsync(difficulty, null);
+        public static UniTask StartDailyChallengeAsync(DateTime date) => OpenGameAsync(null, date.Date);
 
-        private static async UniTask OpenGameAsync(SudokuDifficulty? difficulty)
+        private static async UniTask OpenGameAsync(SudokuDifficulty? difficulty, DateTime? dailyDate)
         {
             if (IsNavigating || Current == null || Current.IsAdShowing) return;
             var game = Current;
-            if (difficulty.HasValue && !game.Session.IsUnlocked(difficulty.Value)) return;
-            if (!difficulty.HasValue && game.Session.IsComplete) return;
+            if (dailyDate.HasValue)
+            {
+                if (!game.CanOpenDaily(dailyDate.Value)) return;
+            }
+            else if (difficulty.HasValue)
+            {
+                if (!game.Session.IsUnlocked(difficulty.Value)) return;
+            }
+            else if (!game.HasNormalGame) return;
             var token = GameModule.Base.GetCancellationTokenOnDestroy();
             IsNavigating = true;
             using (UIInteractionLock.Acquire())
@@ -94,7 +105,9 @@ namespace GameLogic.Sudoku
                     }
                     await UniTask.WaitUntil(() => window.IsBoardReady, cancellationToken: token);
                     // 资源和棋盘准备成功后才替换旧对局；加载失败不会丢失旧题。
-                    if (difficulty.HasValue && !game.OpenLevel(difficulty.Value, game.Session.FirstUncompleted(difficulty.Value)))
+                    bool opened = dailyDate.HasValue ? game.OpenDailyChallenge(dailyDate.Value) :
+                        difficulty.HasValue ? game.StartNewGame(difficulty.Value) : game.ContinueNormalGame();
+                    if (!opened)
                     {
                         GameModule.UI.CloseUI<UISudoku>();
                         return;

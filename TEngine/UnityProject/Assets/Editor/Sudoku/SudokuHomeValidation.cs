@@ -23,8 +23,8 @@ namespace SudokuEditor
             Require(home != null, "startup opens UIHome");
             await home.WaitForContentAsync(token);
             var content = home.FindChild("Panel/Content");
-            Require(content.childCount == 1, "one asynchronous home content instance");
-            var page = content.GetChild(0);
+            var page = content.Find("UIHome_Home");
+            Require(page != null, "one asynchronous home content instance");
             int pageId = page.GetInstanceID();
             var game = SudokuPresenter.Current;
             game.DebugResetProgress(); game.DebugSetProps(2, 345); game.SetSuspended(false);
@@ -36,7 +36,9 @@ namespace SudokuEditor
             {
                 string[] tabs = { "Home", "DailyChallenge", "Statistics", "Setting" };
                 home.FindChildComponent<Button>("Panel/Bottom/Layout/" + tabs[i] + "/root").onClick.Invoke();
-                Require(home.SelectedTab == i && content.childCount == 1 && content.GetChild(0).GetInstanceID() == pageId, "tabs reuse home content");
+                await home.WaitForContentAsync(token);
+                Require(home.SelectedTab == i && content.Find("UIHome_Home").GetInstanceID() == pageId && page.gameObject.activeSelf == (i != 1), "tabs reuse separate cached home/daily content");
+                if (i == 1) Require(home.DailyPage != null && home.DailyPage.Visible, "daily tab displays UIHome_DC");
                 SudokuThemeManager.SetTheme(i);
                 for (int j = 0; j < 4; j++)
                 {
@@ -92,13 +94,13 @@ namespace SudokuEditor
             await UniTask.WaitUntil(() => !SudokuPresenter.IsNavigating, cancellationToken: token);
             home = await GameModule.UI.GetUIAsyncAwait<UIHome>(token);
             Require(home != null && !game.IsWindowActive && !ui.IsOpen, "back returns home and stops gameplay");
-            Require(home.FindChild("Panel/Content").GetChild(0).GetInstanceID() == pageId, "cached home content reused");
+            Require(home.FindChild("Panel/Content/UIHome_Home").GetInstanceID() == pageId, "cached home content reused");
             Require(game.LevelRevision == revision && game.ElapsedSeconds >= seconds, "back preserves puzzle and time");
             await SudokuPresenter.ContinueGameAsync();
             game.DebugComplete(); game.NextLevel(); game.DebugComplete();
             Require(game.Session.IsUnlocked(SudokuDifficulty.Beginner), "two distinct puzzles unlock beginner");
             await SudokuPresenter.ShowHomeAsync();
-            page = home.FindChild("Panel/Content").GetChild(0);
+            page = home.FindChild("Panel/Content/UIHome_Home");
             popup = await OpenPopup(home, page, token);
             var quick = popup.FindChild(Sheet + "Layout/NewGameSelectDiffItem0/bg/Layout");
             Require(quick.Find("ProgressItem1").GetComponent<UIThemeColor>().Role == SudokuThemeRole.Accent &&
@@ -107,7 +109,7 @@ namespace SudokuEditor
             Require(popup.SelectedDifficulty == SudokuDifficulty.Beginner, "difficulty button selection");
             popup.FindChildComponent<Button>(Sheet + "NewGameBtn").onClick.Invoke();
             await UniTask.WaitUntil(() => !SudokuPresenter.IsNavigating, cancellationToken: token);
-            Require(game.Session.Difficulty == SudokuDifficulty.Beginner && game.Session.LevelIndex == 0 && !popup.IsOpen, "start uses first uncompleted puzzle and closes sheet");
+            Require(game.Session.Difficulty == SudokuDifficulty.Beginner && game.Session.LevelIndex == 0 && !popup.IsOpen, "start uses shared pool cursor and closes sheet");
             await SudokuPresenter.ShowHomeAsync();
             popup = await OpenPopup(home, page, token);
             Require(popup.FindChild(Sheet + "Layout").childCount == 7, "cached popup does not duplicate items");
@@ -117,7 +119,7 @@ namespace SudokuEditor
             await UniTask.WaitUntil(() => !popup.IsOpen, cancellationToken: token);
             await SudokuPresenter.ContinueGameAsync();
             GameModule.Localization.Language = originalLanguage;
-            File.WriteAllText(Path.Combine(output, "home-validation.txt"), "PASS: Home startup, async content reuse, tabs/palette, coins, stopped timer, localization, six difficulties, two progress points, locking, sheet animations, cancel, continue/back and first uncompleted new game.\n");
+            File.WriteAllText(Path.Combine(output, "home-validation.txt"), "PASS: Home startup, separate cached home/daily pages, tabs/palette, coins, stopped timer, localization, six difficulties, two progress points, locking, sheet animations, cancel, continue/back and shared-pool new game.\n");
         }
 
         private static async UniTask<UIHomeNewGame> OpenPopup(UIHome home, Transform page, CancellationToken token)

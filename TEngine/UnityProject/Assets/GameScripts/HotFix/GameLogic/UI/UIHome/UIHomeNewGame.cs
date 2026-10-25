@@ -73,7 +73,7 @@ namespace GameLogic
         {
             base.OnRefresh();
             _game = (UserData as SudokuContext)?.Game ?? SudokuPresenter.Current;
-            SelectedDifficulty = _game.Session.Difficulty;
+            SelectedDifficulty = _game.NormalDifficulty;
             RefreshDisplay();
         }
 

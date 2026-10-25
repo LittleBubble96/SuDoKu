@@ -22,7 +22,11 @@ namespace SudokuEditor
 
         public static void Run()
         {
-            string output = Path.GetFullPath("../Tests/Sudoku/Integration");
+            RunToDirectory(Path.GetFullPath("../Tests/Sudoku/Integration"));
+        }
+
+        public static void RunToDirectory(string output)
+        {
             Directory.CreateDirectory(output);
             string cache = Path.Combine(Application.persistentDataPath, "game_cache.json");
             SessionState.SetString(Output, output); SessionState.SetString(CachePath, cache);
@@ -54,6 +58,8 @@ namespace SudokuEditor
             var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(60));
             try
             {
+                await SudokuTrophyUiValidation.RunAsync(SessionState.GetString(Output, ""), timeout.Token);
+                await SudokuDailyUiValidation.RunAsync(SessionState.GetString(Output, ""), timeout.Token);
                 await SudokuHomeValidation.RunAsync(SessionState.GetString(Output, ""), timeout.Token);
                 var ui = await GameModule.UI.GetUIAsyncAwait<UISudoku>();
                 Require(ui != null && ui.IsBoardReady, "real asynchronous UI startup / board readiness");

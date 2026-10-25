@@ -15,6 +15,8 @@ namespace GameLogic.Sudoku
     {
         public int difficulty, puzzleIndex;
         public string packSignature;
+        // 每日挑战保留原题面，后续更新题库仍可继续历史对局；不保存答案。
+        public int[] puzzle;
         public int[] values, notes;
         public SudokuCompletedData[] completed;
         public double elapsedSeconds;
