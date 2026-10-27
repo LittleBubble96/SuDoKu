@@ -26,6 +26,7 @@ namespace GameLogic
         {
             base.RegisterEvent();
             AddUIEvent<SudokuGameController, int, SudokuCompletedRegion>(EventDefine.SudokuRegionsCompleted, PlayCompletion);
+            SudokuThemeManager.Changed += RefreshTheme;
         }
         protected override void OnCreate()
         {
@@ -67,6 +68,10 @@ namespace GameLogic
             if (!CanAnimate(_game)) { StopCompletion(); return; }
             _waveElapsed += Time.unscaledDeltaTime;
             UpdateCompletion();
+        }
+        private void RefreshTheme()
+        {
+            if (_game != null && OwnerWindow.IsOpen) Refresh(_game);
         }
         private static bool CanAnimate(SudokuGameController game) =>
             game != null && game.IsWindowActive && !game.IsPaused && !game.IsSuspended && !game.IsAdShowing;
@@ -113,6 +118,7 @@ namespace GameLogic
         }
         protected override void OnDestroy()
         {
+            SudokuThemeManager.Changed -= RefreshTheme;
             StopCompletion();
             base.OnDestroy();
         }

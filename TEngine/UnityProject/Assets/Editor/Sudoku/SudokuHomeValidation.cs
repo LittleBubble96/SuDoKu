@@ -37,8 +37,9 @@ namespace SudokuEditor
                 string[] tabs = { "Home", "DailyChallenge", "Statistics", "Setting" };
                 home.FindChildComponent<Button>("Panel/Bottom/Layout/" + tabs[i] + "/root").onClick.Invoke();
                 await home.WaitForContentAsync(token);
-                Require(home.SelectedTab == i && content.Find("UIHome_Home").GetInstanceID() == pageId && page.gameObject.activeSelf == (i != 1), "tabs reuse separate cached home/daily content");
+                Require(home.SelectedTab == i && content.Find("UIHome_Home").GetInstanceID() == pageId && page.gameObject.activeSelf == (i == 0 || i == 2), "tabs reuse separate cached content");
                 if (i == 1) Require(home.DailyPage != null && home.DailyPage.Visible, "daily tab displays UIHome_DC");
+                if (i == 3) Require(content.Find("UIHome_Setting").gameObject.activeSelf, "settings tab displays UIHome_Setting");
                 SudokuThemeManager.SetTheme(i);
                 for (int j = 0; j < 4; j++)
                 {

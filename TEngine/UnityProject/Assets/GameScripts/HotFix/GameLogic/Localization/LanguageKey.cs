@@ -8,63 +8,12 @@
 namespace GameLogic.Localization
 {
     /// <summary>
-    /// 多语言 Key 常量类（共 194 个 Key）。
+    /// 多语言 Key 常量类（共 163 个 Key）。
     /// </summary>
     public static class LanguageKey
     {
         public const string select_language_ch = "select_language_ch";
         public const string select_language_en = "select_language_en";
-        public const string back_btn = "back_btn";
-        public const string submit_btn = "submit_btn";
-        public const string start_game_btn = "start_game_btn";
-        public const string next_level_btn = "next_level_btn";
-        public const string level_title = "level_title";
-        public const string home_social = "home_social";
-        public const string home_share = "home_share";
-        public const string setting_music = "setting_music";
-        public const string setting_sfx = "setting_sfx";
-        public const string setting_notify = "setting_notify";
-        public const string setting_language = "setting_language";
-        public const string setting_version = "setting_version";
-        public const string finish_reward = "finish_reward";
-        public const string finish_title = "finish_title";
-        public const string finish_share = "finish_share";
-        public const string finish_completeAllTitle = "finish_completeAllTitle";
-        public const string finish_des = "finish_des";
-        public const string finish_completeDes = "finish_completeDes";
-        public const string btn_confirm = "btn_confirm";
-        public const string getCoin_Title = "getCoin_Title";
-        public const string getCoin_Body_unClaim = "getCoin_Body_unClaim";
-        public const string getCoin_Body_claim = "getCoin_Body_claim";
-        public const string getCoin_Btn_unClaim = "getCoin_Btn_unClaim";
-        public const string getCoin_Btn_claim = "getCoin_Btn_claim";
-        public const string getCoin_Share_Body_unClaim = "getCoin_Share_Body_unClaim";
-        public const string getCoin_Share_Body_claim = "getCoin_Share_Body_claim";
-        public const string getCoin_Share_Btn_unClaim = "getCoin_Share_Btn_unClaim";
-        public const string getCoin_Share_Btn_claim = "getCoin_Share_Btn_claim";
-        public const string toast_select = "toast_select";
-        public const string toast_answerFinded = "toast_answerFinded";
-        public const string toast_answerError = "toast_answerError";
-        public const string game_des = "game_des";
-        public const string game_prop_next = "game_prop_next";
-        public const string game_prop_tip = "game_prop_tip";
-        public const string game_prop_clear = "game_prop_clear";
-        public const string game_prop_select_all = "game_prop_select_all";
-        public const string guide_step1 = "guide_step1";
-        public const string guide_step2 = "guide_step2";
-        public const string guide_step3 = "guide_step3";
-        public const string guide_step4 = "guide_step4";
-        public const string guide_step5 = "guide_step5";
-        public const string guide_step6 = "guide_step6";
-        public const string game_tips1 = "game_tips1";
-        public const string game_tips2 = "game_tips2";
-        public const string game_tips3 = "game_tips3";
-        public const string game_tips4 = "game_tips4";
-        public const string game_tips5 = "game_tips5";
-        public const string finish_double_reward = "finish_double_reward";
-        public const string finish_double_reward_claimed = "finish_double_reward_claimed";
-        public const string back_home_btn = "back_home_btn";
-        public const string finish_share_title = "finish_share_title";
         public const string sudoku_text_001 = "sudoku_text_001";
         public const string sudoku_text_002 = "sudoku_text_002";
         public const string sudoku_text_003 = "sudoku_text_003";
@@ -206,5 +155,25 @@ namespace GameLogic.Localization
         public const string trophy_zodiac_libra = "trophy_zodiac_libra";
         public const string trophy_zodiac_scorpio = "trophy_zodiac_scorpio";
         public const string trophy_zodiac_sagittarius = "trophy_zodiac_sagittarius";
+        public const string setting_title = "setting_title";
+        public const string setting_game_experience = "setting_game_experience";
+        public const string setting_sfx = "setting_sfx";
+        public const string setting_vibration = "setting_vibration";
+        public const string setting_game_assist = "setting_game_assist";
+        public const string setting_highlight_same_number = "setting_highlight_same_number";
+        public const string setting_highlight_same_note = "setting_highlight_same_note";
+        public const string setting_highlight_related = "setting_highlight_related";
+        public const string setting_highlight_related_des = "setting_highlight_related_des";
+        public const string setting_dim_completed_digits = "setting_dim_completed_digits";
+        public const string setting_show_remaining_count = "setting_show_remaining_count";
+        public const string setting_language = "setting_language";
+        public const string setting_how_to_play = "setting_how_to_play";
+        public const string palette_title = "palette_title";
+        public const string palette_classic = "palette_classic";
+        public const string palette_mint = "palette_mint";
+        public const string palette_sky = "palette_sky";
+        public const string palette_peach = "palette_peach";
+        public const string palette_lavender = "palette_lavender";
+        public const string palette_apricot = "palette_apricot";
     }
 }

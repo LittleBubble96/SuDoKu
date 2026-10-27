@@ -25,11 +25,8 @@ namespace GameLogic
             _continue.OnAddListener(() => SudokuPresenter.ContinueGameAsync().Forget());
             CreateWidget<XYButton>(Cards + "DailyChallengeBtn").OnAddListener(() => (OwnerWindow as UIHome)?.SelectDailyDate(SudokuPresenter.Current.Today));
             CreateWidget<XYButton>(Cards + "NewGameBtn").OnAddListener(() => OpenDifficultyAsync().Forget());
-            CreateWidget<XYButton>("Top/Right/Layout/ColorTheme/Btn").OnAddListener(() =>
-            {
-                SudokuPresenter.Current.SaveGameProgress();
-                GameEvent.Send(EventDefine.SudokuPaletteRequested);
-            });
+            CreateWidget<XYButton>("Top/Right/Layout/ColorTheme/Btn")
+                .OnAddListener(() => SudokuPresenter.ShowPaletteAsync(OwnerWindow).Forget());
             BindThemes();
         }
 

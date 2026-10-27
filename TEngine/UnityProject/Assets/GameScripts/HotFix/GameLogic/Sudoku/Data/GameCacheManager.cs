@@ -31,7 +31,9 @@ namespace GameLogic.Data
                 string json = await _fileSystem.ReadCacheAsync();
                 if (!string.IsNullOrEmpty(json))
                 {
-                    var data = JsonUtility.FromJson<GameCacheData>(json);
+                    // 在默认数据上覆盖，旧缓存缺少的新开关仍保留默认值。
+                    var data = new GameCacheData();
+                    JsonUtility.FromJsonOverwrite(json, data);
                     if (data != null && data.version == GameCacheData.CurrentVersion) CacheData = data;
                 }
             }

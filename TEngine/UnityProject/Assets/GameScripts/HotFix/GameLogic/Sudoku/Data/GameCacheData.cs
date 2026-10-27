@@ -12,14 +12,6 @@ namespace GameLogic.Data
     }
 
     [Serializable]
-    public sealed class GameSettingsData
-    {
-        public int themeId;
-        public float MusicVolume = 1f;
-        public float SoundVolume = 1f;
-    }
-
-    [Serializable]
     public sealed class GameCacheData
     {
         public const int CurrentVersion = 1;

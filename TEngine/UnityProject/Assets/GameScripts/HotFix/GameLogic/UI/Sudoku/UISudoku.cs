@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using GameLogic.Sudoku;
 using GameLogic.Localization;
 using TEngine;
@@ -21,6 +22,7 @@ namespace GameLogic
         private UIThemeColor _noteStateColor, _pauseColor;
         private readonly List<SudokuNumberWidget> _numbers = new List<SudokuNumberWidget>(9);
         private long _displaySecond = -1;
+        private bool _openingSettings;
         public bool IsBoardReady => _board?.IsReady == true;
         public SudokuSession Session => _game?.Session;
         protected override void ScriptGenerator()
@@ -46,8 +48,8 @@ namespace GameLogic
             _notes.OnAddListener(() => _game.ToggleNotes());
             _pause.OnAddListener(() => _game.TogglePause());
             back.OnAddListener(() => RequestPopup(EventDefine.SudokuBackRequested));
-            palette.OnAddListener(() => RequestPopup(EventDefine.SudokuPaletteRequested));
-            settings.OnAddListener(() => RequestPopup(EventDefine.SudokuSettingsRequested));
+            palette.OnAddListener(() => SudokuPresenter.ShowPaletteAsync(this).Forget());
+            settings.OnAddListener(() => OpenSettingsAsync().Forget());
         }
         protected override void RegisterEvent()
         {
@@ -97,6 +99,8 @@ namespace GameLogic
         }
         protected override void OnClose()
         {
+            GameModule.UI.CloseUI<UIPalette>();
+            GameModule.UI.CloseUI<UISetting>();
             _game?.SetWindowActive(false);
             AdSystem.ExitPage(AdIds.Tip);
             base.OnClose();
@@ -111,7 +115,24 @@ namespace GameLogic
         }
         private void EnterDigit(int digit)
         {
-            if (IsBoardReady) _game.EnterDigit(_game.SelectedCell, digit, _game.NoteMode);
+            if (IsBoardReady && _game.EnterDigit(_game.SelectedCell, digit, _game.NoteMode))
+                SudokuSettingsManager.Vibrate();
+        }
+        private async UniTaskVoid OpenSettingsAsync()
+        {
+            if (_openingSettings || _game.IsAdShowing) return;
+            _openingSettings = true;
+            int version = OpenVersion;
+            using (UIInteractionLock.Acquire())
+            {
+                try
+                {
+                    await GameModule.UI.ShowUIAsyncAwait<UISetting>();
+                    if (!IsOpen || OpenVersion != version) GameModule.UI.CloseUI<UISetting>();
+                }
+                catch (OperationCanceledException) { }
+                finally { _openingSettings = false; }
+            }
         }
         private void RefreshState()
         {
@@ -123,7 +144,8 @@ namespace GameLogic
             _progress.text = Session.IsComplete ? LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_complete) : string.Format(LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_progress), filled);
             _board.Refresh(_game);
             bool canEdit = _game.CanInteract && _game.SelectedCell >= 0 && !Session.IsGiven(_game.SelectedCell);
-            foreach (var number in _numbers) number.SetInteractable(canEdit);
+            for (int i = 0; i < _numbers.Count; i++)
+                _numbers[i].RefreshDisplay(canEdit, Session.RemainingCount(i + 1), SudokuSettingsManager.Data);
             _undo.Interactable = _game.CanInteract && Session.CanUndo;
             _clear.Interactable = canEdit;
             _notes.Interactable = _game.CanInteract;

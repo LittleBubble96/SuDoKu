@@ -18,18 +18,20 @@ namespace GameLogic
             LanguageKey.home_title, LanguageKey.daily_challenge,
             LanguageKey.home_statistics, LanguageKey.home_setting
         };
-        private static readonly string[] ContentLocations = { "UIHome_Home", "UIHome_DC", "UIHome_Home", "UIHome_Home" };
+        private static readonly string[] ContentLocations = { "UIHome_Home", "UIHome_DC", "UIHome_Home", "UIHome_Setting" };
         private readonly UIThemeColor[] _tabIcons = new UIThemeColor[4];
         private readonly UIThemeColor[] _tabColors = new UIThemeColor[4];
         private readonly TMP_Text[] _tabLabels = new TMP_Text[4];
         private Transform _content;
         private UIHomeHomeWidget _home;
         private UIHomeDailyWidget _daily;
+        private UIHomeSettingWidget _settings;
         private DateTime? _pendingDailyDate;
         private bool _loading;
         private Exception _loadError;
         public int SelectedTab { get; private set; }
-        public bool IsContentReady => SelectedTab == 1 ? _daily != null : _home != null;
+        private int ContentIndex => SelectedTab == 1 ? 1 : SelectedTab == 3 ? 3 : 0;
+        public bool IsContentReady => ContentIndex == 1 ? _daily != null : ContentIndex == 3 ? _settings != null : _home != null;
         public UIHomeDailyWidget DailyPage => _daily;
 
         protected override void ScriptGenerator()
@@ -63,6 +65,7 @@ namespace GameLogic
             {
                 var child = _content.GetChild(i);
                 if (child.name == "UIHome_DC") _daily = CreateWidget<UIHomeDailyWidget>(child.gameObject, false);
+                else if (child.name == "UIHome_Setting") _settings = CreateWidget<UIHomeSettingWidget>(child.gameObject, false);
                 else if (child.name == "UIHome_Home") _home = CreateWidget<UIHomeHomeWidget>(child.gameObject, false);
             }
         }
@@ -73,6 +76,12 @@ namespace GameLogic
             SudokuPresenter.Current.SetWindowActive(false);
             RefreshLabels();
             SelectTab(SelectedTab);
+        }
+
+        protected override void OnClose()
+        {
+            GameModule.UI.CloseUI<UIPalette>();
+            base.OnClose();
         }
 
         public void SelectTab(int index)
@@ -100,7 +109,7 @@ namespace GameLogic
         {
             if (_home != null)
             {
-                _home.Visible = SelectedTab != 1;
+                _home.Visible = ContentIndex == 0;
                 if (_home.Visible) _home.RefreshDisplay();
             }
             if (_daily != null)
@@ -111,6 +120,11 @@ namespace GameLogic
                     if (_pendingDailyDate.HasValue) { _daily.SelectDate(_pendingDailyDate.Value); _pendingDailyDate = null; }
                     _daily.RefreshDisplay();
                 }
+            }
+            if (_settings != null)
+            {
+                _settings.Visible = ContentIndex == 3;
+                if (_settings.Visible) _settings.RefreshDisplay();
             }
         }
 
@@ -124,24 +138,24 @@ namespace GameLogic
             if (_loading) return;
             _loading = true;
             _loadError = null;
-            bool daily = SelectedTab == 1;
+            int page = ContentIndex;
             int openVersion = OpenVersion;
             GameObject instance = null;
             try
             {
-                instance = await GameModule.Resource.LoadGameObjectAsync(daily ? ContentLocations[1] : ContentLocations[0], _content, token);
+                instance = await GameModule.Resource.LoadGameObjectAsync(ContentLocations[page], _content, token);
                 token.ThrowIfCancellationRequested();
                 if (!IsOpen || openVersion != OpenVersion) return;
                 if (instance == null) throw new InvalidOperationException("首页内容预制体加载失败。");
-                instance.name = daily ? "UIHome_DC" : "UIHome_Home";
-                if (daily) _daily = CreateWidget<UIHomeDailyWidget>(instance, SelectedTab == 1);
-                else _home = CreateWidget<UIHomeHomeWidget>(instance, SelectedTab != 1);
-                if ((daily && _daily == null) || (!daily && _home == null)) throw new InvalidOperationException("首页内容绑定失败。");
+                instance.name = ContentLocations[page];
+                if (page == 1) _daily = CreateWidget<UIHomeDailyWidget>(instance, ContentIndex == 1);
+                else if (page == 3) _settings = CreateWidget<UIHomeSettingWidget>(instance, ContentIndex == 3);
+                else _home = CreateWidget<UIHomeHomeWidget>(instance, ContentIndex == 0);
                 instance = null; // 由窗口和 Widget 生命周期持有。
                 RefreshContent();
             }
             catch (OperationCanceledException) { }
-            catch (Exception error) { if (daily == (SelectedTab == 1)) _loadError = error; Debug.LogException(error); }
+            catch (Exception error) { if (page == ContentIndex) _loadError = error; Debug.LogException(error); }
             finally
             {
                 if (instance != null) UnityEngine.Object.Destroy(instance);

@@ -48,6 +48,12 @@ namespace GameLogic.Sudoku
         public byte Value(int index) => _board[index];
         public bool IsGiven(int index) => _puzzle[index] != 0;
         public int Notes(int index) => _notes[index];
+        public int RemainingCount(int digit)
+        {
+            int remaining = 9;
+            for (int i = 0; i < 81; i++) if (_board[i] == digit) remaining--;
+            return Math.Max(0, remaining);
+        }
         public bool HasConflict(int index) => SudokuBoard.HasConflict(_board, index);
         public SudokuCompletedRegion CompletedRegions(int index) => SudokuCompletion.GetCompletedRegions(_board, _solution, index);
 

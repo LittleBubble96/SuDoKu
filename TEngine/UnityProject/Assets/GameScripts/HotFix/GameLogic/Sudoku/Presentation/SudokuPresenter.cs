@@ -11,6 +11,7 @@ namespace GameLogic.Sudoku
         public static SudokuGameController Current { get; private set; }
         public static GameCacheManager Cache { get; private set; }
         private static GameObject _bridge;
+        private static bool _openingPalette;
         public static bool IsNavigating { get; private set; }
 
         public static async UniTask LaunchAsync()
@@ -21,10 +22,11 @@ namespace GameLogic.Sudoku
             var packs = await UniTask.WhenAll(tasks);
             Cache = new GameCacheManager();
             await Cache.LoadAsync();
+            await ConfigSystem.Instance.Tables.TbLanguageAsync();
             await ConfigSystem.Instance.Tables.TbTrophyAsync();
             Current = new SudokuGameController(packs, Cache, trophyConfigs: ConfigSystem.Instance.Tables.TbTrophy.DataList);
             SudokuThemeManager.Initialize(Cache, Current.SaveGameProgress);
-            ApplyAudioSettings();
+            SudokuSettingsManager.Initialize(Cache, Current.SaveGameProgress);
             _bridge = new GameObject("[SudokuAppBridge]");
             UnityEngine.Object.DontDestroyOnLoad(_bridge);
             _bridge.AddComponent<SudokuAppBridge>();
@@ -67,6 +69,26 @@ namespace GameLogic.Sudoku
                     throw;
                 }
                 finally { IsNavigating = false; }
+            }
+        }
+
+        public static async UniTask ShowPaletteAsync(UIWindow owner)
+        {
+            if (_openingPalette || IsNavigating || Current.IsAdShowing || !owner.IsOpen) return;
+            _openingPalette = true;
+            int version = owner.OpenVersion;
+            Current.SaveGameProgress();
+            using (UIInteractionLock.Acquire())
+            {
+                try
+                {
+                    var existing = await GameModule.UI.GetUIAsyncAwait<UIPalette>();
+                    if (existing != null && existing.IsOpen) return;
+                    await GameModule.UI.ShowUIAsyncAwait<UIPalette>(owner);
+                    if (!owner.IsOpen || owner.OpenVersion != version) GameModule.UI.CloseUI<UIPalette>();
+                }
+                catch (OperationCanceledException) { }
+                finally { _openingPalette = false; }
             }
         }
 
@@ -143,20 +165,13 @@ namespace GameLogic.Sudoku
             SaveOnQuit();
             AdSystem.Dispose();
             SudokuThemeManager.Release();
+            SudokuSettingsManager.Release();
             if (_bridge != null) UnityEngine.Object.Destroy(_bridge);
-            _bridge = null; Current = null; Cache = null; IsNavigating = false;
+            _bridge = null; Current = null; Cache = null; IsNavigating = false; _openingPalette = false;
         }
         public static void SetAudioVolumes(float music, float sound)
         {
-            if (Cache == null) return;
-            Cache.CacheData.gameSettingsData.MusicVolume = Mathf.Clamp01(music);
-            Cache.CacheData.gameSettingsData.SoundVolume = Mathf.Clamp01(sound);
-            ApplyAudioSettings(); Current.SaveGameProgress();
-        }
-        private static void ApplyAudioSettings()
-        {
-            AudioSystem.Instance.SetMusicVolume(Cache.CacheData.gameSettingsData.MusicVolume);
-            AudioSystem.Instance.SetSoundVolume(Cache.CacheData.gameSettingsData.SoundVolume);
+            SudokuSettingsManager.SetAudioVolumes(music, sound);
         }
 
         private static async UniTask<SudokuPack> LoadPackAsync(SudokuDifficulty difficulty, System.Threading.CancellationToken token)
