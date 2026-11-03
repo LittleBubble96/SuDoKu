@@ -1,0 +1,28 @@
+{
+  "source": "E:\\xx\\SuDo\\TEngine\\UnityProject\\Art\\\u6700\u7ec8\u6548\u679c\u56fe\\10_\u7ed3\u7b97_\u84dd\u8272\u6a2a\u5e45_\u7ea2\u91d1\u793c\u5305_\u91d1\u8272\u5149\u8292.png",
+  "size": [
+    941,
+    1672
+  ],
+  "regions": {
+    "RibbonReference": [
+      108,
+      326,
+      834,
+      512
+    ],
+    "GiftReference": [
+      384,
+      1066,
+      558,
+      1232
+    ],
+    "GlowReference": [
+      275,
+      965,
+      665,
+      1264
+    ]
+  },
+  "sha256": "f61add9eeb268ba6d1def6cd27697a83b3ffd6fc2109208379406a41517ab747"
+}

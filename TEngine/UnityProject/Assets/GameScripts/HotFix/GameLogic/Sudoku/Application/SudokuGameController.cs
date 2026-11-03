@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using TEngine;
@@ -16,8 +16,11 @@ namespace GameLogic.Sudoku
         private readonly Func<DateTime> _clock;
         private readonly Dictionary<string, SudokuDailySaveData> _daily = new Dictionary<string, SudokuDailySaveData>();
         private bool _hasActiveGame, _normalValid, _normalComplete;
+        private bool _statisticsCounted, _hadMistake, _gmAssisted;
         public SudokuSession Session { get; private set; }
         public SudokuTrophyManager Trophies { get; }
+        public SudokuStatisticsManager Statistics { get; }
+        public DailyTaskManager DailyTasks { get; }
         public string Message { get; private set; }
         public int LevelRevision { get; private set; }
         public int SelectedCell { get; private set; } = -1;
@@ -43,6 +46,7 @@ namespace GameLogic.Sudoku
             _cache = cache;
             _data = cache?.CacheData ?? new GameCacheData();
             _data.InitAll();
+            Statistics = new SudokuStatisticsManager(_data);
             _clock = clock ?? (() => NetTimeSystem.Instance.GetNetTime());
             Props = _data.gamePropData;
             Session = new SudokuSession(_packs);
@@ -77,6 +81,10 @@ namespace GameLogic.Sudoku
             LevelRevision = 1;
             Message = "每行、每列、每个九宫格内，数字 1—9 不重复。";
             Trophies = new SudokuTrophyManager(trophyConfigs, _data, () => Today);
+            DailyTasks = new DailyTaskManager(_data, () => Today, SaveGameProgress);
+            var todayChallenge = GetDaily(Today);
+            if (todayChallenge?.completed == true && todayChallenge.game.gmAssisted == false)
+                DailyTasks.RecordCompletion(true, Today);
             if (Trophies.RefreshAwards()) _cache?.Save();
         }
 
@@ -173,6 +181,9 @@ namespace GameLogic.Sudoku
         private void CommitGame(SudokuSession candidate, SudokuDailySaveData daily, SudokuSaveData saved, SudokuDifficulty? consumedPool = null)
         {
             CaptureActiveGame();
+            // 新普通对局会替换旧普通对局；切换到每日挑战或继续旧题只暂停。
+            if (daily == null && saved == null && _normalValid && !_normalComplete && _data.sudokuSaveData.statisticsCounted)
+                Statistics.Abandon((SudokuDifficulty)_data.sudokuSaveData.difficulty);
             Session = candidate; _hasActiveGame = true; IsDaily = daily != null;
             DailyDate = IsDaily ? DateTime.ParseExact(daily.date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) : default;
             _data.activeDailyDate = daily?.date;
@@ -181,6 +192,7 @@ namespace GameLogic.Sudoku
                 _data.sudokuPools[(int)consumedPool.Value].nextIndex = (candidate.LevelIndex + 1) % candidate.LevelCount(consumedPool.Value);
             LevelRevision++; ResetPlayState();
             if (saved != null) RestorePlayState(saved);
+            else BeginStatistics();
             SaveGameProgress();
         }
 
@@ -189,6 +201,7 @@ namespace GameLogic.Sudoku
             ElapsedSeconds = double.IsNaN(saved.elapsedSeconds) || double.IsInfinity(saved.elapsedSeconds) ? 0 : Math.Max(0, Math.Min(315360000, saved.elapsedSeconds));
             SelectedCell = saved.selectedCell >= 0 && saved.selectedCell < 81 ? saved.selectedCell : -1;
             NoteMode = saved.noteMode;
+            _statisticsCounted = saved.statisticsCounted; _hadMistake = saved.hadMistake; _gmAssisted = saved.gmAssisted;
         }
 
         private void InitializePools(SudokuSaveData legacy)
@@ -222,8 +235,9 @@ namespace GameLogic.Sudoku
 
         public void Restart()
         {
-            if (IsDaily && Session.IsComplete) return;
-            Session.Restart(); LevelRevision++; ResetPlayState(); SaveGameProgress(); SetMessage("本题已重开。");
+            if (!_hasActiveGame || IsDaily && Session.IsComplete) return;
+            if (_statisticsCounted && !Session.IsComplete) Statistics.Abandon(Session.Difficulty);
+            Session.Restart(); LevelRevision++; ResetPlayState(); BeginStatistics(); SaveGameProgress(); SetMessage("本题已重开。");
         }
 
         public bool EnterDigit(int cell, int digit, bool notes)
@@ -234,6 +248,8 @@ namespace GameLogic.Sudoku
             bool nextWasLocked = d < 5 && !Session.IsUnlocked((SudokuDifficulty)(d + 1));
             var completedBefore = Session.CompletedRegions(cell);
             if (!Session.SetDigit(cell, digit, notes)) return false;
+            if (!notes && digit != 0 && !Session.IsCorrect(cell, digit)) _hadMistake = true;
+            CompletePlayerGame();
             var newlyCompleted = Session.CompletedRegions(cell) & ~completedBefore;
             SaveGameProgress();
             if (Session.IsComplete && !IsDaily)
@@ -250,6 +266,7 @@ namespace GameLogic.Sudoku
         private void ResetPlayState()
         {
             ElapsedSeconds = 0; SelectedCell = -1; NoteMode = false; IsPaused = false;
+            _statisticsCounted = _hadMistake = _gmAssisted = false;
         }
         public void SelectCell(int index)
         {
@@ -290,7 +307,11 @@ namespace GameLogic.Sudoku
         }
         public void Tick(float seconds)
         {
-            if (CanInteract && seconds > 0 && !float.IsNaN(seconds) && !float.IsInfinity(seconds)) ElapsedSeconds += seconds;
+            if (CanInteract && seconds > 0 && !float.IsNaN(seconds) && !float.IsInfinity(seconds))
+            {
+                ElapsedSeconds += seconds;
+                if (_statisticsCounted) Statistics.AddTime(Session.Difficulty, seconds);
+            }
         }
         public bool TryUseHint(bool adRewarded, int expectedRevision)
         {
@@ -302,6 +323,7 @@ namespace GameLogic.Sudoku
             if (!byCount && !byCoin && !adRewarded) return false;
             var completedBefore = Session.CompletedRegions(cell);
             if (!Session.ApplyHint(cell)) return false;
+            CompletePlayerGame();
             var newlyCompleted = Session.CompletedRegions(cell) & ~completedBefore;
             if (byCount) Props.tipCount--;
             else if (byCoin) Props.coinCount -= HintCoinCost;
@@ -311,6 +333,20 @@ namespace GameLogic.Sudoku
             NotifyRegionsCompleted(cell, newlyCompleted);
             return true;
         }
+        private void BeginStatistics()
+        {
+            _statisticsCounted = true; _hadMistake = false;
+            Statistics.Begin(Session.Difficulty);
+        }
+
+        private void CompletePlayerGame()
+        {
+            // 只在玩家落子/提示使对局完成时结算；存档和读档不会重复结算。
+            if (!Session.IsComplete) return;
+            if (_statisticsCounted) Statistics.Complete(Session.Difficulty, ElapsedSeconds, !_hadMistake);
+            if (!_gmAssisted) DailyTasks.RecordCompletion(IsDaily, DailyDate);
+        }
+
         private void NotifyRegionsCompleted(int cell, SudokuCompletedRegion regions)
         {
             // 先完成状态刷新，再播放；读档、选格和笔记不会重播已完成区域。
@@ -330,6 +366,7 @@ namespace GameLogic.Sudoku
             if (!_hasActiveGame) return;
             var data = Session.Capture();
             data.elapsedSeconds = ElapsedSeconds; data.selectedCell = SelectedCell; data.noteMode = NoteMode;
+            data.statisticsCounted = _statisticsCounted; data.hadMistake = _hadMistake; data.gmAssisted = _gmAssisted;
             if (IsDaily)
             {
                 var record = _daily[SudokuDailyRules.DateKey(DailyDate)];
@@ -367,18 +404,26 @@ namespace GameLogic.Sudoku
             _hasActiveGame = _normalValid = true; _normalComplete = IsDaily = false;
             DailyDate = default; _data.activeDailyDate = null;
             _data.dailyChallenges.Clear(); _daily.Clear(); InitializePools(null);
-            Trophies.ClearAwards();
+            Trophies.ClearAwards(); Statistics.Clear();
             _data.sudokuPools[0].nextIndex = 1 % _packs[0].Count;
             LevelRevision++; ResetPlayState(); SaveGameProgress(); SetMessage("[GM] 数独进度已重置，仅快速档开放。");
         }
         public void DebugComplete()
         {
-            Session.DebugComplete(); SaveGameProgress(); SetMessage("[GM] 本关已通关，解锁进度按不同题累计。");
+            ExcludeStatistics(); Session.DebugComplete(); SaveGameProgress(); SetMessage("[GM] 本关已通关，解锁进度按不同题累计。");
         }
         public void DebugFillNext()
         {
-            bool filled = Session.DebugFillNext(); SaveGameProgress();
+            ExcludeStatistics(); bool filled = Session.DebugFillNext(); SaveGameProgress();
             SetMessage(filled ? "[GM] 已填入一个正确数字。" : "[GM] 本关已完成。");
+        }
+        private void ExcludeStatistics()
+        {
+            if (Session.IsComplete) return;
+            _gmAssisted = true;
+            if (!_statisticsCounted) return;
+            Statistics.Exclude(Session.Difficulty, ElapsedSeconds);
+            _statisticsCounted = false;
         }
         public void DebugSetProps(int hints, int coins)
         {

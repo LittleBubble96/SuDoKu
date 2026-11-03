@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using GameLogic.Sudoku;
 using GameLogic.Localization;
 using TEngine;
@@ -80,7 +80,9 @@ namespace GameLogic
                     _game.SetAdShowing(false); waitingForAd = false;
                 }
                 if (_destroyed || OwnerWindow?.IsOpen != true || OwnerWindow.OpenVersion != openVersion || revision != _game.LevelRevision) return;
-                _game.TryUseHint(rewarded, revision);
+                int coins = _game.Props.coinCount;
+                if (_game.TryUseHint(rewarded, revision) && coins != _game.Props.coinCount)
+                    SudokuPresenter.Coins.RefreshView();
             }
             catch (System.Exception error) { Log.Error("[SudokuHint] 使用失败: " + error); }
             finally

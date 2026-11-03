@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Cysharp.Threading.Tasks;
 using GameLogic.Localization;
 using GameLogic.Sudoku;
@@ -10,7 +10,7 @@ namespace GameLogic
     public sealed class UIHomeHomeWidget : UIWidget
     {
         private const string Cards = "Center/Layout/Content/";
-        private TMP_Text _coins, _continueInfo, _dailyInfo;
+        private TMP_Text _continueInfo, _dailyInfo;
         private XYButton _continue;
         private bool _openingDifficulty;
         private DateTime _displayDate;
@@ -18,7 +18,8 @@ namespace GameLogic
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
-            _coins = FindChildComponent<TMP_Text>("Top/CoinRoot/Btn/m_num");
+            var coinDisplay = CreateWidget<CoinDisplayWidget>(FindChild("Top/CoinRoot/Btn/m_num").gameObject);
+            coinDisplay.SetAnimationRoot(FindChildComponent<UnityEngine.RectTransform>("Top/CoinRoot"));
             _continueInfo = FindChildComponent<TMP_Text>(Cards + "ContinueGameBtn/m_des");
             _dailyInfo = FindChildComponent<TMP_Text>(Cards + "DailyChallengeBtn/m_des");
             _continue = CreateWidget<XYButton>(Cards + "ContinueGameBtn");
@@ -27,6 +28,10 @@ namespace GameLogic
             CreateWidget<XYButton>(Cards + "NewGameBtn").OnAddListener(() => OpenDifficultyAsync().Forget());
             CreateWidget<XYButton>("Top/Right/Layout/ColorTheme/Btn")
                 .OnAddListener(() => SudokuPresenter.ShowPaletteAsync(OwnerWindow).Forget());
+            CreateWidget<XYButton>("Top/Right/Layout/DailyTask/Btn")
+                .OnAddListener(() => SudokuPresenter.ShowDailyTaskAsync(OwnerWindow).Forget());
+            CreateWidget<XYButton>("Top/Right/Layout/SignIn/Btn")
+                .OnAddListener(() => SudokuPresenter.ShowDailySignInAsync(OwnerWindow).Forget());
             BindThemes();
         }
 
@@ -43,7 +48,6 @@ namespace GameLogic
         {
             var game = SudokuPresenter.Current;
             if (game == null) return;
-            _coins.text = game.Props.coinCount.ToString();
             _continueInfo.text = SudokuUIFormatting.Difficulty(game.NormalDifficulty) + " · " + SudokuUIFormatting.Time(game.NormalIsComplete ? 0 : game.NormalElapsedSeconds);
             _continue.Interactable = game.HasNormalGame;
             _displayDate = game.Today;

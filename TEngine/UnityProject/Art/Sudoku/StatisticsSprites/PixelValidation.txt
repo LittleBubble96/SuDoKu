@@ -1,0 +1,2 @@
+PASS: 8 PNGs; white RGB including transparent pixels; transparent 1px margins; antialias preserved; tight bounds; size scaled uniformly to 1080-wide reference canvas.
+Source SHA256: 46a1ec06ffa94520d226456e64992bcaad83851b1128b1bcc3e6667e9593ea73

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace GameLogic.Sudoku
 {
@@ -22,5 +22,9 @@ namespace GameLogic.Sudoku
         public double elapsedSeconds;
         public int selectedCell = -1;
         public bool noteMode;
+        // 与对局快照一起保存；旧对局默认不纳入新统计，也不会补算历史成绩。
+        public bool statisticsCounted;
+        public bool hadMistake;
+        public bool gmAssisted;
     }
 }

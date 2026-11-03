@@ -1,0 +1,7 @@
+PASS bg_result_ribbon: 824x203; whiteRGB=True; RGBA; transparent outer edge; 13634 bytes
+PASS bg_result_ribbon_shade: 824x203; whiteRGB=True; RGBA; transparent outer edge; 46414 bytes
+PASS bg_result_ribbon_highlight: 824x203; whiteRGB=True; RGBA; transparent outer edge; 59889 bytes
+PASS gift_box_red_gold: 176x171; whiteRGB=False; RGBA; transparent outer edge; 43709 bytes
+PASS fx_reward_gold_rays: 446x343; whiteRGB=False; RGBA; transparent outer edge; 168589 bytes
+PASS icon_share: 59x67; whiteRGB=True; RGBA; transparent outer edge; 2546 bytes
+PASS ribbon layers share identical dimensions and registration; no baked text.

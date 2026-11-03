@@ -1,4 +1,4 @@
-#if !TE_RELEASE
+﻿#if !TE_RELEASE
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -111,6 +111,7 @@ namespace GameLogic
                 {
                     if (!int.TryParse(value, out int count) || count < 0) throw new ArgumentException("请输入非负整数。");
                     game.DebugSetProps(game.Props.tipCount, count);
+                    SudokuPresenter.Coins.RefreshView();
                 });
                 await CreateTopBtnAsync("工具");
                 await CreateGmGroupAsync("状态与导航");

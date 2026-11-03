@@ -3,6 +3,7 @@ using GameLogic.Localization;
 using GameLogic.Sudoku;
 using TEngine;
 using TMPro;
+using UnityEngine;
 
 namespace GameLogic
 {
@@ -10,6 +11,7 @@ namespace GameLogic
     public sealed class UIPalette : UIWindow
     {
         private const string Dialog = "Panel/Dialog/";
+        private UIPopupAnimation _popupAnimation;
         private static readonly string[] ThemeKeys =
         {
             LanguageKey.palette_classic, LanguageKey.palette_mint, LanguageKey.palette_sky,
@@ -24,6 +26,8 @@ namespace GameLogic
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            _popupAnimation = new UIPopupAnimation(gameObject.GetComponent<CanvasGroup>(),
+                FindChildComponent<RectTransform>("Panel/Dialog"));
             _title = FindChildComponent<TMP_Text>(Dialog + "m_title");
             UIThemeColor.Bind(_title, SudokuThemeRole.Text);
             UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>(Dialog + "Bg"), SudokuThemeRole.Surface);
@@ -69,8 +73,12 @@ namespace GameLogic
             foreach (var item in _items) item.RefreshDisplay();
         }
 
+        protected override void OnInAnimation() => _popupAnimation.PlayIn(CompleteInAnimation);
+        protected override void OnOutAnimation() => _popupAnimation.PlayOut(CompleteOutAnimation);
+
         protected override void OnClose()
         {
+            _popupAnimation.Reset();
             if (_owner is UISudoku && _owner.IsOpen && _owner.OpenVersion == _ownerVersion)
             {
                 SudokuPresenter.Current.SetWindowActive(_resumeGame);
@@ -82,6 +90,7 @@ namespace GameLogic
 
         protected override void OnDestroy()
         {
+            _popupAnimation.Reset();
             SudokuThemeManager.Changed -= RefreshDisplay;
             base.OnDestroy();
         }

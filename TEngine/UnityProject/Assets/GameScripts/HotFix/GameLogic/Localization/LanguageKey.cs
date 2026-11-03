@@ -8,7 +8,7 @@
 namespace GameLogic.Localization
 {
     /// <summary>
-    /// 多语言 Key 常量类（共 163 个 Key）。
+    /// 多语言 Key 常量类（共 193 个 Key）。
     /// </summary>
     public static class LanguageKey
     {
@@ -175,5 +175,35 @@ namespace GameLogic.Localization
         public const string palette_peach = "palette_peach";
         public const string palette_lavender = "palette_lavender";
         public const string palette_apricot = "palette_apricot";
+        public const string daily_sign_in_title = "daily_sign_in_title";
+        public const string daily_sign_in_streak = "daily_sign_in_streak";
+        public const string daily_sign_in_day = "daily_sign_in_day";
+        public const string daily_sign_in_claimed = "daily_sign_in_claimed";
+        public const string daily_sign_in_today = "daily_sign_in_today";
+        public const string daily_sign_in_claim = "daily_sign_in_claim";
+        public const string daily_reward_ad_double = "daily_reward_ad_double";
+        public const string daily_sign_in_ad_double_desc = "daily_sign_in_ad_double_desc";
+        public const string daily_gift_title = "daily_gift_title";
+        public const string daily_gift_free_reward = "daily_gift_free_reward";
+        public const string daily_gift_free_claim = "daily_gift_free_claim";
+        public const string daily_gift_ad_double_desc = "daily_gift_ad_double_desc";
+        public const string daily_gift_task_play_game = "daily_gift_task_play_game";
+        public const string daily_gift_task_daily_challenge = "daily_gift_task_daily_challenge";
+        public const string daily_gift_claim = "daily_gift_claim";
+        public const string daily_gift_go = "daily_gift_go";
+        public const string daily_gift_refresh_desc = "daily_gift_refresh_desc";
+        public const string statistics_title = "statistics_title";
+        public const string statistics_games = "statistics_games";
+        public const string statistics_games_played = "statistics_games_played";
+        public const string statistics_games_won = "statistics_games_won";
+        public const string statistics_win_rate = "statistics_win_rate";
+        public const string statistics_mistake_free_wins = "statistics_mistake_free_wins";
+        public const string statistics_time = "statistics_time";
+        public const string statistics_best_time = "statistics_best_time";
+        public const string statistics_average_time = "statistics_average_time";
+        public const string statistics_total_time = "statistics_total_time";
+        public const string statistics_win_streaks = "statistics_win_streaks";
+        public const string statistics_current_streak = "statistics_current_streak";
+        public const string statistics_best_streak = "statistics_best_streak";
     }
 }

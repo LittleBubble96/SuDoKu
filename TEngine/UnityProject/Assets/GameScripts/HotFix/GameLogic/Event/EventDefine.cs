@@ -1,4 +1,4 @@
-namespace GameLogic
+﻿namespace GameLogic
 {
     public static class EventDefine
     {
@@ -9,5 +9,7 @@ namespace GameLogic
         public const int SudokuBackRequested = 26102204;
         public const int SudokuRegionsCompleted = 26102205;
         public const int SudokuTrophiesChanged = 26102206;
+        public const int CoinViewChanged = 26102207;
+        public const int CoinViewAnimationStarted = 26102208;
     }
 }

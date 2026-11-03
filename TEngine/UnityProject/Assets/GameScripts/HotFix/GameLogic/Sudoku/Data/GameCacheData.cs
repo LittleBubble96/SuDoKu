@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using GameLogic.Sudoku;
 
@@ -21,11 +21,19 @@ namespace GameLogic.Data
         public List<SudokuDailySaveData> dailyChallenges = new List<SudokuDailySaveData>();
         public List<SudokuTrophyAward> trophyAwards = new List<SudokuTrophyAward>();
         public string activeDailyDate;
+        public int signInDays;
+        public string signInDate;
+        public DailyTaskData dailyTaskData = new DailyTaskData();
+        public SudokuStatisticsData[] statistics = new SudokuStatisticsData[6];
         public GamePropData gamePropData = new GamePropData();
         public GameSettingsData gameSettingsData = new GameSettingsData();
 
         public void InitAll()
         {
+            if (statistics == null || statistics.Length != 6) Array.Resize(ref statistics, 6);
+            for (int i = 0; i < statistics.Length; i++)
+                if (statistics[i] == null) statistics[i] = new SudokuStatisticsData();
+            if (dailyTaskData == null) dailyTaskData = new DailyTaskData();
             if (gamePropData == null) gamePropData = new GamePropData();
             if (dailyChallenges == null) dailyChallenges = new List<SudokuDailySaveData>();
             if (trophyAwards == null) trophyAwards = new List<SudokuTrophyAward>();

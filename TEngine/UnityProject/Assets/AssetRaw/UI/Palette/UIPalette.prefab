@@ -486,7 +486,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 6119547453664355055}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -527,6 +527,7 @@ GameObject:
   - component: {fileID: 4430924199508731756}
   - component: {fileID: 2647653247855389810}
   - component: {fileID: 2546842173169521462}
+  - component: {fileID: 7498211549306860204}
   m_Layer: 5
   m_Name: UIPalette
   m_TagString: Untagged
@@ -632,6 +633,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &7498211549306860204
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3856693224163046546}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4829788901760587887
 GameObject:
   m_ObjectHideFlags: 0

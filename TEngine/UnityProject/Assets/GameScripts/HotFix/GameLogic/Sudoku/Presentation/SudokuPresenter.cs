@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Cysharp.Threading.Tasks;
 using TEngine;
 using UnityEngine;
@@ -11,7 +11,9 @@ namespace GameLogic.Sudoku
         public static SudokuGameController Current { get; private set; }
         public static GameCacheManager Cache { get; private set; }
         private static GameObject _bridge;
-        private static bool _openingPalette;
+        private static bool _openingPalette, _openingDailySignIn, _openingDailyTask;
+        public static CoinViewManager Coins { get; private set; }
+        public static DailySignInManager DailySignIn { get; private set; }
         public static bool IsNavigating { get; private set; }
 
         public static async UniTask LaunchAsync()
@@ -25,6 +27,9 @@ namespace GameLogic.Sudoku
             await ConfigSystem.Instance.Tables.TbLanguageAsync();
             await ConfigSystem.Instance.Tables.TbTrophyAsync();
             Current = new SudokuGameController(packs, Cache, trophyConfigs: ConfigSystem.Instance.Tables.TbTrophy.DataList);
+            Coins = new CoinViewManager(Current.Props);
+            var signInGame = Current;
+            DailySignIn = new DailySignInManager(Cache, () => signInGame.Today);
             SudokuThemeManager.Initialize(Cache, Current.SaveGameProgress);
             SudokuSettingsManager.Initialize(Cache, Current.SaveGameProgress);
             _bridge = new GameObject("[SudokuAppBridge]");
@@ -89,6 +94,44 @@ namespace GameLogic.Sudoku
                 }
                 catch (OperationCanceledException) { }
                 finally { _openingPalette = false; }
+            }
+        }
+
+        public static async UniTask ShowDailySignInAsync(UIWindow owner)
+        {
+            if (_openingDailySignIn || IsNavigating || Current.IsAdShowing || !owner.IsOpen) return;
+            _openingDailySignIn = true;
+            int version = owner.OpenVersion;
+            using (UIInteractionLock.Acquire())
+            {
+                try
+                {
+                    var existing = await GameModule.UI.GetUIAsyncAwait<UIDailySignIn>();
+                    if (existing != null && existing.IsOpen) return;
+                    await GameModule.UI.ShowUIAsyncAwait<UIDailySignIn>();
+                    if (!owner.IsOpen || owner.OpenVersion != version) GameModule.UI.CloseUI<UIDailySignIn>();
+                }
+                catch (OperationCanceledException) { }
+                finally { _openingDailySignIn = false; }
+            }
+        }
+
+        public static async UniTask ShowDailyTaskAsync(UIWindow owner)
+        {
+            if (_openingDailyTask || IsNavigating || Current.IsAdShowing || !owner.IsOpen) return;
+            _openingDailyTask = true;
+            int version = owner.OpenVersion;
+            using (UIInteractionLock.Acquire())
+            {
+                try
+                {
+                    var existing = await GameModule.UI.GetUIAsyncAwait<UIDailyTask>();
+                    if (existing != null && existing.IsOpen) return;
+                    await GameModule.UI.ShowUIAsyncAwait<UIDailyTask>();
+                    if (!owner.IsOpen || owner.OpenVersion != version) GameModule.UI.CloseUI<UIDailyTask>();
+                }
+                catch (OperationCanceledException) { }
+                finally { _openingDailyTask = false; }
             }
         }
 
@@ -164,10 +207,11 @@ namespace GameLogic.Sudoku
         {
             SaveOnQuit();
             AdSystem.Dispose();
+            Coins?.Dispose(); Coins = null;
             SudokuThemeManager.Release();
             SudokuSettingsManager.Release();
             if (_bridge != null) UnityEngine.Object.Destroy(_bridge);
-            _bridge = null; Current = null; Cache = null; IsNavigating = false; _openingPalette = false;
+            _bridge = null; Current = null; Cache = null; DailySignIn = null; IsNavigating = false; _openingPalette = _openingDailySignIn = _openingDailyTask = false;
         }
         public static void SetAudioVolumes(float music, float sound)
         {

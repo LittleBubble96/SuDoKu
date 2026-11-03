@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GameLogic.Sudoku
@@ -54,6 +54,7 @@ namespace GameLogic.Sudoku
             for (int i = 0; i < 81; i++) if (_board[i] == digit) remaining--;
             return Math.Max(0, remaining);
         }
+        public bool IsCorrect(int index, int digit) => _solution[index] == digit;
         public bool HasConflict(int index) => SudokuBoard.HasConflict(_board, index);
         public SudokuCompletedRegion CompletedRegions(int index) => SudokuCompletion.GetCompletedRegions(_board, _solution, index);
 

@@ -1,0 +1,5 @@
+PASS: all 130 pre-existing PNG/meta hashes unchanged.
+PASS: approved source image SHA256 unchanged.
+PASS: six new PNG files copied and hash-verified.
+No code, prefab, Sprite meta or atlas file was edited.
+Unity refresh/import/play validation was not invoked.

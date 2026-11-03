@@ -1,0 +1,183 @@
+[
+  {
+    "name": "bg_result_ribbon",
+    "resource": "Sudoku_bg_result_ribbon",
+    "width": 824,
+    "height": 203,
+    "recommendedWidth": 824,
+    "recommendedHeight": 203,
+    "tint": true,
+    "description": "无字横幅底形，跟随调色盘主色",
+    "imageType": "Simple",
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "layerOrder": 0,
+    "exampleColor": "#2086FF",
+    "alignmentGroup": "result_ribbon",
+    "originalSourceBounds": [
+      113,
+      330,
+      829,
+      505
+    ],
+    "generatedAlphaCrop": [
+      14,
+      96,
+      2156,
+      623
+    ]
+  },
+  {
+    "name": "bg_result_ribbon_shade",
+    "resource": "Sudoku_bg_result_ribbon_shade",
+    "width": 824,
+    "height": 203,
+    "recommendedWidth": 824,
+    "recommendedHeight": 203,
+    "tint": true,
+    "description": "横幅褶皱阴影；白图用黑色着色",
+    "imageType": "Simple",
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "layerOrder": 1,
+    "exampleColor": "#000000",
+    "alignmentGroup": "result_ribbon",
+    "originalSourceBounds": [
+      113,
+      330,
+      829,
+      505
+    ],
+    "generatedAlphaCrop": [
+      14,
+      96,
+      2156,
+      623
+    ]
+  },
+  {
+    "name": "bg_result_ribbon_highlight",
+    "resource": "Sudoku_bg_result_ribbon_highlight",
+    "width": 824,
+    "height": 203,
+    "recommendedWidth": 824,
+    "recommendedHeight": 203,
+    "tint": true,
+    "description": "横幅边缘与上部高光；白图用白色着色",
+    "imageType": "Simple",
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "layerOrder": 2,
+    "exampleColor": "#FFFFFF",
+    "alignmentGroup": "result_ribbon",
+    "originalSourceBounds": [
+      113,
+      330,
+      829,
+      505
+    ],
+    "generatedAlphaCrop": [
+      14,
+      96,
+      2156,
+      623
+    ]
+  },
+  {
+    "name": "gift_box_red_gold",
+    "resource": "Sudoku_gift_box_red_gold",
+    "width": 176,
+    "height": 171,
+    "recommendedWidth": 176,
+    "recommendedHeight": 171,
+    "tint": false,
+    "description": "红金礼盒，保留固有颜色，与光芒分离",
+    "imageType": "Simple",
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "originalSourceBounds": [
+      395,
+      1074,
+      547,
+      1223
+    ],
+    "generatedAlphaCrop": [
+      84,
+      61,
+      1203,
+      1148
+    ]
+  },
+  {
+    "name": "fx_reward_gold_rays",
+    "resource": "Sudoku_fx_reward_gold_rays",
+    "width": 446,
+    "height": 343,
+    "recommendedWidth": 446,
+    "recommendedHeight": 343,
+    "tint": false,
+    "description": "礼盒后方金色光芒，中心透亮、外沿渐隐",
+    "imageType": "Simple",
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "originalSourceBounds": [
+      276,
+      964,
+      665,
+      1263
+    ],
+    "pivot": [
+      0.51,
+      0.44
+    ]
+  },
+  {
+    "name": "icon_share",
+    "resource": "Sudoku_icon_share",
+    "width": 59,
+    "height": 67,
+    "recommendedWidth": 59,
+    "recommendedHeight": 67,
+    "tint": true,
+    "description": "挑战好友：分享连线图标，直接从效果图提取",
+    "imageType": "Simple",
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "sourceCrop": [
+      548,
+      1418,
+      605,
+      1483
+    ],
+    "maskCrop": [
+      2,
+      4,
+      52,
+      61
+    ]
+  }
+]
