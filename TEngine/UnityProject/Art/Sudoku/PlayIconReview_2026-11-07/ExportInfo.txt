@@ -1,0 +1,3 @@
+Source crop: 445,422,359,444
+PNG: 123 x 124
+White RGB + alpha; circle copied from existing pause icon; central glyph from built-in imagegen. Review only, not assigned to UI.

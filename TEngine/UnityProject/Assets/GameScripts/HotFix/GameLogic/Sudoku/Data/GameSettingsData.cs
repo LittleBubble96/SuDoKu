@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using GameLogic.Sudoku;
 
 namespace GameLogic.Data
 {
@@ -17,6 +18,7 @@ namespace GameLogic.Data
         public bool highlightRelated = true;
         public bool dimCompletedDigits = true;
         public bool showRemainingCount;
+        public SudokuTextSize textSize = SudokuTextSize.Medium;
 
         public void SetMusicVolume(float value) => MusicVolume = Mathf.Clamp01(value);
         public void SetSoundVolume(float value) => SoundVolume = Mathf.Clamp01(value);

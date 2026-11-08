@@ -17,6 +17,12 @@ namespace GameLogic.Sudoku
         private readonly Dictionary<string, SudokuDailySaveData> _daily = new Dictionary<string, SudokuDailySaveData>();
         private bool _hasActiveGame, _normalValid, _normalComplete;
         private bool _statisticsCounted, _hadMistake, _gmAssisted;
+        private bool _completionProcessed;
+        private int _mistakeCount, _hintCount;
+        private readonly SudokuScoringRules[] _scoring;
+        public SudokuSettlementData Settlement => _data.settlement;
+        public int MistakeCount => _mistakeCount;
+        public int HintCount => _hintCount;
         public SudokuSession Session { get; private set; }
         public SudokuTrophyManager Trophies { get; }
         public SudokuStatisticsManager Statistics { get; }
@@ -40,12 +46,14 @@ namespace GameLogic.Sudoku
         public SudokuDifficulty NormalDifficulty => _normalValid ? (SudokuDifficulty)_data.sudokuSaveData.difficulty : SudokuDifficulty.Quick;
         public double NormalElapsedSeconds => _normalValid ? _data.sudokuSaveData.elapsedSeconds : 0;
 
-        public SudokuGameController(SudokuPack[] packs, GameCacheManager cache = null, Func<DateTime> clock = null, IEnumerable<GameConfig.trophy.ConfTrophy> trophyConfigs = null)
+        public SudokuGameController(SudokuPack[] packs, GameCacheManager cache = null, Func<DateTime> clock = null, IEnumerable<GameConfig.trophy.ConfTrophy> trophyConfigs = null,
+            IEnumerable<GameConfig.settlement.ConfSettlement> settlementConfigs = null)
         {
             _packs = (SudokuPack[])packs.Clone();
             _cache = cache;
             _data = cache?.CacheData ?? new GameCacheData();
             _data.InitAll();
+            _scoring = SudokuScoringRules.Load(settlementConfigs);
             Statistics = new SudokuStatisticsManager(_data);
             _clock = clock ?? (() => NetTimeSystem.Instance.GetNetTime());
             Props = _data.gamePropData;
@@ -86,6 +94,8 @@ namespace GameLogic.Sudoku
             if (todayChallenge?.completed == true && todayChallenge.game.gmAssisted == false)
                 DailyTasks.RecordCompletion(true, Today);
             if (Trophies.RefreshAwards()) _cache?.Save();
+            // 上次在结算/广告期间退出或进程终止，重新启动时补基础奖励，不回放旧结算。
+            TryClaimSettlement(_data.settlement, false);
         }
 
         public bool OpenLevel(SudokuDifficulty difficulty, int index)
@@ -180,6 +190,8 @@ namespace GameLogic.Sudoku
 
         private void CommitGame(SudokuSession candidate, SudokuDailySaveData daily, SudokuSaveData saved, SudokuDifficulty? consumedPool = null)
         {
+            TryClaimSettlement(Settlement, false);
+            _data.settlement = null;
             CaptureActiveGame();
             // 新普通对局会替换旧普通对局；切换到每日挑战或继续旧题只暂停。
             if (daily == null && saved == null && _normalValid && !_normalComplete && _data.sudokuSaveData.statisticsCounted)
@@ -202,6 +214,8 @@ namespace GameLogic.Sudoku
             SelectedCell = saved.selectedCell >= 0 && saved.selectedCell < 81 ? saved.selectedCell : -1;
             NoteMode = saved.noteMode;
             _statisticsCounted = saved.statisticsCounted; _hadMistake = saved.hadMistake; _gmAssisted = saved.gmAssisted;
+            _mistakeCount = Math.Max(saved.hadMistake ? 1 : 0, saved.mistakeCount);
+            _hintCount = Math.Max(0, saved.hintCount); _completionProcessed = saved.completionProcessed;
         }
 
         private void InitializePools(SudokuSaveData legacy)
@@ -236,6 +250,7 @@ namespace GameLogic.Sudoku
         public void Restart()
         {
             if (!_hasActiveGame || IsDaily && Session.IsComplete) return;
+            TryClaimSettlement(Settlement, false); _data.settlement = null;
             if (_statisticsCounted && !Session.IsComplete) Statistics.Abandon(Session.Difficulty);
             Session.Restart(); LevelRevision++; ResetPlayState(); BeginStatistics(); SaveGameProgress(); SetMessage("本题已重开。");
         }
@@ -248,7 +263,7 @@ namespace GameLogic.Sudoku
             bool nextWasLocked = d < 5 && !Session.IsUnlocked((SudokuDifficulty)(d + 1));
             var completedBefore = Session.CompletedRegions(cell);
             if (!Session.SetDigit(cell, digit, notes)) return false;
-            if (!notes && digit != 0 && !Session.IsCorrect(cell, digit)) _hadMistake = true;
+            if (!notes && digit != 0 && !Session.IsCorrect(cell, digit)) { _hadMistake = true; _mistakeCount++; }
             CompletePlayerGame();
             var newlyCompleted = Session.CompletedRegions(cell) & ~completedBefore;
             SaveGameProgress();
@@ -267,6 +282,7 @@ namespace GameLogic.Sudoku
         {
             ElapsedSeconds = 0; SelectedCell = -1; NoteMode = false; IsPaused = false;
             _statisticsCounted = _hadMistake = _gmAssisted = false;
+            _mistakeCount = _hintCount = 0; _completionProcessed = false;
         }
         public void SelectCell(int index)
         {
@@ -323,6 +339,7 @@ namespace GameLogic.Sudoku
             if (!byCount && !byCoin && !adRewarded) return false;
             var completedBefore = Session.CompletedRegions(cell);
             if (!Session.ApplyHint(cell)) return false;
+            _hintCount++;
             CompletePlayerGame();
             var newlyCompleted = Session.CompletedRegions(cell) & ~completedBefore;
             if (byCount) Props.tipCount--;
@@ -342,9 +359,36 @@ namespace GameLogic.Sudoku
         private void CompletePlayerGame()
         {
             // 只在玩家落子/提示使对局完成时结算；存档和读档不会重复结算。
-            if (!Session.IsComplete) return;
+            if (!Session.IsComplete || _completionProcessed) return;
+            _completionProcessed = true;
             if (_statisticsCounted) Statistics.Complete(Session.Difficulty, ElapsedSeconds, !_hadMistake);
             if (!_gmAssisted) DailyTasks.RecordCompletion(IsDaily, DailyDate);
+            if (_gmAssisted) return;
+            var rule = _scoring[(int)Session.Difficulty];
+            int score = rule.Calculate(ElapsedSeconds, _mistakeCount, _hintCount);
+            var stats = Statistics.Get(Session.Difficulty);
+            stats.bestScore = Math.Max(stats.bestScore, score);
+            _data.settlement = new SudokuSettlementData
+            {
+                id = Guid.NewGuid().ToString("N"), difficulty = (int)Session.Difficulty,
+                score = score, bestScore = stats.bestScore, seconds = ElapsedSeconds,
+                bestSeconds = stats.won > 0 ? stats.bestSeconds : ElapsedSeconds,
+                mistakes = _mistakeCount, hints = _hintCount, daily = IsDaily,
+                dailyDate = IsDaily ? SudokuDailyRules.DateKey(DailyDate) : null,
+                coins = rule.Coins, tips = rule.Tips
+            };
+        }
+
+        public bool TryClaimSettlement(SudokuSettlementData result, bool doubled)
+        {
+            if (result == null || !ReferenceEquals(result, Settlement) || result.IsClaimed) return false;
+            int multiplier = doubled ? 2 : 1;
+            Props.coinCount = (int)Math.Min(int.MaxValue, (long)Props.coinCount + Math.Max(0, result.coins) * (long)multiplier);
+            Props.tipCount = (int)Math.Min(int.MaxValue, (long)Props.tipCount + Math.Max(0, result.tips) * (long)multiplier);
+            result.claimedMultiplier = multiplier;
+            SaveGameProgress();
+            GameEvent.Send(EventDefine.SudokuStateChanged);
+            return true;
         }
 
         private void NotifyRegionsCompleted(int cell, SudokuCompletedRegion regions)
@@ -367,6 +411,7 @@ namespace GameLogic.Sudoku
             var data = Session.Capture();
             data.elapsedSeconds = ElapsedSeconds; data.selectedCell = SelectedCell; data.noteMode = NoteMode;
             data.statisticsCounted = _statisticsCounted; data.hadMistake = _hadMistake; data.gmAssisted = _gmAssisted;
+            data.mistakeCount = _mistakeCount; data.hintCount = _hintCount; data.completionProcessed = _completionProcessed;
             if (IsDaily)
             {
                 var record = _daily[SudokuDailyRules.DateKey(DailyDate)];
@@ -403,6 +448,7 @@ namespace GameLogic.Sudoku
             Session = new SudokuSession(_packs); Session.BeginLevel(SudokuDifficulty.Quick, 0);
             _hasActiveGame = _normalValid = true; _normalComplete = IsDaily = false;
             DailyDate = default; _data.activeDailyDate = null;
+            _data.settlement = null;
             _data.dailyChallenges.Clear(); _daily.Clear(); InitializePools(null);
             Trophies.ClearAwards(); Statistics.Clear();
             _data.sudokuPools[0].nextIndex = 1 % _packs[0].Count;

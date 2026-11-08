@@ -1,0 +1,132 @@
+[
+  {
+    "name": "gift_box_open_red_gold",
+    "resource": "Sudoku_gift_box_open_red_gold",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/gift_box_open_red_gold.png",
+    "width": 312,
+    "height": 400,
+    "recommendedWidth": 312,
+    "recommendedHeight": 400,
+    "tint": false,
+    "imageType": "Simple",
+    "preserveAspect": true,
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "description": "打开的红金礼盒，盒盖与盒身保留相对位置，不含外部光效",
+    "source": "Art/Sudoku/RewardSprites/Source/GiftOpen_Generated.png",
+    "sha256": "9f1df2774265ea46a4867c46879b526256ef2acfcaa97dea7790a47b445d0bb2"
+  },
+  {
+    "name": "fx_reward_open_light",
+    "resource": "Sudoku_fx_reward_open_light",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/fx_reward_open_light.png",
+    "width": 384,
+    "height": 256,
+    "recommendedWidth": 384,
+    "recommendedHeight": 256,
+    "tint": false,
+    "imageType": "Simple",
+    "preserveAspect": true,
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "description": "由盒口向上发散的金色开盒光效",
+    "source": "Art/Sudoku/RewardSprites/Source/OpenLight_Generated.png",
+    "sha256": "519c7060255152ef5e9751c5695f814bfe8f56994b5768c9b4cceed5a95a2051",
+    "suggestedLightCorePivot": [
+      0.48,
+      0.22
+    ]
+  },
+  {
+    "name": "icon_reward_coin_star_gold",
+    "resource": "Sudoku_icon_reward_coin_star_gold",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/icon_reward_coin_star_gold.png",
+    "width": 120,
+    "height": 120,
+    "recommendedWidth": 120,
+    "recommendedHeight": 120,
+    "tint": false,
+    "imageType": "Simple",
+    "preserveAspect": true,
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "description": "五角星金币奖励图标，无数量",
+    "source": "Art/Sudoku/RewardSprites/Source/CoinStar_Generated.png",
+    "sha256": "f7ead1936f71f143f593f71d01035367a64643bc7b4865b23aa5f9f92446c548"
+  },
+  {
+    "name": "icon_reward_hint_gold",
+    "resource": "Sudoku_icon_reward_hint_gold",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/icon_reward_hint_gold.png",
+    "width": 122,
+    "height": 126,
+    "recommendedWidth": 122,
+    "recommendedHeight": 126,
+    "tint": false,
+    "imageType": "Simple",
+    "preserveAspect": true,
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "description": "金色提示灯泡，保留五根光线短条，无数量",
+    "source": "Art/Sudoku/RewardSprites/Source/HintGold_Generated.png",
+    "sha256": "2a252b4321a6236459150fb035c9b1657372397cb293a85364ab73e602f5bd87"
+  },
+  {
+    "name": "fx_reward_sparkle",
+    "resource": "Sudoku_fx_reward_sparkle",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/fx_reward_sparkle.png",
+    "width": 38,
+    "height": 46,
+    "recommendedWidth": 38,
+    "recommendedHeight": 46,
+    "tint": true,
+    "imageType": "Simple",
+    "preserveAspect": true,
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "description": "四角星光白图，可用金色或白色着色",
+    "source": "Art/Sudoku/RewardSprites/Source/SparkleReference.png",
+    "sha256": "601a6650a81be967d9777ff5d5a8431aee7ff0fcb8e334f06ed572613ccc37a0"
+  },
+  {
+    "name": "fx_reward_confetti",
+    "resource": "Sudoku_fx_reward_confetti",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/fx_reward_confetti.png",
+    "width": 34,
+    "height": 38,
+    "recommendedWidth": 34,
+    "recommendedHeight": 38,
+    "tint": true,
+    "imageType": "Simple",
+    "preserveAspect": true,
+    "border": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "description": "弯曲彩纸白图，可用调色盘主色或金色着色",
+    "source": "Art/Sudoku/RewardSprites/Source/ConfettiReference.png",
+    "sha256": "580d5cd6cdcb2b2d87305a8398c66faa974de99081612abb3521d4ef67d7428f"
+  }
+]

@@ -181,6 +181,36 @@ public partial class Tables
         m_TbTrophy = new trophy.TbTrophy(await defaultLoaderAsync("trophy_tbtrophy"));
         m_TbTrophy.ResolveRef(this);
     }
+    /// <summary>
+    /// 通关计分与奖励
+    /// </summary>
+    private settlement.TbSettlement m_TbSettlement;
+    public settlement.TbSettlement TbSettlement 
+    {
+        get
+        {
+            if (m_TbSettlement == null)
+            {
+                m_TbSettlement = new settlement.TbSettlement(defaultLoader("settlement_tbsettlement"));
+                m_TbSettlement.ResolveRef(this);
+            }
+            return m_TbSettlement;
+        }
+        set
+        {
+            m_TbSettlement = value;
+            m_TbSettlement.ResolveRef(this);
+        }
+    }
+    public async UniTask TbSettlementAsync() 
+    {
+        if (m_TbSettlement != null)
+        {
+            return;
+        }
+        m_TbSettlement = new settlement.TbSettlement(await defaultLoaderAsync("settlement_tbsettlement"));
+        m_TbSettlement.ResolveRef(this);
+    }
 
     #endregion
 

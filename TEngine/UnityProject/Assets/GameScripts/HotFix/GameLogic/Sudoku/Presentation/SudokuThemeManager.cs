@@ -6,7 +6,8 @@ namespace GameLogic.Sudoku
 {
     public enum SudokuThemeRole
     {
-        Background, Surface, Text, MutedText, Accent, Line, Related, Matching, Selected, Error, KeyBackground, StrongLine, CompletionFlash
+        Background, Surface, Text, MutedText, Accent, Line, Related, Matching, Selected, Error, KeyBackground, StrongLine, CompletionFlash,
+        RelatedCell
     }
 
     /// <summary>统一主题入口。调色盘调用 SetTheme，UIThemeColor 监听 Changed 刷新。</summary>
@@ -31,6 +32,7 @@ namespace GameLogic.Sudoku
                 Related       = new Color32(235, 244, 255, 255), // #EBF4FF 同行、同列、同宫高亮
                 Matching      = new Color32(213, 232, 255, 255), // #D5E8FF 相同数字高亮
                 Selected      = new Color32(184, 216, 255, 255), // #B8D8FF 当前选中格
+                RelatedCell   = new Color32(208, 229, 255, 255), // #D0E5FF 同行、同列、同宫；略浅于选中格
                 Error         = new Color32(206, 77, 77, 255), // #CE4D4D 冲突提示
                 KeyBackground = new Color32(245, 250, 255, 255), // #F5FAFF 数字键底色
                 StrongLine    = new Color32(72, 93, 122, 255), // #485D7A 粗宫格线
@@ -49,6 +51,7 @@ namespace GameLogic.Sudoku
                 Related       = new Color32(237, 244, 242, 255), // #EDF4F2 同行、同列、同宫高亮
                 Matching      = new Color32(216, 232, 227, 255), // #D8E8E3 相同数字高亮
                 Selected      = new Color32(190, 216, 208, 255), // #BED8D0 当前选中格
+                RelatedCell   = new Color32(212, 229, 224, 255), // #D4E5E0 同行、同列、同宫；略浅于选中格
                 Error         = new Color32(206, 77, 77, 255), // #CE4D4D 冲突提示
                 KeyBackground = new Color32(246, 250, 248, 255), // #F6FAF8 数字键底色
                 StrongLine    = new Color32(73, 93, 110, 255), // #495D6E 粗宫格线
@@ -67,6 +70,7 @@ namespace GameLogic.Sudoku
                 Related       = new Color32(239, 243, 248, 255), // #EFF3F8 同行、同列、同宫高亮
                 Matching      = new Color32(220, 230, 241, 255), // #DCE6F1 相同数字高亮
                 Selected      = new Color32(196, 213, 231, 255), // #C4D5E7 当前选中格
+                RelatedCell   = new Color32(215, 227, 239, 255), // #D7E3EF 同行、同列、同宫；略浅于选中格
                 Error         = new Color32(206, 77, 77, 255), // #CE4D4D 冲突提示
                 KeyBackground = new Color32(247, 249, 252, 255), // #F7F9FC 数字键底色
                 StrongLine    = new Color32(75, 92, 116, 255), // #4B5C74 粗宫格线
@@ -85,6 +89,7 @@ namespace GameLogic.Sudoku
                 Related       = new Color32(249, 242, 241, 255), // #F9F2F1 同行、同列、同宫高亮
                 Matching      = new Color32(242, 228, 226, 255), // #F2E4E2 相同数字高亮
                 Selected      = new Color32(234, 209, 206, 255), // #EAD1CE 当前选中格
+                RelatedCell   = new Color32(241, 224, 222, 255), // #F1E0DE 同行、同列、同宫；略浅于选中格
                 Error         = new Color32(206, 77, 77, 255), // #CE4D4D 冲突提示
                 KeyBackground = new Color32(252, 249, 248, 255), // #FCF9F8 数字键底色
                 StrongLine    = new Color32(84, 91, 109, 255), // #545B6D 粗宫格线
@@ -103,6 +108,7 @@ namespace GameLogic.Sudoku
                 Related       = new Color32(244, 242, 247, 255), // #F4F2F7 同行、同列、同宫高亮
                 Matching      = new Color32(232, 227, 238, 255), // #E8E3EE 相同数字高亮
                 Selected      = new Color32(216, 209, 227, 255), // #D8D1E3 当前选中格
+                RelatedCell   = new Color32(229, 224, 236, 255), // #E5E0EC 同行、同列、同宫；略浅于选中格
                 Error         = new Color32(206, 77, 77, 255), // #CE4D4D 冲突提示
                 KeyBackground = new Color32(250, 248, 251, 255), // #FAF8FB 数字键底色
                 StrongLine    = new Color32(80, 91, 115, 255), // #505B73 粗宫格线
@@ -121,6 +127,7 @@ namespace GameLogic.Sudoku
                 Related       = new Color32(248, 244, 238, 255), // #F8F4EE 同行、同列、同宫高亮
                 Matching      = new Color32(241, 232, 220, 255), // #F1E8DC 相同数字高亮
                 Selected      = new Color32(231, 217, 195, 255), // #E7D9C3 当前选中格
+                RelatedCell   = new Color32(239, 230, 215, 255), // #EFE6D7 同行、同列、同宫；略浅于选中格
                 Error         = new Color32(206, 77, 77, 255), // #CE4D4D 冲突提示
                 KeyBackground = new Color32(252, 250, 247, 255), // #FCFAF7 数字键底色
                 StrongLine    = new Color32(83, 93, 107, 255), // #535D6B 粗宫格线
@@ -143,6 +150,7 @@ namespace GameLogic.Sudoku
             public Color32 KeyBackground;
             public Color32 StrongLine;
             public Color32 CompletionFlash;
+            public Color32 RelatedCell;
         }
 
         private static GameCacheManager _cache;
@@ -187,6 +195,7 @@ namespace GameLogic.Sudoku
                 case SudokuThemeRole.KeyBackground: return colors.KeyBackground;
                 case SudokuThemeRole.StrongLine: return colors.StrongLine;
                 case SudokuThemeRole.CompletionFlash: return colors.CompletionFlash;
+                case SudokuThemeRole.RelatedCell: return colors.RelatedCell;
                 default: return Color.white;
             }
         }

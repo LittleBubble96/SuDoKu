@@ -21,6 +21,7 @@ namespace GameLogic.Data
         public List<SudokuDailySaveData> dailyChallenges = new List<SudokuDailySaveData>();
         public List<SudokuTrophyAward> trophyAwards = new List<SudokuTrophyAward>();
         public string activeDailyDate;
+        public SudokuSettlementData settlement;
         public int signInDays;
         public string signInDate;
         public DailyTaskData dailyTaskData = new DailyTaskData();
@@ -41,6 +42,7 @@ namespace GameLogic.Data
             gamePropData.coinCount = Math.Max(0, gamePropData.coinCount);
             gamePropData.tipCount = Math.Max(0, gamePropData.tipCount);
             if (gameSettingsData.themeId < 0 || gameSettingsData.themeId > 5) gameSettingsData.themeId = 0;
+            if ((int)gameSettingsData.textSize < 0 || (int)gameSettingsData.textSize > 2) gameSettingsData.textSize = SudokuTextSize.Medium;
             if (float.IsNaN(gameSettingsData.MusicVolume) || float.IsInfinity(gameSettingsData.MusicVolume)) gameSettingsData.MusicVolume = 1;
             if (float.IsNaN(gameSettingsData.SoundVolume) || float.IsInfinity(gameSettingsData.SoundVolume)) gameSettingsData.SoundVolume = 1;
             gameSettingsData.MusicVolume = Math.Max(0, Math.Min(1, gameSettingsData.MusicVolume));

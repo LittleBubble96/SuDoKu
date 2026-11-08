@@ -26,7 +26,9 @@ namespace GameLogic.Sudoku
             await Cache.LoadAsync();
             await ConfigSystem.Instance.Tables.TbLanguageAsync();
             await ConfigSystem.Instance.Tables.TbTrophyAsync();
-            Current = new SudokuGameController(packs, Cache, trophyConfigs: ConfigSystem.Instance.Tables.TbTrophy.DataList);
+            await ConfigSystem.Instance.Tables.TbSettlementAsync();
+            Current = new SudokuGameController(packs, Cache, trophyConfigs: ConfigSystem.Instance.Tables.TbTrophy.DataList,
+                settlementConfigs: ConfigSystem.Instance.Tables.TbSettlement.DataList);
             Coins = new CoinViewManager(Current.Props);
             var signInGame = Current;
             DailySignIn = new DailySignInManager(Cache, () => signInGame.Today);
@@ -44,7 +46,7 @@ namespace GameLogic.Sudoku
 #endif
         }
 
-        public static async UniTask ShowHomeAsync()
+        public static async UniTask ShowHomeAsync(bool selectHomeTab = false)
         {
             if (IsNavigating || Current == null || Current.IsAdShowing) return;
             var game = Current;
@@ -58,10 +60,14 @@ namespace GameLogic.Sudoku
                 {
                     var home = await GameModule.UI.ShowUIAsyncAwait<UIHome>();
                     if (home == null) throw new InvalidOperationException("首页加载失败。");
-                    if (game.IsDaily) home.SelectDailyDate(game.DailyDate);
+                    if (game.IsDaily && !selectHomeTab) home.SelectDailyDate(game.DailyDate);
                     else home.SelectTab(0);
                     await home.WaitForContentAsync(token);
                     token.ThrowIfCancellationRequested();
+                    GameModule.UI.CloseUI<UIReward>();
+                    GameModule.UI.CloseUI<UISettlement>();
+                    game.TryClaimSettlement(game.Settlement, false);
+                    Coins?.RefreshView();
                     GameModule.UI.CloseUI<UISudoku>();
                 }
                 catch
@@ -184,6 +190,9 @@ namespace GameLogic.Sudoku
                         await UniTask.WaitUntil(() => !popup.IsOpen, cancellationToken: token);
                     }
                     GameModule.UI.CloseUI<UIHome>();
+                    GameModule.UI.CloseUI<UIReward>();
+                    GameModule.UI.CloseUI<UISettlement>();
+                    Coins?.RefreshView();
                     // 从首页继续时解除此前局内的暂停，保留题面、笔记、撤销和用时。
                     game.SetWindowActive(true);
                     if (game.IsPaused) game.TogglePause();

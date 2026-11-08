@@ -20,6 +20,7 @@ namespace GameLogic
         private SudokuCompletedRegion _waveRegions;
         private bool _wavePlaying;
         private SudokuGameController _game;
+        private SudokuNoteItemPool _notePool;
         public bool IsReady => _cells.Count == 81;
         public int CellCount => _cells.Count;
         protected override void RegisterEvent()
@@ -34,6 +35,9 @@ namespace GameLogic
             var template = FindChild("SudoCell");
             if (template == null) throw new InvalidOperationException("棋盘缺少 SudoCell 模板。");
             template.gameObject.SetActive(false);
+            var noteTemplate = FindChild("NoteItem");
+            if (noteTemplate == null) throw new InvalidOperationException("棋盘缺少 NoteItem 模板。");
+            _notePool = new SudokuNoteItemPool(this, noteTemplate.gameObject);
             for (int i = 0; i < 10; i++)
             {
                 _vertical[i] = FindChildComponent<RectTransform>("Vertical" + i);
@@ -46,7 +50,7 @@ namespace GameLogic
                 int index = i;
                 var cell = CreateWidgetByPrefab<SudoCellWidget>(template.gameObject, transform);
                 cell.gameObject.name = "Cell" + i;
-                cell.Bind(() => _game?.SelectCell(index));
+                cell.Bind(() => _game?.SelectCell(index), _notePool);
                 _cells.Add(cell);
             }
             LayoutBoard();

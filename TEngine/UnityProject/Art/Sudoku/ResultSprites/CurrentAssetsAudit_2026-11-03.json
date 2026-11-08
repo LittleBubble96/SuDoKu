@@ -1,0 +1,151 @@
+{
+  "date": "2026-11-03",
+  "source": "D:\\Work\\Sudu\\TEngine\\UnityProject\\Art\\最终效果图\\10_结算_蓝色横幅_红金礼包_金色光芒.png",
+  "source_matches_previous_cut": true,
+  "existing_assets": [
+    {
+      "name": "bg_result_ribbon",
+      "path": "Assets\\AssetRaw\\UIRaw\\Raw\\UI\\Guide\\bg_result_ribbon.png",
+      "size": [
+        824,
+        203
+      ],
+      "white_rgb": true,
+      "transparent_border": true,
+      "sprite_meta_present": true,
+      "sha256": "c991570ef959d7c7e8096cd4081192577bb4d20c01f67fe7384d00d067d9aead",
+      "meta_sha256": "417094beed38a237f0f4c61d19d4db6f515de70124358a2e77e4c35817bce6d0",
+      "usage": "Simple, Preserve Aspect"
+    },
+    {
+      "name": "bg_result_ribbon_shade",
+      "path": "Assets\\AssetRaw\\UIRaw\\Raw\\UI\\Guide\\bg_result_ribbon_shade.png",
+      "size": [
+        824,
+        203
+      ],
+      "white_rgb": true,
+      "transparent_border": true,
+      "sprite_meta_present": true,
+      "sha256": "d610b1387b1591ef8ed17c394a0a466e824cbe066060d4ef3753821854a90e5e",
+      "meta_sha256": "4242a0406ba48916d1de6a49cb89244d66afd0180c1c0ac4c8d277e304ab7159",
+      "usage": "Simple, Preserve Aspect"
+    },
+    {
+      "name": "bg_result_ribbon_highlight",
+      "path": "Assets\\AssetRaw\\UIRaw\\Raw\\UI\\Guide\\bg_result_ribbon_highlight.png",
+      "size": [
+        824,
+        203
+      ],
+      "white_rgb": true,
+      "transparent_border": true,
+      "sprite_meta_present": true,
+      "sha256": "4b20f79019ca0176ab0ec407328af9c3ef5f28d9c380772356b5eb5c61819646",
+      "meta_sha256": "3db97dfa0bc4b71bf9c527284586e114679c14bce818484e61d2ca0b202f8bfb",
+      "usage": "Simple, Preserve Aspect"
+    },
+    {
+      "name": "gift_box_red_gold",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\gift_box_red_gold.png",
+      "size": [
+        176,
+        171
+      ],
+      "white_rgb": false,
+      "transparent_border": true,
+      "sprite_meta_present": true,
+      "sha256": "926d6064851c5ac6d2df9f5a8b62e86171090925f806286de8d8f409ecf8c848",
+      "meta_sha256": "f604d140af50dc8af2a21bd664be6f0099f771e819eb0de1da30011dfe7e7c2b",
+      "usage": "Simple, Preserve Aspect"
+    },
+    {
+      "name": "fx_reward_gold_rays",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\fx_reward_gold_rays.png",
+      "size": [
+        446,
+        343
+      ],
+      "white_rgb": false,
+      "transparent_border": true,
+      "sprite_meta_present": true,
+      "sha256": "066c52f6dd941bb39ccbeaf64359beeff65abf23b52ee7811d83d77ddcf7dc9c",
+      "meta_sha256": "df25382564e0e22c99de5946253a94601dbad345f95219989594ce32a9c071ab",
+      "usage": "Simple, Preserve Aspect"
+    },
+    {
+      "name": "icon_share",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\icon_share.png",
+      "size": [
+        59,
+        67
+      ],
+      "white_rgb": true,
+      "transparent_border": true,
+      "sprite_meta_present": true,
+      "sha256": "eb11609949bdca5838a4ba1d6bea8f016fb713e06309c381c8d80b22db22d257",
+      "meta_sha256": "753c077baf70856cf57988aec1b649231e7a5109d506ac7d672e16afc7e960d2",
+      "usage": "Simple, Preserve Aspect"
+    }
+  ],
+  "missing_assets": [],
+  "reused_assets": [
+    {
+      "name": "bg_button_fill_9s",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\bg_button_fill_9s.png",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "name": "bg_button_outline_9s",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\bg_button_outline_9s.png",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "name": "icon_trophy",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\icon_trophy.png",
+      "size": [
+        68,
+        68
+      ]
+    },
+    {
+      "name": "icon_clock",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\icon_clock.png",
+      "size": [
+        68,
+        68
+      ]
+    },
+    {
+      "name": "icon_stat_best_time",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\icon_stat_best_time.png",
+      "size": [
+        62,
+        73
+      ]
+    },
+    {
+      "name": "icon_home_outline",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\icon_home_outline.png",
+      "size": [
+        72,
+        69
+      ]
+    },
+    {
+      "name": "bg_white_quad_9s",
+      "path": "Assets\\AssetRaw\\UIRaw\\Atlas\\Sudoku\\bg_white_quad_9s.png",
+      "size": [
+        4,
+        4
+      ]
+    }
+  ],
+  "new_png_count": 0
+}

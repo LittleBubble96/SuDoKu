@@ -2,15 +2,30 @@
 
 参考：`Art/最终效果图/10_结算_蓝色横幅_红金礼包_金色光芒.png`。
 
-只补当前图集中不存在的部分，共 **6 张 PNG**，导出至 `Assets/AssetRaw/UIRaw/Atlas/Sudoku`。没有拼接 UI，没有修改预制体或业务代码。原参考图实际为 941×1672，按宽 1080 的竖屏画布等比换算，保持图中各元素的显示比例。
+该参考图此前已补切 **6 张 PNG**。2026-11-03 先按当前工程复核了素材，随后按用户“蓝色的横幅重新切一下”的要求，重新提取无字横幅并覆盖三张同名白图。其余礼盒、光芒和分享图标沿用原资源。没有拼接 UI，没有修改预制体或业务代码。原参考图实际为 941×1672，切图按宽 1080 的竖屏画布等比换算，保持图中各元素的显示比例。
+
+当前目录（相对 UnityProject）：
+
+- 横幅三层：`Assets/AssetRaw/UIRaw/Raw/UI/Guide/`。
+- 礼盒、光芒、分享图标及通用复用项：`Assets/AssetRaw/UIRaw/Atlas/Sudoku/`。
+
+横幅三层已移至 Raw，其定位地址为文件名，不再带 `Sudoku_` 前缀。本轮像素、透明通道、Sprite 基本设置及参考图一致性检查见 `CurrentAssetsAudit_2026-11-03.json`。横幅三层重切后仍使用同一 824×203 画布、同名文件和原 Sprite GUID；没有修改 meta、图集或 Unity 导入规则。
+
+## 2026-11-03 横幅重切
+
+- 无字蓝色参考成品：`RibbonRecut_2026-11-03/Ribbon_Blue.png`。
+- 新三层的主题叠色预览：`RibbonRecut_2026-11-03/RibbonPreview.png`，包括蓝色原图、经典蓝、薄荷绿和蜜桃。
+- 新生成源图与提示词：`RibbonRecut_2026-11-03/Source/`、`RibbonRecut_2026-11-03/prompts.md`。
+- 重新处理弧形轮廓、卷边、燕尾和渐变表面，去除全部文字，清理 Alpha 外沿杂点；采用共同边界导出底形、阴影、高光三层，RGB 仍全白。
+- 替换前文件备份在工程工作区 `work/ribbon-recut/before/`。旧 `ContactSheet.png` 是上一版预览，本次以新预览为准。
 
 ## 新增资源
 
 | 文件／资源地址 | PNG／建议显示尺寸 | 调色盘 | 使用方式 |
 | --- | --- | --- | --- |
-| `bg_result_ribbon.png`／`Sudoku_bg_result_ribbon` | 824×203 | 白图，用主题主色 | 无字横幅底形 |
-| `bg_result_ribbon_shade.png`／`Sudoku_bg_result_ribbon_shade` | 824×203 | 白图，Image 固定黑色 | 横幅褶皱、暗部，叠在底形上 |
-| `bg_result_ribbon_highlight.png`／`Sudoku_bg_result_ribbon_highlight` | 824×203 | 白图，Image 固定白色 | 横幅高光，叠在阴影上 |
+| `bg_result_ribbon.png`／`bg_result_ribbon` | 824×203 | 白图，用主题主色 | 无字横幅底形 |
+| `bg_result_ribbon_shade.png`／`bg_result_ribbon_shade` | 824×203 | 白图，Image 固定黑色 | 横幅褶皱、暗部，叠在底形上 |
+| `bg_result_ribbon_highlight.png`／`bg_result_ribbon_highlight` | 824×203 | 白图，Image 固定白色 | 横幅高光，叠在阴影上 |
 | `gift_box_red_gold.png`／`Sudoku_gift_box_red_gold` | 176×171 | 保留红金固有色 | Image.color 用白色 |
 | `fx_reward_gold_rays.png`／`Sudoku_fx_reward_gold_rays` | 446×343 | 保留金色固有色 | 放在礼盒后方，透明外沿，可独立旋转、缩放或渐显 |
 | `icon_share.png`／`Sudoku_icon_share` | 59×67 | 白图，使用主题色／主题浅色 | 挑战好友分享图标 |

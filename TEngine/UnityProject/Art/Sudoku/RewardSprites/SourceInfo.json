@@ -1,0 +1,46 @@
+{
+  "source": "D:\\Work\\Sudu\\TEngine\\UnityProject\\Art\\最终效果图\\11_通用领奖_红金礼包.png",
+  "size": [
+    941,
+    1672
+  ],
+  "sha256": "f577bbf6f9daad06afeeff5fb110d76b37719c49aa0e63e09ef831af9afdf611",
+  "sourceRegions": {
+    "ConfettiReference": [
+      268,
+      888,
+      35,
+      39
+    ],
+    "CoinReference": [
+      294,
+      468,
+      119,
+      116
+    ],
+    "LightReference": [
+      310,
+      770,
+      335,
+      344
+    ],
+    "HintReference": [
+      525,
+      464,
+      119,
+      118
+    ],
+    "GiftReference": [
+      340,
+      735,
+      292,
+      371
+    ],
+    "SparkleReference": [
+      279,
+      946,
+      40,
+      45
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+PASS gift_box_open_red_gold: 312x400; RGBA; whiteRGB=False; transparent border; components=2; 181417 bytes
+PASS fx_reward_open_light: 384x256; RGBA; whiteRGB=False; transparent border; components=1; 128106 bytes
+PASS icon_reward_coin_star_gold: 120x120; RGBA; whiteRGB=False; transparent border; components=1; 26921 bytes
+PASS icon_reward_hint_gold: 122x126; RGBA; whiteRGB=False; transparent border; components=6; 17998 bytes
+PASS fx_reward_sparkle: 38x46; RGBA; whiteRGB=True; transparent border; components=1; 1394 bytes
+PASS fx_reward_confetti: 34x38; RGBA; whiteRGB=True; transparent border; components=1; 752 bytes

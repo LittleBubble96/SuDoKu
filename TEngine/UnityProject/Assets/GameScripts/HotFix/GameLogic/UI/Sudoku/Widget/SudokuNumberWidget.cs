@@ -19,9 +19,12 @@ namespace GameLogic
             _button = CreateWidget<XYButton>(gameObject);
             _number = FindChildComponent<TMP_Text>("Bg/m_num");
             _numberColor = UIThemeColor.Bind(_number, SudokuThemeRole.Accent);
-            // 由美术后续在 Num1 下补 m_remaining；没有节点时仅保留数量逻辑。
-            _remaining = FindChildComponent<TMP_Text>("m_remaining");
-            if (_remaining != null) UIThemeColor.Bind(_remaining, SudokuThemeRole.MutedText);
+            _remaining = FindChildComponent<TMP_Text>("Bg/m_numRemaining");
+            if (_remaining != null)
+            {
+                _remaining.raycastTarget = false;
+                UIThemeColor.Bind(_remaining, SudokuThemeRole.MutedText);
+            }
             _button.OnAddListener(() => _clicked?.Invoke(_digit));
         }
         public void Init(int digit, Action<int> clicked)

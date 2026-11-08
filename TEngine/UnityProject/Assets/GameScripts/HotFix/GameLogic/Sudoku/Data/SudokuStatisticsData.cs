@@ -8,6 +8,7 @@ namespace GameLogic.Data
     {
         public int played, won, perfectWins, currentStreak, bestStreak;
         public double bestSeconds, winSeconds, totalSeconds;
+        public int bestScore;
 
         public double WinRate => played == 0 ? 0 : won * 100.0 / played;
         public double AverageSeconds => won == 0 ? 0 : winSeconds / won;

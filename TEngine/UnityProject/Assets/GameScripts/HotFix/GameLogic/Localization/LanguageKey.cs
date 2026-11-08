@@ -8,7 +8,7 @@
 namespace GameLogic.Localization
 {
     /// <summary>
-    /// 多语言 Key 常量类（共 193 个 Key）。
+    /// 多语言 Key 常量类（共 211 个 Key）。
     /// </summary>
     public static class LanguageKey
     {
@@ -205,5 +205,23 @@ namespace GameLogic.Localization
         public const string statistics_win_streaks = "statistics_win_streaks";
         public const string statistics_current_streak = "statistics_current_streak";
         public const string statistics_best_streak = "statistics_best_streak";
+        public const string finish_title = "finish_title";
+        public const string finish_score = "finish_score";
+        public const string finish_time = "finish_time";
+        public const string finish_best_score = "finish_best_score";
+        public const string back_home_btn = "back_home_btn";
+        public const string finish_share = "finish_share";
+        public const string reward_title = "reward_title";
+        public const string reward_coin = "reward_coin";
+        public const string reward_double = "reward_double";
+        public const string reward_double_desc = "reward_double_desc";
+        public const string reward_ad_failed = "reward_ad_failed";
+        public const string reward_ad_loading = "reward_ad_loading";
+        public const string reward_ad_retry = "reward_ad_retry";
+        public const string finish_share_message = "finish_share_message";
+        public const string setting_text_size = "setting_text_size";
+        public const string setting_text_size_large = "setting_text_size_large";
+        public const string setting_text_size_medium = "setting_text_size_medium";
+        public const string setting_text_size_small = "setting_text_size_small";
     }
 }

@@ -2,6 +2,8 @@
 
 散图目录：`Assets/AssetRaw/UIRaw/Atlas/Sudoku`。可换色素材使用纯白 RGB + 透明 Alpha；金币及奖杯彩色/灰色素材保留固有色。清单记录在 `Sprites.json`。Sprite 使用 PPU 100、Full Rect，无 Mipmap、不缩放 NPOT、不压缩。新增散图、尺寸和复用方式详见 [补切说明](ExpandedSprites/README.md)；奖杯底部独立柔影见 [柔影说明](TrophyShadow/README.md)。
 
+通用领奖的打开礼盒、开盒光效、两款奖励图标及星光 / 彩纸补切，见 [领奖散图说明](RewardSprites/README.md)；结算横幅重切见 [结算散图说明](ResultSprites/README.md)。
+
 ## 参考图
 
 - `Home_Classic_1080x1920.png`：经典首页。
@@ -33,6 +35,7 @@
 |---|---|---:|---:|---:|
 | icon_back.png | 返回 | 41×75 | — | 41×75 |
 | icon_pause.png | 暂停（含圆圈） | 123×124 | — | 123×124 |
+| icon_play.png | 暂停后的继续按钮（同尺寸圆圈＋实心三角形） | 123×124 | — | 123×124 |
 | icon_palette.png | 调色盘 | 86×83 | — | 86×83 |
 | icon_settings.png | 设置 | 86×87 | — | 86×87 |
 | icon_clock.png | 计时 | 68×68 | — | 68×68 |

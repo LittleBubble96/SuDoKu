@@ -1,7 +1,8 @@
 [
   {
     "name": "bg_result_ribbon",
-    "resource": "Sudoku_bg_result_ribbon",
+    "resource": "bg_result_ribbon",
+    "path": "Assets/AssetRaw/UIRaw/Raw/UI/Guide/bg_result_ribbon.png",
     "width": 824,
     "height": 203,
     "recommendedWidth": 824,
@@ -25,15 +26,18 @@
       505
     ],
     "generatedAlphaCrop": [
-      14,
-      96,
-      2156,
-      623
-    ]
+      10,
+      88,
+      2159,
+      628
+    ],
+    "revision": "2026-11-03-ribbon-recut",
+    "source": "Art/Sudoku/ResultSprites/RibbonRecut_2026-11-03/Source/Ribbon_Blue_Generated.png"
   },
   {
     "name": "bg_result_ribbon_shade",
-    "resource": "Sudoku_bg_result_ribbon_shade",
+    "resource": "bg_result_ribbon_shade",
+    "path": "Assets/AssetRaw/UIRaw/Raw/UI/Guide/bg_result_ribbon_shade.png",
     "width": 824,
     "height": 203,
     "recommendedWidth": 824,
@@ -57,15 +61,18 @@
       505
     ],
     "generatedAlphaCrop": [
-      14,
-      96,
-      2156,
-      623
-    ]
+      10,
+      88,
+      2159,
+      628
+    ],
+    "revision": "2026-11-03-ribbon-recut",
+    "source": "Art/Sudoku/ResultSprites/RibbonRecut_2026-11-03/Source/Ribbon_Blue_Generated.png"
   },
   {
     "name": "bg_result_ribbon_highlight",
-    "resource": "Sudoku_bg_result_ribbon_highlight",
+    "resource": "bg_result_ribbon_highlight",
+    "path": "Assets/AssetRaw/UIRaw/Raw/UI/Guide/bg_result_ribbon_highlight.png",
     "width": 824,
     "height": 203,
     "recommendedWidth": 824,
@@ -89,15 +96,18 @@
       505
     ],
     "generatedAlphaCrop": [
-      14,
-      96,
-      2156,
-      623
-    ]
+      10,
+      88,
+      2159,
+      628
+    ],
+    "revision": "2026-11-03-ribbon-recut",
+    "source": "Art/Sudoku/ResultSprites/RibbonRecut_2026-11-03/Source/Ribbon_Blue_Generated.png"
   },
   {
     "name": "gift_box_red_gold",
     "resource": "Sudoku_gift_box_red_gold",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/gift_box_red_gold.png",
     "width": 176,
     "height": 171,
     "recommendedWidth": 176,
@@ -127,6 +137,7 @@
   {
     "name": "fx_reward_gold_rays",
     "resource": "Sudoku_fx_reward_gold_rays",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/fx_reward_gold_rays.png",
     "width": 446,
     "height": 343,
     "recommendedWidth": 446,
@@ -154,6 +165,7 @@
   {
     "name": "icon_share",
     "resource": "Sudoku_icon_share",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/icon_share.png",
     "width": 59,
     "height": 67,
     "recommendedWidth": 59,

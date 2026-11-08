@@ -6,5 +6,6 @@
         public const string DailySignIn = "adunit-sudoku-signin-placeholder";
         public const string DailyTask = "adunit-sudoku-dailytask-placeholder";
         public const string Tip = "adunit-sudoku-hint-placeholder";
+        public const string Settlement = "adunit-sudoku-settlement-placeholder";
     }
 }

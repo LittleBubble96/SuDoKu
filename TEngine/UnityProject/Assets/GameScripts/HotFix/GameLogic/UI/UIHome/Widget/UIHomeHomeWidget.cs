@@ -49,7 +49,9 @@ namespace GameLogic
             var game = SudokuPresenter.Current;
             if (game == null) return;
             _continueInfo.text = SudokuUIFormatting.Difficulty(game.NormalDifficulty) + " · " + SudokuUIFormatting.Time(game.NormalIsComplete ? 0 : game.NormalElapsedSeconds);
-            _continue.Interactable = game.HasNormalGame;
+            bool canContinue = game.HasNormalGame && !game.NormalIsComplete;
+            _continue.Visible = canContinue;
+            _continue.Interactable = canContinue;
             _displayDate = game.Today;
             var daily = game.GetDaily(_displayDate);
             _dailyInfo.text = daily == null ? string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_incomplete), _displayDate.Month, _displayDate.Day) :

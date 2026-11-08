@@ -19,10 +19,16 @@ namespace GameLogic
         private SudokuHintWidget _hint;
         private XYButton _undo, _clear, _notes, _pause;
         private TMP_Text _level, _progress, _time, _noteState;
-        private UIThemeColor _noteStateColor, _pauseColor;
+        private UIThemeColor _noteStateColor;
+        private UnityEngine.UI.Image _pauseIcon;
+        private Sprite _pauseSprite, _playSprite;
+        private bool _loadingPlayIcon, _destroyed;
         private readonly List<SudokuNumberWidget> _numbers = new List<SudokuNumberWidget>(9);
         private long _displaySecond = -1;
         private bool _openingSettings;
+        private bool _openingSettlement;
+        private string _shownSettlement;
+        private float _retrySettlementAt;
         public bool IsBoardReady => _board?.IsReady == true;
         public SudokuSession Session => _game?.Session;
         protected override void ScriptGenerator()
@@ -33,7 +39,10 @@ namespace GameLogic
             _time = FindChildComponent<TMP_Text>(LayoutPath + "Board/SudoInfoPanel/m_time");
             _noteState = FindChildComponent<TMP_Text>(LayoutPath + "PropArea/NoteBtn/Toggle/m_text");
             _noteStateColor = _noteState.GetComponent<UIThemeColor>();
-            _pauseColor = FindChildComponent<UIThemeColor>(LayoutPath + "Top/StopBtn/Icon");
+            _pauseIcon = FindChildComponent<UnityEngine.UI.Image>(LayoutPath + "Top/StopBtn/Icon");
+            _pauseIcon.preserveAspect = true;
+            _pauseSprite = _pauseIcon.sprite;
+            UIThemeColor.Bind(_pauseIcon, SudokuThemeRole.Text);
             _board = CreateWidget<SudokuBoardWidget>(LayoutPath + "Board/m_rect_Board");
             _hint = CreateWidget<SudokuHintWidget>(LayoutPath + "PropArea/TipsBtn");
             _undo = CreateWidget<XYButton>(LayoutPath + "PropArea/UnDoBtn");
@@ -85,6 +94,8 @@ namespace GameLogic
             _hint.Init(_game);
             AdSystem.EnterPage(AdIds.Tip);
             RefreshState();
+            RefreshPauseIcon();
+            LoadPlayIconAsync().Forget();
         }
         private void RefreshLanguage()
         {
@@ -99,6 +110,8 @@ namespace GameLogic
         }
         protected override void OnClose()
         {
+            GameModule.UI.CloseUI<UIReward>();
+            GameModule.UI.CloseUI<UISettlement>();
             GameModule.UI.CloseUI<UIPalette>();
             GameModule.UI.CloseUI<UISetting>();
             _game?.SetWindowActive(false);
@@ -152,9 +165,46 @@ namespace GameLogic
             _pause.Interactable = !Session.IsComplete && !_game.IsAdShowing;
             _noteState.text = LocalizationHelper.GetLocalText(_game.NoteMode ? LanguageKey.sudoku_ui_on : LanguageKey.sudoku_ui_off);
             _noteStateColor.SetRole(_game.NoteMode ? SudokuThemeRole.Accent : SudokuThemeRole.MutedText);
-            _pauseColor.SetRole(_game.IsPaused ? SudokuThemeRole.Accent : SudokuThemeRole.Text);
+            RefreshPauseIcon();
             _hint.RefreshDisplay();
             RefreshTime();
+        }
+        private void RefreshPauseIcon()
+        {
+            if (_pauseIcon != null)
+                _pauseIcon.sprite = _game != null && _game.IsPaused && _playSprite != null ? _playSprite : _pauseSprite;
+        }
+        private async UniTaskVoid LoadPlayIconAsync()
+        {
+            if (_playSprite != null || _loadingPlayIcon || _destroyed) return;
+            _loadingPlayIcon = true;
+            Sprite asset = null;
+            try
+            {
+                var token = gameObject.GetCancellationTokenOnDestroy();
+                asset = await GameModule.Resource.LoadAssetAsync<Sprite>("Sudoku_icon_play", token);
+                token.ThrowIfCancellationRequested();
+                if (_destroyed) return;
+                if (asset == null) throw new InvalidOperationException("继续游戏图标加载失败。");
+                _playSprite = asset; asset = null;
+                // 异步加载完成后按当前状态刷新，快速连点也不会留下旧状态的图标。
+                RefreshPauseIcon();
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception error) { Debug.LogException(error); }
+            finally
+            {
+                if (asset != null) GameModule.Resource.UnloadAsset(asset);
+                _loadingPlayIcon = false;
+            }
+        }
+        protected override void OnDestroy()
+        {
+            _destroyed = true;
+            if (_pauseIcon != null) _pauseIcon.sprite = _pauseSprite;
+            if (_playSprite != null) GameModule.Resource.UnloadAsset(_playSprite);
+            _playSprite = null;
+            base.OnDestroy();
         }
         private void RefreshTime()
         {
@@ -166,6 +216,10 @@ namespace GameLogic
         protected override void OnUpdate()
         {
             if (_game == null || !IsBoardReady) return;
+            if (IsOpen && _game.Session.IsComplete && _game.Settlement != null &&
+                _shownSettlement != _game.Settlement.id && !_openingSettlement && !SudokuPresenter.IsNavigating &&
+                Time.unscaledTime >= _retrySettlementAt)
+                OpenSettlementAsync().Forget();
 #if !TE_RELEASE
             if (GMSingle.IsPanelOpen) return;
 #endif
@@ -183,6 +237,29 @@ namespace GameLogic
             if (Input.GetKeyDown(KeyCode.UpArrow)) next = Math.Max(0, next - 9);
             if (Input.GetKeyDown(KeyCode.DownArrow)) next = Math.Min(80, next + 9);
             if (next != _game.SelectedCell) _game.SelectCell(next);
+        }
+
+        private async UniTaskVoid OpenSettlementAsync()
+        {
+            _openingSettlement = true;
+            var result = _game.Settlement;
+            int version = OpenVersion;
+            try
+            {
+                // 保留最后一次行列宫完成波纹，再展示结算。
+                await UniTask.Delay(650, ignoreTimeScale: true, cancellationToken: CloseToken);
+                if (!IsOpen || version != OpenVersion || !ReferenceEquals(result, _game.Settlement) || SudokuPresenter.IsNavigating) return;
+                using (UIInteractionLock.Acquire())
+                {
+                    GameModule.UI.CloseUI<UIPalette>(); GameModule.UI.CloseUI<UISetting>();
+                    var popup = await GameModule.UI.ShowUIAsyncAwait<UISettlement>(new SettlementContext(_game, result));
+                    if (!IsOpen || version != OpenVersion || !ReferenceEquals(result, _game.Settlement)) GameModule.UI.CloseUI<UISettlement>();
+                    else if (popup != null) _shownSettlement = result.id;
+                }
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception error) { Debug.LogException(error); _retrySettlementAt = Time.unscaledTime + 5; }
+            finally { _openingSettlement = false; }
         }
     }
 }

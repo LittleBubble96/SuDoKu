@@ -1287,5 +1287,19 @@
     "path":  "Assets/AssetRaw/UIRaw/Atlas/Sudoku/bg_trophy_shadow.png",
     "kind":  "shadow",
     "pngBytes":  7235
+},
+{
+    "name": "icon_play",
+    "width": 123,
+    "height": 124,
+    "left": 0,
+    "bottom": 0,
+    "right": 0,
+    "top": 0,
+    "tint": true,
+    "recommendedWidth": 123,
+    "recommendedHeight": 124,
+    "source": "Art/Sudoku/PlayIconReview_2026-11-07/icon_play.png",
+    "path": "Assets/AssetRaw/UIRaw/Atlas/Sudoku/icon_play.png"
 }
 ]

@@ -68,8 +68,9 @@ namespace GameLogic
             _activeBorder.effectColor = SudokuThemeManager.GetColor(SudokuThemeRole.Accent);
             _locked.SetActive(!obtained && !active);
             _obtained.SetActive(obtained);
-            _icon.color = new Color(1, 1, 1, active ? .6f : 1); // 原画保留金色 / 银色，进行中淡显彩色奖杯。
-            string location = obtained || active ? progress.Config.IconObtained : progress.Config.IconNotObtained;
+            _icon.color = Color.white;
+            // 只有已获得才显示彩色原画，进行中同样使用配置的灰色图。
+            string location = progress.Icon;
             if (_loadedIcon == location && _sprite != null)
             {
                 CancelIconLoad(); _requestedIcon = location; IconError = null; _icon.enabled = true;

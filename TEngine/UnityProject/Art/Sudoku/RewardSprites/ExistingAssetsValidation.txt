@@ -1,0 +1,5 @@
+PASS: 192 existing PNG/meta files unchanged.
+PASS: reference image unchanged.
+PASS: 6 new PNG files copied and hash verified.
+No prefab, business code, existing Sprite meta or atlas settings changed.
+Unity import/play verification was not performed.

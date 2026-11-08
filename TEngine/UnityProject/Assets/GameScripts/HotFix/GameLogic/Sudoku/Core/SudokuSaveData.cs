@@ -26,5 +26,7 @@ namespace GameLogic.Sudoku
         public bool statisticsCounted;
         public bool hadMistake;
         public bool gmAssisted;
+        public int mistakeCount, hintCount;
+        public bool completionProcessed;
     }
 }

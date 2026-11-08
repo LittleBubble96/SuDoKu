@@ -41,6 +41,12 @@ namespace GameLogic.Sudoku
         public static void SetHighlightRelated(bool enabled) { Data.highlightRelated = enabled; Save(); }
         public static void SetDimCompletedDigits(bool enabled) { Data.dimCompletedDigits = enabled; Save(); }
         public static void SetShowRemainingCount(bool enabled) { Data.showRemainingCount = enabled; Save(); }
+        public static void SetTextSize(SudokuTextSize size)
+        {
+            if ((int)size < 0 || (int)size > 2 || Data.textSize == size) return;
+            Data.textSize = size;
+            Save();
+        }
 
         public static void SetLanguage(string language)
         {

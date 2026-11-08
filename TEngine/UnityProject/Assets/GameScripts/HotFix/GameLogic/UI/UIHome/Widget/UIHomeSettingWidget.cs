@@ -12,7 +12,7 @@ namespace GameLogic
     {
         private const string Layout = "Center/Layout/";
         private readonly List<SettingToggleItem> _toggles = new List<SettingToggleItem>(7);
-        private TMP_Dropdown _language;
+        private TMP_Dropdown _language, _textSize;
         private List<ConfLanguage> _languages;
 
         protected override void ScriptGenerator()
@@ -20,6 +20,8 @@ namespace GameLogic
             base.ScriptGenerator();
             _language = FindChildComponent<TMP_Dropdown>(Layout + "GameOther/LanguageItem/dropdown");
             _language.onValueChanged.AddListener(OnLanguageSelected);
+            _textSize = FindChildComponent<TMP_Dropdown>(Layout + "GameAssist/TextSizeToggleItem/dropdown");
+            _textSize.onValueChanged.AddListener(index => SudokuSettingsManager.SetTextSize((SudokuTextSize)index));
             CreateWidget<XYButton>("Top/Back/Btn").OnAddListener(() =>
             {
                 if (OwnerWindow is UIHome home) home.SelectTab(0);
@@ -67,6 +69,16 @@ namespace GameLogic
             Label(Layout + "GameAssist/relatedAreaToggleItem/m_des", LanguageKey.setting_highlight_related_des);
             Label(Layout + "GameOther/LanguageItem/m_title", LanguageKey.setting_language);
             Label(Layout + "GameOther/RuleItem/m_title", LanguageKey.setting_how_to_play);
+            Label(Layout + "GameAssist/TextSizeToggleItem/m_title", LanguageKey.setting_text_size);
+            _textSize.ClearOptions();
+            _textSize.AddOptions(new List<string>
+            {
+                LocalizationHelper.GetLocalText(LanguageKey.setting_text_size_large),
+                LocalizationHelper.GetLocalText(LanguageKey.setting_text_size_medium),
+                LocalizationHelper.GetLocalText(LanguageKey.setting_text_size_small)
+            });
+            _textSize.SetValueWithoutNotify((int)SudokuSettingsManager.Data.textSize);
+            _textSize.RefreshShownValue();
             foreach (var toggle in _toggles) toggle.RefreshDisplay();
             var options = new List<TMP_Dropdown.OptionData>(_languages.Count);
             int selected = 0;
@@ -122,7 +134,12 @@ namespace GameLogic
             Theme(Layout + "GameOther/LanguageItem/icon", SudokuThemeRole.Accent);
             Theme(Layout + "GameOther/RuleItem/icon", SudokuThemeRole.MutedText);
             Theme(Layout + "GameOther/RuleItem/m_title", SudokuThemeRole.MutedText);
-            const string dropdown = Layout + "GameOther/LanguageItem/dropdown/";
+            Theme(Layout + "GameAssist/TextSizeToggleItem/icon", SudokuThemeRole.Accent);
+            BindDropdownThemes(Layout + "GameOther/LanguageItem/dropdown/");
+            BindDropdownThemes(Layout + "GameAssist/TextSizeToggleItem/dropdown/");
+        }
+        private void BindDropdownThemes(string dropdown)
+        {
             Theme(dropdown + "Arrow", SudokuThemeRole.Accent);
             Theme(dropdown + "Template", SudokuThemeRole.Surface);
             Theme(dropdown + "Template/Viewport/Content/Item/Item Background", SudokuThemeRole.Related);
