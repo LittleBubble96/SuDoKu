@@ -90,22 +90,107 @@ namespace GameLogic.Sudoku
             foreach (var config in _configs)
             {
                 if (_awards.ContainsKey(config.Id) || new DateTime(config.Year, config.Month, 1) > today) continue;
-                counts.TryGetValue(MonthKey(config.Year, config.Month), out int completed);
-                if (completed < RequiredDays(config)) continue;
-                var award = new SudokuTrophyAward { id = config.Id, awardedDate = SudokuDailyRules.DateKey(today) };
-                _awards.Add(config.Id, award); _data.trophyAwards.Add(award); changed = true;
+                if (CompletedDays(config, counts) < RequiredDays(config)) continue;
+                GrantAward(config.Id, today);
+                changed = true;
             }
             return changed;
         }
 
-        internal void ClearAwards() { _awards.Clear(); _data.trophyAwards.Clear(); }
+        private void GrantAward(int id, DateTime today)
+        {
+            var award = new SudokuTrophyAward { id = id, awardedDate = SudokuDailyRules.DateKey(today) };
+            _awards.Add(id, award);
+            _data.trophyAwards.Add(award);
+        }
+
+#if !TE_RELEASE
+        internal void ClearAwards()
+        {
+            _awards.Clear();
+            _data.trophyAwards.Clear();
+            _data.trophyProgressOverrides.Clear();
+        }
+
+        internal void DebugGrant(int yearMonth)
+        {
+            var config = GetDebugConfig(yearMonth);
+            if (!_awards.ContainsKey(config.Id)) GrantAward(config.Id, _clock().Date);
+        }
+
+        internal void DebugSetProgress(int yearMonth, int completedDays)
+        {
+            var config = GetDebugConfig(yearMonth);
+            int required = RequiredDays(config);
+            if (completedDays < 0 || completedDays > required)
+                throw new ArgumentOutOfRangeException(nameof(completedDays), $"奖杯进度请输入 0～{required} 天。");
+
+            var today = _clock().Date;
+            SetProgressOverride(config, completedDays, CompletedByMonth(today));
+            if (completedDays == required)
+            {
+                if (!_awards.ContainsKey(config.Id)) GrantAward(config.Id, today);
+            }
+            else if (_awards.Remove(config.Id))
+            {
+                _data.trophyAwards.RemoveAll(award => award?.id == config.Id);
+            }
+        }
+
+        internal void DebugClear(int? yearMonth)
+        {
+            if (yearMonth.HasValue)
+            {
+                DebugSetProgress(yearMonth.Value, 0);
+                return;
+            }
+
+            ClearAwards();
+            // 奖杯清零后仍保留每日记录，避免读档或保存时按原记录补发。
+            var counts = CompletedByMonth(_clock().Date);
+            foreach (var config in _configs)
+                if (counts.ContainsKey(MonthKey(config.Year, config.Month))) SetProgressOverride(config, 0, counts);
+        }
+
+        private ConfTrophy GetDebugConfig(int yearMonth) => _byMonth.TryGetValue(yearMonth, out var config)
+            ? config : throw new ArgumentException($"{yearMonth} 没有奖杯配置，请输入配置中的年月（如 202611）。");
+
+        private GameCacheData.TrophyProgressOverride GetProgressOverride(int id) =>
+            _data.trophyProgressOverrides.Find(entry => entry?.id == id);
+
+        private void SetProgressOverride(ConfTrophy config, int completedDays, Dictionary<int, int> counts)
+        {
+            var entry = GetProgressOverride(config.Id);
+            if (entry == null)
+            {
+                entry = new GameCacheData.TrophyProgressOverride { id = config.Id };
+                _data.trophyProgressOverrides.Add(entry);
+            }
+            entry.completedDays = completedDays;
+            counts.TryGetValue(MonthKey(config.Year, config.Month), out entry.dailyCompletedAtOverride);
+        }
+#endif
+
+        private int CompletedDays(ConfTrophy config, Dictionary<int, int> counts)
+        {
+            counts.TryGetValue(MonthKey(config.Year, config.Month), out int completed);
+#if !TE_RELEASE
+            var progressOverride = GetProgressOverride(config.Id);
+            if (progressOverride != null)
+            {
+                int newCompletions = Math.Max(0, completed - progressOverride.dailyCompletedAtOverride);
+                return Math.Min(RequiredDays(config), progressOverride.completedDays + newCompletions);
+            }
+#endif
+            return completed;
+        }
 
         private SudokuTrophyProgress Progress(ConfTrophy config, Dictionary<int, int> counts, DateTime today)
         {
-            counts.TryGetValue(MonthKey(config.Year, config.Month), out int completed);
+            int completed = CompletedDays(config, counts);
             _awards.TryGetValue(config.Id, out var award);
             var month = new DateTime(config.Year, config.Month, 1);
-            var state = award != null ? SudokuTrophyState.Obtained : month > today ? SudokuTrophyState.NotStarted :
+            var state = award != null ? SudokuTrophyState.Obtained : month > today && completed == 0 ? SudokuTrophyState.NotStarted :
                 config.Year == today.Year && config.Month == today.Month ? SudokuTrophyState.InProgress : SudokuTrophyState.NotObtained;
             return new SudokuTrophyProgress(config, completed, RequiredDays(config), state, award?.awardedDate);
         }

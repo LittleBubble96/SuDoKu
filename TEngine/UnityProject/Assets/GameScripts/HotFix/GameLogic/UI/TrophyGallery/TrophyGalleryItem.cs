@@ -11,10 +11,10 @@ namespace GameLogic
 {
     public sealed class TrophyGalleryItem : UIWidget
     {
+        private const string DetailColor = "#946400";
         private TMP_Text _title, _status;
         private UnityEngine.UI.Image _icon;
-        private UnityEngine.UI.Outline _activeBorder;
-        private GameObject _locked, _obtained, _activeOutline;
+        private GameObject _locked, _obtained;
         private UIThemeColor _backgroundColor, _outlineColor, _statusColor;
         private Sprite _sprite;
         private string _loadedIcon, _requestedIcon;
@@ -33,13 +33,11 @@ namespace GameLogic
             _icon = FindChildComponent<UnityEngine.UI.Image>("Trophy/icon");
             _locked = FindChild("Trophy/LockBg").gameObject;
             _obtained = FindChild("Trophy/GetRoot").gameObject;
-            _activeOutline = FindChild("bg/ActiveOutline").gameObject;
-            _activeBorder = _activeOutline.GetComponent<UnityEngine.UI.Outline>();
+            FindChild("bg/ActiveOutline").gameObject.SetActive(false);
             _backgroundColor = UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>("bg"), SudokuThemeRole.KeyBackground);
             _outlineColor = UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>("bg/outline"), SudokuThemeRole.Matching);
             UIThemeColor.Bind(_title, SudokuThemeRole.Text);
             _statusColor = UIThemeColor.Bind(_status, SudokuThemeRole.MutedText);
-            Theme("bg/ActiveOutline", SudokuThemeRole.Accent);
             Theme("Trophy/LockBg", SudokuThemeRole.Surface);
             Theme("Trophy/LockBg/outLine", SudokuThemeRole.Matching);
             Theme("Trophy/LockBg/lock", SudokuThemeRole.MutedText);
@@ -50,26 +48,23 @@ namespace GameLogic
         public void RefreshDisplay(SudokuTrophyProgress progress, CancellationToken token)
         {
             Progress = progress;
-            bool obtained = progress.IsObtained, active = progress.State == SudokuTrophyState.InProgress;
+            bool obtained = progress.IsObtained;
             _title.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.trophy_month_name), progress.Config.Month, LocalizationHelper.GetLocalText(progress.Config.NameKey));
-            if (active)
+            if (obtained)
             {
-                string textColor = ColorUtility.ToHtmlStringRGB(SudokuThemeManager.GetColor(SudokuThemeRole.Text));
-                string completed = "<color=#" + textColor + ">" + progress.CompletedDays + "</color>";
-                string required = "<color=#" + textColor + ">" + progress.RequiredDays + "</color>";
-                _status.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.trophy_progress), completed, required);
+                string date = SudokuDailyRules.TryParseDate(progress.AwardedDate, out _) ? progress.AwardedDate : null;
+                _status.text = FormatStatus(LanguageKey.trophy_obtained, date);
             }
-            else _status.text = LocalizationHelper.GetLocalText(obtained ? LanguageKey.trophy_obtained :
-                progress.State == SudokuTrophyState.NotStarted ? LanguageKey.trophy_not_started : LanguageKey.trophy_not_obtained);
-            _statusColor.SetRole(obtained || active ? SudokuThemeRole.Accent : SudokuThemeRole.MutedText);
-            _backgroundColor.SetRole(obtained ? SudokuThemeRole.Related : active ? SudokuThemeRole.Surface : SudokuThemeRole.KeyBackground);
+            else if (progress.State == SudokuTrophyState.NotStarted)
+                _status.text = LocalizationHelper.GetLocalText(LanguageKey.trophy_not_started);
+            else
+                _status.text = FormatStatus(LanguageKey.trophy_not_obtained, $"{progress.CompletedDays}/{progress.RequiredDays}");
+            _statusColor.SetRole(obtained ? SudokuThemeRole.Accent : SudokuThemeRole.MutedText);
+            _backgroundColor.SetRole(obtained ? SudokuThemeRole.Related : SudokuThemeRole.KeyBackground);
             _outlineColor.SetRole(obtained ? SudokuThemeRole.Selected : SudokuThemeRole.Matching);
-            _activeOutline.SetActive(active);
-            _activeBorder.effectColor = SudokuThemeManager.GetColor(SudokuThemeRole.Accent);
-            _locked.SetActive(!obtained && !active);
+            _locked.SetActive(!obtained);
             _obtained.SetActive(obtained);
             _icon.color = Color.white;
-            // 只有已获得才显示彩色原画，进行中同样使用配置的灰色图。
             string location = progress.Icon;
             if (_loadedIcon == location && _sprite != null)
             {
@@ -80,6 +75,12 @@ namespace GameLogic
             CancelIconLoad(); _requestedIcon = location; IconError = null; _icon.enabled = false;
             _iconCancellation = CancellationTokenSource.CreateLinkedTokenSource(token);
             LoadIconAsync(location, ++_iconVersion, _iconCancellation.Token).Forget();
+        }
+
+        private static string FormatStatus(string key, string detail)
+        {
+            string status = LocalizationHelper.GetLocalText(key);
+            return string.IsNullOrEmpty(detail) ? status : $"{status} <color={DetailColor}><size=115%>{detail}</size></color>";
         }
 
         private async UniTaskVoid LoadIconAsync(string location, int version, CancellationToken token)

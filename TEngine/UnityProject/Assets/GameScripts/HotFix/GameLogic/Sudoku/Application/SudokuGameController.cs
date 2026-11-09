@@ -439,6 +439,31 @@ namespace GameLogic.Sudoku
         }
 
 #if !TE_RELEASE
+        public void DebugGrantTrophy(int yearMonth)
+        {
+            Trophies.DebugGrant(yearMonth);
+            SaveDebugTrophyChange($"{yearMonth} 奖杯已获得。");
+        }
+
+        public void DebugSetTrophyProgress(int yearMonth, int completedDays)
+        {
+            Trophies.DebugSetProgress(yearMonth, completedDays);
+            SaveDebugTrophyChange($"{yearMonth} 奖杯进度已设为 {completedDays} 天。");
+        }
+
+        public void DebugClearTrophies(int? yearMonth)
+        {
+            Trophies.DebugClear(yearMonth);
+            SaveDebugTrophyChange(yearMonth.HasValue ? $"{yearMonth} 奖杯和进度已清除。" : "全部奖杯和进度已清除。");
+        }
+
+        private void SaveDebugTrophyChange(string message)
+        {
+            _cache?.Save();
+            GameEvent.Send(EventDefine.SudokuTrophiesChanged);
+            SetMessage("[GM] " + message);
+        }
+
         public void DebugUnlockAll()
         {
             Session.DebugUnlockAll(); SetMessage("[GM] 已临时解锁全部难度，实际通关数不变。");

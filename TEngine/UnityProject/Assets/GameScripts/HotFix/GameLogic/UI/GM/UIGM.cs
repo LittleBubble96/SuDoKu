@@ -51,7 +51,8 @@ namespace GameLogic
             _currentGroup.SetTitle(title); _groups[_currentTitle].Add(_currentGroup);
         }
         private UniTask CreateBtnAsync(string label, Action action) => _currentGroup.CreateBtnAsync(label, () => Execute(action));
-        private UniTask CreateBtnAndInputAsync(string label, Action<string> action) => _currentGroup.CreateBtnAndInputAsync(label, value => Execute(() => action(value)));
+        private UniTask CreateBtnAndInputAsync(string label, Action<string> action, bool acceptsText = false) =>
+            _currentGroup.CreateBtnAndInputAsync(label, value => Execute(() => action(value)), acceptsText);
 
         private void Execute(Action action)
         {
@@ -96,6 +97,24 @@ namespace GameLogic
                 await CreateGmGroupAsync("难度解锁");
                 await CreateBtnAsync("临时解锁全部难度", game.DebugUnlockAll);
                 await CreateBtnAsync("重置数独进度", game.DebugResetProgress);
+                await CreateGmGroupAsync("奖杯");
+                await CreateBtnAndInputAsync("获得奖杯（年月）", value =>
+                {
+                    if (!int.TryParse(value, out int month)) throw new ArgumentException("请输入奖杯年月，例如 202611。");
+                    game.DebugGrantTrophy(month);
+                });
+                await CreateBtnAndInputAsync("设置奖杯进度（年月 天数）", value =>
+                {
+                    var parts = value.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length != 2 || !int.TryParse(parts[0], out int month) || !int.TryParse(parts[1], out int days))
+                        throw new ArgumentException("请输入奖杯年月和完成天数，中间用空格分隔，例如 202611 12。");
+                    game.DebugSetTrophyProgress(month, days);
+                }, acceptsText: true);
+                await CreateBtnAndInputAsync("清除奖杯（年月或 0）", value =>
+                {
+                    if (!int.TryParse(value, out int month)) throw new ArgumentException("请输入奖杯年月，或输入 0 清除全部。");
+                    game.DebugClearTrophies(month == 0 ? (int?)null : month);
+                });
                 await CreateGmGroupAsync("换色与提示");
                 await CreateBtnAndInputAsync("主题颜色：0～5", value =>
                 {

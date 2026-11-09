@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: MiniGameConfig
   m_EditorClassIdentifier: 
   ProjectConf:
-    projectName: "\u5BFB\u5B57\u5927\u5E08"
+    projectName: "\u4E5D\u5BAB\u586B\u6570\u6311\u6218"
     Appid: wx308052a1ea617d67
-    CDN: https://xunzi.setworld.net
+    CDN: 
     assetLoadType: 1
     compressDataPackage: 1
     VideoUrl: 
-    relativeDST: E:/xx/NewText/output
-    DST: E:/xx/NewText/output
+    relativeDST: E:/xx/SuDo/output
+    DST: E:/xx/SuDo/output
     StreamCDN: 
     bundleHashLength: 32
     bundlePathIdentifier: StreamingAssets;

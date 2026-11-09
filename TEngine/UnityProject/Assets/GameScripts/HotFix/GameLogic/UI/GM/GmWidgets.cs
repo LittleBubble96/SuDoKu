@@ -37,11 +37,11 @@ namespace GameLogic
             if (item == null) throw new InvalidOperationException("GM 按钮预制体加载失败。");
             item.InitBtn(label, action);
         }
-        public async UniTask CreateBtnAndInputAsync(string label, Action<string> action)
+        public async UniTask CreateBtnAndInputAsync(string label, Action<string> action, bool acceptsText = false)
         {
             var item = await CreateWidgetByPathAsync<GmBtnAndInputItemWidget>(_content, "BtnAndInput_GM");
             if (item == null) throw new InvalidOperationException("GM 输入项预制体加载失败。");
-            item.InitBtnAndInput(label, action);
+            item.InitBtnAndInput(label, action, acceptsText);
         }
     }
 
@@ -63,8 +63,9 @@ namespace GameLogic
         {
             _label.text = label; _clicked = clicked; _submitted = null; _input.gameObject.SetActive(false);
         }
-        public void InitBtnAndInput(string label, Action<string> submitted)
+        public void InitBtnAndInput(string label, Action<string> submitted, bool acceptsText)
         {
+            if (acceptsText) _input.contentType = TMP_InputField.ContentType.Standard;
             _label.text = label; _submitted = submitted; _clicked = null; _input.gameObject.SetActive(true);
         }
     }

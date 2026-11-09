@@ -20,6 +20,17 @@ namespace GameLogic.Data
         public SudokuPoolCursor[] sudokuPools;
         public List<SudokuDailySaveData> dailyChallenges = new List<SudokuDailySaveData>();
         public List<SudokuTrophyAward> trophyAwards = new List<SudokuTrophyAward>();
+#if !TE_RELEASE
+        [Serializable]
+        public sealed class TrophyProgressOverride
+        {
+            public int id;
+            public int completedDays;
+            public int dailyCompletedAtOverride;
+        }
+
+        public List<TrophyProgressOverride> trophyProgressOverrides = new List<TrophyProgressOverride>();
+#endif
         public string activeDailyDate;
         public SudokuSettlementData settlement;
         public int signInDays;
@@ -38,6 +49,9 @@ namespace GameLogic.Data
             if (gamePropData == null) gamePropData = new GamePropData();
             if (dailyChallenges == null) dailyChallenges = new List<SudokuDailySaveData>();
             if (trophyAwards == null) trophyAwards = new List<SudokuTrophyAward>();
+#if !TE_RELEASE
+            if (trophyProgressOverrides == null) trophyProgressOverrides = new List<TrophyProgressOverride>();
+#endif
             if (gameSettingsData == null) gameSettingsData = new GameSettingsData();
             gamePropData.coinCount = Math.Max(0, gamePropData.coinCount);
             gamePropData.tipCount = Math.Max(0, gamePropData.tipCount);
