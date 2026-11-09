@@ -10,7 +10,9 @@ namespace GameLogic
     /// <summary>设置页内容，同时供首页页签和 UISetting 窗口复用。</summary>
     public sealed class UIHomeSettingWidget : UIWidget
     {
-        private const string Layout = "Center/Layout/";
+        
+        private const string ScrollViewPath = "Center/ScrollView";
+        private const string Layout = ScrollViewPath + "/Viewport/Content/";
         private readonly List<SettingToggleItem> _toggles = new List<SettingToggleItem>(7);
         private TMP_Dropdown _language, _textSize;
         private List<ConfLanguage> _languages;
@@ -18,6 +20,7 @@ namespace GameLogic
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            ConfigureScrollContent();
             _language = FindChildComponent<TMP_Dropdown>(Layout + "GameOther/LanguageItem/dropdown");
             _language.onValueChanged.AddListener(OnLanguageSelected);
             _textSize = FindChildComponent<TMP_Dropdown>(Layout + "GameAssist/TextSizeToggleItem/dropdown");
@@ -30,6 +33,20 @@ namespace GameLogic
             // 游戏说明尚无对应页面，先保留入口外观。
             CreateWidget<XYButton>(Layout + "GameOther/RuleItem/btn").Interactable = false;
             BindThemes();
+        }
+
+        private void ConfigureScrollContent()
+        {
+            var content = FindChildComponent<UnityEngine.UI.ScrollRect>(ScrollViewPath).content;
+            // 从视口顶部向下扩展，滚动范围取决于实际分组高度。
+            content.anchorMin = new UnityEngine.Vector2(content.anchorMin.x, 1f);
+            content.anchorMax = new UnityEngine.Vector2(content.anchorMax.x, 1f);
+            content.pivot = new UnityEngine.Vector2(content.pivot.x, 1f);
+            content.anchoredPosition = new UnityEngine.Vector2(content.anchoredPosition.x, 0f);
+
+            var fitter = content.GetComponent<UnityEngine.UI.ContentSizeFitter>();
+            if (fitter == null) fitter = content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>();
+            fitter.verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
         }
 
         protected override void RegisterEvent()
@@ -117,7 +134,7 @@ namespace GameLogic
             foreach (string group in new[] { "GameExperience", "GameAssist", "GameOther" })
             {
                 var parent = FindChild(Layout + group);
-                Theme(Layout + group + "/bg", SudokuThemeRole.Surface);
+                Theme(Layout + group + "/bg", SudokuThemeRole.CardOutline);
                 if (group != "GameOther")
                 {
                     Theme(Layout + group + "/bg/bgTitle", SudokuThemeRole.Related);

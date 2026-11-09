@@ -20,7 +20,7 @@ namespace SudokuEditor
         private const string Pending = "Sudoku.Settings.Pending", Phase = "Sudoku.Settings.Phase",
             Output = "Sudoku.Settings.Output", CachePath = "Sudoku.Settings.CachePath",
             HadCache = "Sudoku.Settings.HadCache", Result = "Sudoku.Settings.Result";
-        private const string Layout = "Center/Layout/";
+        private const string Layout = "Center/ScrollView/Viewport/Content/";
 
         static SudokuSettingsValidation() { EditorApplication.update += Tick; }
 

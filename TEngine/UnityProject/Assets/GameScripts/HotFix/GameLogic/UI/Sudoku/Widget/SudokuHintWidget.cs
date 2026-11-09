@@ -48,9 +48,9 @@ namespace GameLogic
             bool byCount = _game.Props.tipCount > 0;
             bool byCoin = !byCount && _game.Props.coinCount >= SudokuGameController.HintCoinCost;
             bool byAd = !byCount && !byCoin;
-            _countRoot.gameObject.SetActive(byCount);
-            _coinRoot.gameObject.SetActive(byCoin);
-            _adRoot.gameObject.SetActive(byAd);
+            _countRoot?.gameObject.SetActive(byCount);
+            _coinRoot?.gameObject.SetActive(byCoin);
+            _adRoot?.gameObject.SetActive(byAd);
             _count.text = _game.Props.tipCount.ToString();
             _coin.text = SudokuGameController.HintCoinCost.ToString();
             _loadingText.text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_loading);
