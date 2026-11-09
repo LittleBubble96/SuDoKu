@@ -20,12 +20,18 @@ namespace GameLogic
         private DailyTaskItem _playOnce, _challenge;
         private XYButton _freeButton, _adButton, _close, _mask;
         private TMP_Text _freeText, _adText;
+        private UnityEngine.UI.Image _adIcon;
         private bool _busy;
         private string _displayDate;
+
+        private TMP_Text _title, _freeTitle, _tasksTitle;
 
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            _title = FindChildComponent<TMP_Text>(Dialog + "m_title");
+            _freeTitle = FindChildComponent<TMP_Text>(Free + "m_title");
+            _tasksTitle = FindChildComponent<TMP_Text>(Tasks + "m_title");
             _animation = new UIPopupAnimation(gameObject.GetComponent<CanvasGroup>(),
                 FindChildComponent<RectTransform>("Panel/Dialog"));
             _freeButton = CreateWidget<XYButton>(Free + "FreeBtn");
@@ -46,11 +52,13 @@ namespace GameLogic
             Theme(Free + "FreeBtn/bg", SudokuThemeRole.Surface);
             Theme(Free + "FreeBtn/bg/outline", SudokuThemeRole.Accent);
             Theme(Free + "AdClaimBtn/bg", SudokuThemeRole.Accent);
-            Theme(Free + "AdClaimBtn/icon", SudokuThemeRole.Surface);
+            _adIcon = FindChildComponent<UnityEngine.UI.Image>(Free + "AdClaimBtn/icon");
+            UIThemeColor.Bind(_adIcon, SudokuThemeRole.Surface);
             UIThemeColor.Bind(_freeText, SudokuThemeRole.Accent);
             UIThemeColor.Bind(_adText, SudokuThemeRole.Surface);
-            foreach (string path in new[] { Dialog + "m_title", Free + "m_title", Tasks + "m_title" })
-                UIThemeColor.Bind(FindChildComponent<TMP_Text>(path), SudokuThemeRole.Text);
+            UIThemeColor.Bind(_title, SudokuThemeRole.Text);
+            UIThemeColor.Bind(_freeTitle, SudokuThemeRole.Text);
+            UIThemeColor.Bind(_tasksTitle, SudokuThemeRole.Text);
             foreach (var text in new[] { _freeText, _adText })
             {
                 text.fontSizeMax = text.fontSize; text.fontSizeMin = text.fontSize * .6f;
@@ -95,14 +103,14 @@ namespace GameLogic
             _displayDate = _manager.TodayKey;
             bool claimed = _manager.Data.freeClaimed;
             bool busy = _busy || SudokuPresenter.Current.IsAdShowing;
-            Label(Dialog + "m_title", LanguageKey.daily_gift_title);
-            Label(Free + "m_title", LanguageKey.daily_gift_free_reward);
-            Label(Tasks + "m_title", LanguageKey.home_daily_tasks);
+            _title.text = LocalizationHelper.GetLocalText(LanguageKey.daily_gift_title);
+            _freeTitle.text = LocalizationHelper.GetLocalText(LanguageKey.daily_gift_free_reward);
+            _tasksTitle.text = LocalizationHelper.GetLocalText(LanguageKey.home_daily_tasks);
             _freeText.text = LocalizationHelper.GetLocalText(claimed ? LanguageKey.daily_sign_in_claimed : LanguageKey.daily_gift_free_claim);
             _adText.text = LocalizationHelper.GetLocalText(claimed ? LanguageKey.daily_sign_in_claimed : LanguageKey.daily_reward_ad_double);
             _freeButton.Interactable = !claimed && !busy;
             _adButton.Interactable = !claimed && !busy && AdSystem.IsAdAvailable(AdIds.DailyTask);
-            FindChild(Free + "AdClaimBtn/icon").gameObject.SetActive(!claimed);
+            _adIcon.gameObject.SetActive(!claimed);
             _close.Interactable = _mask.Interactable = !busy;
             _playOnce.RefreshDisplay(_manager, busy);
             _challenge.RefreshDisplay(_manager, busy);
@@ -197,7 +205,6 @@ namespace GameLogic
             AdSystem.StateChanged -= OnAdStateChanged;
             base.OnDestroy();
         }
-        private void Label(string path, string key) => FindChildComponent<TMP_Text>(path).text = LocalizationHelper.GetLocalText(key);
         private void Theme(string path, SudokuThemeRole role) => UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>(path), role);
     }
 }

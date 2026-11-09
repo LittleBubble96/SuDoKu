@@ -94,7 +94,6 @@ namespace Procedure
                     CurrentSpeed));
 
             LauncherMgr.RefreshProgress(_resourceModule.Downloader.Progress);
-            LauncherMgr.ShowUI<LoadUpdateUI>($"{line1}\n{line2}\n{line3}");
 
             Log.Info($"{line1} {line2} {line3}");
         }

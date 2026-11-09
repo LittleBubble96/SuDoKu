@@ -20,6 +20,7 @@ namespace GameLogic
             LanguageKey.daily_weekday_monday, LanguageKey.daily_weekday_tuesday, LanguageKey.daily_weekday_wednesday,
             LanguageKey.daily_weekday_thursday, LanguageKey.daily_weekday_friday, LanguageKey.daily_weekday_saturday, LanguageKey.daily_weekday_sunday
         };
+        private readonly TMP_Text[] _weekdayLabels = new TMP_Text[Weekdays.Length];
         private readonly List<DailyCalendarItem> _days = new List<DailyCalendarItem>(42);
         private XYButton _previous, _next, _start;
         private TMP_Text _month, _info, _status, _startLabel, _monthProgress;
@@ -30,9 +31,16 @@ namespace GameLogic
         public DateTime SelectedDate { get; private set; }
         public DateTime ViewedMonth { get; private set; }
 
+        private TMP_Text _title, _trophyGalleryLabel, _trophyDescription, _trophyUnlockDescription, _trophyName;
+
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            _title = FindChildComponent<TMP_Text>("Top/Center/m_title");
+            _trophyGalleryLabel = FindChildComponent<TMP_Text>("Top/Trophy/Btn/m_text");
+            _trophyDescription = FindChildComponent<TMP_Text>(Top + "m_des1");
+            _trophyUnlockDescription = FindChildComponent<TMP_Text>(Top + "m_des2");
+            _trophyName = FindChildComponent<TMP_Text>(Top + "m_title");
             _previous = CreateWidget<XYButton>(Panel + "Left/Btn");
             _next = CreateWidget<XYButton>(Panel + "Right/Btn");
             _previous.OnAddListener(() => MoveMonth(-1));
@@ -106,7 +114,8 @@ namespace GameLogic
             var record = game.GetDaily(SelectedDate);
             bool completed = record?.completed == true;
             _month.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_calendar_month), ViewedMonth.Year, ViewedMonth.Month);
-            for (int i = 0; i < 7; i++) Label(Calendar + "m_" + (i + 1), Weekdays[i]);
+            for (int i = 0; i < _weekdayLabels.Length; i++)
+                _weekdayLabels[i].text = LocalizationHelper.GetLocalText(Weekdays[i]);
             int offset = SudokuDailyRules.MondayOffset(ViewedMonth);
             var first = ViewedMonth.AddDays(-offset);
             for (int i = 0; i < 42; i++)
@@ -127,11 +136,11 @@ namespace GameLogic
             int wins = game.CompletedDays(ViewedMonth), days = DateTime.DaysInMonth(ViewedMonth.Year, ViewedMonth.Month);
             _monthProgress.text = wins + "/" + days;
             _monthFill.fillAmount = wins / (float)days;
-            Label("Top/Center/m_title", LanguageKey.daily_challenge);
-            Label("Top/Trophy/Btn/m_text", LanguageKey.daily_trophy_hall);
-            Label(Top + "m_des1", LanguageKey.daily_monthly_trophy);
-            Label(Top + "m_des2", LanguageKey.daily_trophy_unlock_desc);
-            Label(Top + "m_title", LanguageKey.daily_trophy_leo);
+            _title.text = LocalizationHelper.GetLocalText(LanguageKey.daily_challenge);
+            _trophyGalleryLabel.text = LocalizationHelper.GetLocalText(LanguageKey.daily_trophy_hall);
+            _trophyDescription.text = LocalizationHelper.GetLocalText(LanguageKey.daily_monthly_trophy);
+            _trophyUnlockDescription.text = LocalizationHelper.GetLocalText(LanguageKey.daily_trophy_unlock_desc);
+            _trophyName.text = LocalizationHelper.GetLocalText(LanguageKey.daily_trophy_leo);
         }
 
         protected override void OnUpdate()
@@ -167,8 +176,6 @@ namespace GameLogic
             finally { _openingTrophies = false; }
         }
 
-        private void Label(string path, string key) => FindChildComponent<TMP_Text>(path).text = LocalizationHelper.GetLocalText(key);
-
         private void Theme(string path, SudokuThemeRole role)
         {
             var graphic = FindChild(path).GetComponent<UnityEngine.UI.Graphic>();
@@ -189,13 +196,18 @@ namespace GameLogic
             Theme(Panel + "Left/Btn/icon", SudokuThemeRole.Text);
             Theme(Panel + "Right/Btn/icon", SudokuThemeRole.Text);
             Theme("Top/Back/Btn/icon", SudokuThemeRole.Text);
-            Theme("Top/Center/m_title", SudokuThemeRole.Text);
+            UIThemeColor.Bind(_title, SudokuThemeRole.Text);
             Theme("Top/Trophy/Btn/icon", SudokuThemeRole.Accent);
-            Theme("Top/Trophy/Btn/m_text", SudokuThemeRole.Accent);
-            Theme(Top + "m_title", SudokuThemeRole.Text);
-            Theme(Top + "m_des1", SudokuThemeRole.MutedText);
-            Theme(Top + "m_des2", SudokuThemeRole.MutedText);
-            for (int i = 1; i <= 7; i++) Theme(Calendar + "m_" + i, SudokuThemeRole.MutedText);
+            UIThemeColor.Bind(_trophyGalleryLabel, SudokuThemeRole.Accent);
+            UIThemeColor.Bind(_trophyName, SudokuThemeRole.Text);
+            UIThemeColor.Bind(_trophyDescription, SudokuThemeRole.MutedText);
+            UIThemeColor.Bind(_trophyUnlockDescription, SudokuThemeRole.MutedText);
+            for (int i = 0; i < _weekdayLabels.Length; i++)
+            {
+                var label = FindChildComponent<TMP_Text>(Calendar + "m_" + (i + 1));
+                _weekdayLabels[i] = label;
+                UIThemeColor.Bind(label, SudokuThemeRole.MutedText);
+            }
         }
     }
 }

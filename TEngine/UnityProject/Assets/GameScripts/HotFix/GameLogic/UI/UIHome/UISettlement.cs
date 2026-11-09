@@ -19,17 +19,34 @@ namespace GameLogic
     public sealed class UISettlement : UIWindow
     {
         private const string Content = "Center/Content/";
+        private static readonly (string Node, string Key)[] Stats =
+        {
+            ("scoreRound", LanguageKey.finish_score),
+            ("timeRound", LanguageKey.finish_time),
+            ("historyHighest", LanguageKey.finish_best_score),
+            ("fastestTime", LanguageKey.statistics_best_time)
+        };
+        private readonly TMP_Text[] _statLabels = new TMP_Text[Stats.Length];
+        private readonly TMP_Text[] _statValues = new TMP_Text[Stats.Length];
+        private GameObject _giftGlow;
         private SettlementContext _context;
         private XYButton _gift, _next, _home, _share;
         private UIPopupAnimation _animation;
         private bool _openingReward;
         public SudokuSettlementData Result => _context?.Result;
 
+        private TMP_Text _title, _nextLabel, _homeLabel, _shareLabel;
+
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            _title = FindChildComponent<TMP_Text>("Center/Top/m_text");
+            _nextLabel = FindChildComponent<TMP_Text>(Content + "AgainGameBtn/m_text");
+            _homeLabel = FindChildComponent<TMP_Text>(Content + "ActionBtn/ReturnBtn/m_text");
+            _shareLabel = FindChildComponent<TMP_Text>(Content + "ActionBtn/FightBtn/m_text");
             _animation = new UIPopupAnimation(gameObject.GetComponent<CanvasGroup>(), FindChildComponent<RectTransform>("Center"));
             _gift = CreateWidget<XYButton>(Content + "GiftBtn");
+            _giftGlow = FindChild(Content + "GiftBtn/bg_glow").gameObject;
             _next = CreateWidget<XYButton>(Content + "AgainGameBtn");
             _home = CreateWidget<XYButton>(Content + "ActionBtn/ReturnBtn");
             _share = CreateWidget<XYButton>(Content + "ActionBtn/FightBtn");
@@ -46,18 +63,20 @@ namespace GameLogic
             Theme("Center/Top/icon", SudokuThemeRole.Accent);
             Theme("Center/Top/icon_outline", SudokuThemeRole.StrongLine);
             Theme("Center/Top/icon_outline2", SudokuThemeRole.Surface);
-            foreach (string field in new[] { "scoreRound", "timeRound", "historyHighest", "fastestTime" })
+            for (int i = 0; i < Stats.Length; i++)
             {
-                Theme(Content + "DataArea/" + field + "/Icon", SudokuThemeRole.Selected);
-                UIThemeColor.Bind(FindChildComponent<TMP_Text>(Content + "DataArea/" + field + "/m_text"), SudokuThemeRole.Selected);
+                string path = Content + "DataArea/" + Stats[i].Node;
+                _statLabels[i] = FindChildComponent<TMP_Text>(path + "/m_text");
+                _statValues[i] = FindChildComponent<TMP_Text>(path + "/m_textNum");
+                Theme(path + "/Icon", SudokuThemeRole.Selected);
+                UIThemeColor.Bind(_statLabels[i], SudokuThemeRole.Selected);
             }
             Theme(Content + "AgainGameBtn/bg", SudokuThemeRole.Accent);
             Theme(Content + "AgainGameBtn/bg_outline", SudokuThemeRole.Selected);
-            foreach (string button in new[] { "ReturnBtn", "FightBtn" })
-            {
-                Theme(Content + "ActionBtn/" + button + "/Icon", SudokuThemeRole.Selected);
-                UIThemeColor.Bind(FindChildComponent<TMP_Text>(Content + "ActionBtn/" + button + "/m_text"), SudokuThemeRole.Selected);
-            }
+            Theme(Content + "ActionBtn/ReturnBtn/Icon", SudokuThemeRole.Selected);
+            Theme(Content + "ActionBtn/FightBtn/Icon", SudokuThemeRole.Selected);
+            UIThemeColor.Bind(_homeLabel, SudokuThemeRole.Selected);
+            UIThemeColor.Bind(_shareLabel, SudokuThemeRole.Selected);
         }
 
         protected override void RegisterEvent()
@@ -73,20 +92,18 @@ namespace GameLogic
         public void RefreshDisplay()
         {
             if (!IsOpen || Result == null) return;
-            Label("Center/Top/m_text", LanguageKey.finish_title);
-            string[] fields = { "scoreRound", "timeRound", "historyHighest", "fastestTime" };
-            string[] keys = { LanguageKey.finish_score, LanguageKey.finish_time, LanguageKey.finish_best_score, LanguageKey.statistics_best_time };
-            string[] values = { Result.score.ToString(), SudokuUIFormatting.Time(Result.seconds), Result.bestScore.ToString(), SudokuUIFormatting.Time(Result.bestSeconds) };
-            for (int i = 0; i < fields.Length; i++)
-            {
-                Label(Content + "DataArea/" + fields[i] + "/m_text", keys[i]);
-                FindChildComponent<TMP_Text>(Content + "DataArea/" + fields[i] + "/m_textNum").text = values[i];
-            }
-            Label(Content + "AgainGameBtn/m_text", LanguageKey.continue_btn);
-            Label(Content + "ActionBtn/ReturnBtn/m_text", LanguageKey.back_home_btn);
-            Label(Content + "ActionBtn/FightBtn/m_text", LanguageKey.finish_share);
+            _title.text = LocalizationHelper.GetLocalText(LanguageKey.finish_title);
+            for (int i = 0; i < Stats.Length; i++)
+                _statLabels[i].text = LocalizationHelper.GetLocalText(Stats[i].Key);
+            _statValues[0].text = Result.score.ToString();
+            _statValues[1].text = SudokuUIFormatting.Time(Result.seconds);
+            _statValues[2].text = Result.bestScore.ToString();
+            _statValues[3].text = SudokuUIFormatting.Time(Result.bestSeconds);
+            _nextLabel.text = LocalizationHelper.GetLocalText(LanguageKey.continue_btn);
+            _homeLabel.text = LocalizationHelper.GetLocalText(LanguageKey.back_home_btn);
+            _shareLabel.text = LocalizationHelper.GetLocalText(LanguageKey.finish_share);
             _gift.Interactable = !Result.IsClaimed && !_openingReward;
-            FindChild(Content + "GiftBtn/bg_glow").gameObject.SetActive(!Result.IsClaimed);
+            _giftGlow.SetActive(!Result.IsClaimed);
         }
         private async UniTaskVoid OpenRewardAsync()
         {
@@ -126,7 +143,6 @@ namespace GameLogic
             base.OnClose();
         }
         protected override void OnDestroy() { _animation.Reset(); base.OnDestroy(); }
-        private void Label(string path, string key) => FindChildComponent<TMP_Text>(path).text = LocalizationHelper.GetLocalText(key);
         private void Theme(string path, SudokuThemeRole role) => UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>(path), role);
     }
 }

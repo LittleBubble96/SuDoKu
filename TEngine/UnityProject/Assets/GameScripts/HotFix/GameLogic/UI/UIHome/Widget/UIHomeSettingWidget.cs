@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GameConfig.language;
 using GameLogic.Localization;
 using GameLogic.Sudoku;
+using RTLTMPro;
 using TEngine;
 using TMPro;
 
@@ -15,16 +16,28 @@ namespace GameLogic
         private const string Layout = ScrollViewPath + "/Viewport/Content/";
         private readonly List<SettingToggleItem> _toggles = new List<SettingToggleItem>(7);
         private TMP_Dropdown _language, _textSize;
+        private RTLTextMeshPro _gameVersionText;
         private List<ConfLanguage> _languages;
+        private Language? _displayedLanguage;
+
+        private TMP_Text _title, _experienceTitle, _assistTitle, _relatedDescription, _languageTitle, _rulesTitle, _textSizeTitle;
 
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            _title = FindChildComponent<TMP_Text>("Top/Center/m_title");
+            _experienceTitle = FindChildComponent<TMP_Text>(Layout + "GameExperience/m_title");
+            _assistTitle = FindChildComponent<TMP_Text>(Layout + "GameAssist/m_title");
+            _relatedDescription = FindChildComponent<TMP_Text>(Layout + "GameAssist/relatedAreaToggleItem/m_des");
+            _languageTitle = FindChildComponent<TMP_Text>(Layout + "GameOther/LanguageItem/m_title");
+            _rulesTitle = FindChildComponent<TMP_Text>(Layout + "GameOther/RuleItem/m_title");
+            _textSizeTitle = FindChildComponent<TMP_Text>(Layout + "GameAssist/TextSizeToggleItem/m_title");
             ConfigureScrollContent();
             _language = FindChildComponent<TMP_Dropdown>(Layout + "GameOther/LanguageItem/dropdown");
             _language.onValueChanged.AddListener(OnLanguageSelected);
             _textSize = FindChildComponent<TMP_Dropdown>(Layout + "GameAssist/TextSizeToggleItem/dropdown");
             _textSize.onValueChanged.AddListener(index => SudokuSettingsManager.SetTextSize((SudokuTextSize)index));
+            _gameVersionText = FindChildComponent<RTLTextMeshPro>(Layout + "GameOther/gameVersion");
             CreateWidget<XYButton>("Top/Back/Btn").OnAddListener(() =>
             {
                 if (OwnerWindow is UIHome home) home.SelectTab(0);
@@ -52,7 +65,7 @@ namespace GameLogic
         protected override void RegisterEvent()
         {
             base.RegisterEvent();
-            AddUIEvent(EventDefine.SudokuStateChanged, RefreshDisplay);
+            AddUIEvent(EventDefine.SudokuSettingsChanged, RefreshSettings);
             AddUIEvent(LocalizationModule.Event_LanguageChanged, RefreshDisplay);
         }
 
@@ -80,13 +93,19 @@ namespace GameLogic
 
         public void RefreshDisplay()
         {
-            Label("Top/Center/m_title", LanguageKey.setting_title);
-            Label(Layout + "GameExperience/m_title", LanguageKey.setting_game_experience);
-            Label(Layout + "GameAssist/m_title", LanguageKey.setting_game_assist);
-            Label(Layout + "GameAssist/relatedAreaToggleItem/m_des", LanguageKey.setting_highlight_related_des);
-            Label(Layout + "GameOther/LanguageItem/m_title", LanguageKey.setting_language);
-            Label(Layout + "GameOther/RuleItem/m_title", LanguageKey.setting_how_to_play);
-            Label(Layout + "GameAssist/TextSizeToggleItem/m_title", LanguageKey.setting_text_size);
+            if (_displayedLanguage != GameModule.Localization.Language) RefreshLanguage();
+            RefreshSettings();
+        }
+
+        private void RefreshLanguage()
+        {
+            _title.text = LocalizationHelper.GetLocalText(LanguageKey.setting_title);
+            _experienceTitle.text = LocalizationHelper.GetLocalText(LanguageKey.setting_game_experience);
+            _assistTitle.text = LocalizationHelper.GetLocalText(LanguageKey.setting_game_assist);
+            _relatedDescription.text = LocalizationHelper.GetLocalText(LanguageKey.setting_highlight_related_des);
+            _languageTitle.text = LocalizationHelper.GetLocalText(LanguageKey.setting_language);
+            _rulesTitle.text = LocalizationHelper.GetLocalText(LanguageKey.setting_how_to_play);
+            _textSizeTitle.text = LocalizationHelper.GetLocalText(LanguageKey.setting_text_size);
             _textSize.ClearOptions();
             _textSize.AddOptions(new List<string>
             {
@@ -94,19 +113,23 @@ namespace GameLogic
                 LocalizationHelper.GetLocalText(LanguageKey.setting_text_size_medium),
                 LocalizationHelper.GetLocalText(LanguageKey.setting_text_size_small)
             });
+            var options = new List<TMP_Dropdown.OptionData>(_languages.Count);
+            foreach (var language in _languages)
+                options.Add(new TMP_Dropdown.OptionData(LocalizationHelper.GetLocalText(language.Name)));
+            _language.ClearOptions();
+            _language.AddOptions(options);
+            foreach (var toggle in _toggles) toggle.RefreshLanguage();
+            _gameVersionText.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.setting_version), GameModule.Resource.ApplicableGameVersion);
+            _displayedLanguage = GameModule.Localization.Language;
+        }
+
+        private void RefreshSettings()
+        {
             _textSize.SetValueWithoutNotify((int)SudokuSettingsManager.Data.textSize);
             _textSize.RefreshShownValue();
             foreach (var toggle in _toggles) toggle.RefreshDisplay();
-            var options = new List<TMP_Dropdown.OptionData>(_languages.Count);
-            int selected = 0;
-            for (int i = 0; i < _languages.Count; i++)
-            {
-                options.Add(new TMP_Dropdown.OptionData(LocalizationHelper.GetLocalText(_languages[i].Name)));
-                if (_languages[i].LanguageCode.ToString() == SudokuSettingsManager.Data.language) selected = i;
-            }
-            _language.ClearOptions();
-            _language.AddOptions(options);
-            _language.SetValueWithoutNotify(selected);
+            int selected = _languages.FindIndex(language => language.LanguageCode.ToString() == SudokuSettingsManager.Data.language);
+            _language.SetValueWithoutNotify(selected < 0 ? 0 : selected);
             _language.RefreshShownValue();
         }
 
@@ -119,9 +142,6 @@ namespace GameLogic
             toggle.Init(key, getValue, setValue);
             _toggles.Add(toggle);
         }
-
-        private void Label(string path, string key) =>
-            FindChildComponent<TMP_Text>(path).text = LocalizationHelper.GetLocalText(key);
 
         private void Theme(string path, SudokuThemeRole role) =>
             UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Graphic>(path), role);
@@ -138,7 +158,7 @@ namespace GameLogic
                 if (group != "GameOther")
                 {
                     Theme(Layout + group + "/bg/bgTitle", SudokuThemeRole.Related);
-                    var title = FindChildComponent<TMP_Text>(Layout + group + "/m_title");
+                    var title = group == "GameExperience" ? _experienceTitle : _assistTitle;
                     title.fontSizeMax = title.fontSize;
                     title.enableAutoSizing = true;
                     title.enableWordWrapping = false;
@@ -147,10 +167,10 @@ namespace GameLogic
                     if (parent.GetChild(i).name.StartsWith("line", System.StringComparison.Ordinal))
                         UIThemeColor.Bind(parent.GetChild(i).GetComponent<UnityEngine.UI.Image>(), SudokuThemeRole.Matching);
             }
-            Theme(Layout + "GameAssist/relatedAreaToggleItem/m_des", SudokuThemeRole.MutedText);
+            UIThemeColor.Bind(_relatedDescription, SudokuThemeRole.MutedText);
             Theme(Layout + "GameOther/LanguageItem/icon", SudokuThemeRole.Accent);
             Theme(Layout + "GameOther/RuleItem/icon", SudokuThemeRole.MutedText);
-            Theme(Layout + "GameOther/RuleItem/m_title", SudokuThemeRole.MutedText);
+            UIThemeColor.Bind(_rulesTitle, SudokuThemeRole.MutedText);
             Theme(Layout + "GameAssist/TextSizeToggleItem/icon", SudokuThemeRole.Accent);
             BindDropdownThemes(Layout + "GameOther/LanguageItem/dropdown/");
             BindDropdownThemes(Layout + "GameAssist/TextSizeToggleItem/dropdown/");

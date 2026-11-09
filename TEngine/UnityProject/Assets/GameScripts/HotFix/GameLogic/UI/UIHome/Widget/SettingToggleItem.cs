@@ -38,13 +38,15 @@ namespace GameLogic
             _key = key;
             _getValue = getValue;
             _setValue = setValue;
+            RefreshLanguage();
             RefreshDisplay();
         }
+
+        public void RefreshLanguage() => _title.text = LocalizationHelper.GetLocalText(_key);
 
         public void RefreshDisplay()
         {
             bool enabled = _getValue();
-            _title.text = LocalizationHelper.GetLocalText(_key);
             _handle.anchoredPosition = enabled ? _onPosition : _offPosition;
             _backgroundColor.SetRole(enabled ? SudokuThemeRole.Accent : SudokuThemeRole.MutedText);
             _background.canvasRenderer.SetAlpha(enabled ? 1f : 0.28f);

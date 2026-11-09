@@ -30,7 +30,7 @@ namespace Procedure
             _finished = false;
             _active = true;
             _fullProgressFrame = -1;
-            LauncherMgr.ShowUI<LoadUpdateUI>(string.Format(LoadText.Instance.Label_Load_Load_Progress, 0));
+            LauncherMgr.ShowUI<LoadUpdateUI>();
             _loadingUI = LauncherMgr.GetActiveUI<LoadUpdateUI>();
             GameEvent.AddEventListener(GameStartSuccessEvent, OnGameStartSuccessEvent);
         }

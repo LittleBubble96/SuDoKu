@@ -52,7 +52,7 @@ namespace Procedure
             StartupTelemetry.Start(8);
             _loadedFlag.Clear();
 
-            LauncherMgr.ShowUI<LoadUpdateUI>(Utility.Text.Format(LoadText.Instance.Label_Load_Load_Progress, 0));
+            LauncherMgr.ShowUI<LoadUpdateUI>();
 
             GameEvent.Send("UILoadUpdate.RefreshVersion");
 
@@ -70,35 +70,13 @@ namespace Procedure
 
             foreach (KeyValuePair<string, bool> loadedFlag in _loadedFlag)
             {
-                if (!loadedFlag.Value)
-                {
-                    break;
-                }
-                else
+                if (loadedFlag.Value)
                 {
                     loadCount++;
                 }
             }
 
-            if (_loadedFlag.Count != 0)
-            {
-                LauncherMgr.ShowUI<LoadUpdateUI>(Utility.Text.Format(LoadText.Instance.Label_Load_Load_Progress, (float)loadCount / totalCount * 100));
-            }
-            else
-            {
-                LauncherMgr.RefreshProgress(_progress);
-
-                string progressStr = $"{_progress * 100:f1}";
-
-                if (Math.Abs(_progress - 1f) < 0.001f)
-                {
-                    LauncherMgr.ShowUI<LoadUpdateUI>(LoadText.Instance.Label_Load_Load_Complete);
-                }
-                else
-                {
-                    LauncherMgr.ShowUI<LoadUpdateUI>(Utility.Text.Format(LoadText.Instance.Label_Load_Load_Progress, progressStr));
-                }
-            }
+            LauncherMgr.RefreshProgress(_loadedFlag.Count == 0 ? _progress : (float)loadCount / totalCount);
 
             if (loadCount < totalCount)
             {

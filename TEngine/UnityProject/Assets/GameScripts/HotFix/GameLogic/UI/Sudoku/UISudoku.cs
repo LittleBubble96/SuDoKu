@@ -31,9 +31,15 @@ namespace GameLogic
         private float _retrySettlementAt;
         public bool IsBoardReady => _board?.IsReady == true;
         public SudokuSession Session => _game?.Session;
+        private TMP_Text _undoLabel, _clearLabel, _notesLabel, _hintLabel;
+
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            _undoLabel = FindChildComponent<TMP_Text>(LayoutPath + "PropArea/UnDoBtn/m_text");
+            _clearLabel = FindChildComponent<TMP_Text>(LayoutPath + "PropArea/ClearBtn/m_text");
+            _notesLabel = FindChildComponent<TMP_Text>(LayoutPath + "PropArea/NoteBtn/m_text");
+            _hintLabel = FindChildComponent<TMP_Text>(LayoutPath + "PropArea/TipsBtn/m_text");
             _level = FindChildComponent<TMP_Text>(LayoutPath + "Board/SudoInfoPanel/Level");
             _progress = FindChildComponent<TMP_Text>(LayoutPath + "Board/SudoInfoPanel/Progress");
             _time = FindChildComponent<TMP_Text>(LayoutPath + "Board/SudoInfoPanel/m_time");
@@ -103,10 +109,10 @@ namespace GameLogic
         }
         private void RefreshLabels()
         {
-            FindChildComponent<TMP_Text>(LayoutPath + "PropArea/UnDoBtn/m_text").text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_undo);
-            FindChildComponent<TMP_Text>(LayoutPath + "PropArea/ClearBtn/m_text").text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_clear);
-            FindChildComponent<TMP_Text>(LayoutPath + "PropArea/NoteBtn/m_text").text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_notes);
-            FindChildComponent<TMP_Text>(LayoutPath + "PropArea/TipsBtn/m_text").text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_hint);
+            _undoLabel.text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_undo);
+            _clearLabel.text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_clear);
+            _notesLabel.text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_notes);
+            _hintLabel.text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_hint);
         }
         protected override void OnClose()
         {
@@ -224,7 +230,7 @@ namespace GameLogic
             if (GMSingle.IsPanelOpen) return;
 #endif
             _game.Tick(Time.unscaledDeltaTime); RefreshTime();
-            if (!_game.CanInteract || UIInteractionLock.IsLocked) return;
+            if (!_game.CanInteract || UIInteractionLock.IsLocked || !Input.anyKeyDown) return;
             var focused = EventSystem.current?.currentSelectedGameObject;
             if (focused != null && focused.activeInHierarchy && focused.GetComponentInParent<TMP_InputField>() != null) return;
             for (int d = 1; d <= 9; d++)

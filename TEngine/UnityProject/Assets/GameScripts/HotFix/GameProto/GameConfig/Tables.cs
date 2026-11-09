@@ -16,33 +16,6 @@ public partial class Tables
 {
     #region The Tables
 
-    private item.TbItem m_TbItem;
-    public item.TbItem TbItem 
-    {
-        get
-        {
-            if (m_TbItem == null)
-            {
-                m_TbItem = new item.TbItem(defaultLoader("item_tbitem"));
-                m_TbItem.ResolveRef(this);
-            }
-            return m_TbItem;
-        }
-        set
-        {
-            m_TbItem = value;
-            m_TbItem.ResolveRef(this);
-        }
-    }
-    public async UniTask TbItemAsync() 
-    {
-        if (m_TbItem != null)
-        {
-            return;
-        }
-        m_TbItem = new item.TbItem(await defaultLoaderAsync("item_tbitem"));
-        m_TbItem.ResolveRef(this);
-    }
     private language.TbLanguage m_TbLanguage;
     public language.TbLanguage TbLanguage 
     {
@@ -96,60 +69,6 @@ public partial class Tables
         }
         m_TbLanguageContent = new language.TbLanguageContent(await defaultLoaderAsync("language_tblanguagecontent"));
         m_TbLanguageContent.ResolveRef(this);
-    }
-    private level.TbLevel m_TbLevel;
-    public level.TbLevel TbLevel 
-    {
-        get
-        {
-            if (m_TbLevel == null)
-            {
-                m_TbLevel = new level.TbLevel(defaultLoader("level_tblevel"));
-                m_TbLevel.ResolveRef(this);
-            }
-            return m_TbLevel;
-        }
-        set
-        {
-            m_TbLevel = value;
-            m_TbLevel.ResolveRef(this);
-        }
-    }
-    public async UniTask TbLevelAsync() 
-    {
-        if (m_TbLevel != null)
-        {
-            return;
-        }
-        m_TbLevel = new level.TbLevel(await defaultLoaderAsync("level_tblevel"));
-        m_TbLevel.ResolveRef(this);
-    }
-    private reward.TbReward m_TbReward;
-    public reward.TbReward TbReward 
-    {
-        get
-        {
-            if (m_TbReward == null)
-            {
-                m_TbReward = new reward.TbReward(defaultLoader("reward_tbreward"));
-                m_TbReward.ResolveRef(this);
-            }
-            return m_TbReward;
-        }
-        set
-        {
-            m_TbReward = value;
-            m_TbReward.ResolveRef(this);
-        }
-    }
-    public async UniTask TbRewardAsync() 
-    {
-        if (m_TbReward != null)
-        {
-            return;
-        }
-        m_TbReward = new reward.TbReward(await defaultLoaderAsync("reward_tbreward"));
-        m_TbReward.ResolveRef(this);
     }
     /// <summary>
     /// 月度每日挑战奖杯

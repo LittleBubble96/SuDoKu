@@ -11,5 +11,6 @@
         public const int SudokuTrophiesChanged = 26102206;
         public const int CoinViewChanged = 26102207;
         public const int CoinViewAnimationStarted = 26102208;
+        public const int SudokuSettingsChanged = 26102209;
     }
 }

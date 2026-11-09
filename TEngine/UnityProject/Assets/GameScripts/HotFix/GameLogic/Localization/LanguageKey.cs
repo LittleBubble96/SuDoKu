@@ -8,7 +8,7 @@
 namespace GameLogic.Localization
 {
     /// <summary>
-    /// 多语言 Key 常量类（共 211 个 Key）。
+    /// 多语言 Key 常量类（共 212 个 Key）。
     /// </summary>
     public static class LanguageKey
     {
@@ -168,6 +168,7 @@ namespace GameLogic.Localization
         public const string setting_show_remaining_count = "setting_show_remaining_count";
         public const string setting_language = "setting_language";
         public const string setting_how_to_play = "setting_how_to_play";
+        public const string setting_version = "setting_version";
         public const string palette_title = "palette_title";
         public const string palette_classic = "palette_classic";
         public const string palette_mint = "palette_mint";

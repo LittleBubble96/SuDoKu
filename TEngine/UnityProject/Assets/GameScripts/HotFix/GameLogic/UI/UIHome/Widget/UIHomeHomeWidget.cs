@@ -15,9 +15,19 @@ namespace GameLogic
         private bool _openingDifficulty;
         private DateTime _displayDate;
 
+        private TMP_Text _signInLabel, _tasksLabel, _title, _otherGamesLabel, _dailyLabel, _dailyGoLabel, _continueLabel, _newGameLabel;
+
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            _signInLabel = FindChildComponent<TMP_Text>("Top/Right/Layout/SignIn/Btn/m_text");
+            _tasksLabel = FindChildComponent<TMP_Text>("Top/Right/Layout/DailyTask/Btn/m_text");
+            _title = FindChildComponent<TMP_Text>("Center/Layout/Top/m_text");
+            _otherGamesLabel = FindChildComponent<TMP_Text>(Cards + "OtherGameBtn/m_text");
+            _dailyLabel = FindChildComponent<TMP_Text>(Cards + "DailyChallengeBtn/m_text");
+            _dailyGoLabel = FindChildComponent<TMP_Text>(Cards + "DailyChallengeBtn/Go/m_text");
+            _continueLabel = FindChildComponent<TMP_Text>(Cards + "ContinueGameBtn/m_text");
+            _newGameLabel = FindChildComponent<TMP_Text>(Cards + "NewGameBtn/m_text");
             var coinDisplay = CreateWidget<CoinDisplayWidget>(FindChild("Top/CoinRoot/Btn/m_num").gameObject);
             coinDisplay.SetAnimationRoot(FindChildComponent<UnityEngine.RectTransform>("Top/CoinRoot"));
             _continueInfo = FindChildComponent<TMP_Text>(Cards + "ContinueGameBtn/m_des");
@@ -58,14 +68,14 @@ namespace GameLogic
                 string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_selected_info), _displayDate.Month, _displayDate.Day,
                     daily.completed ? LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_complete) :
                     string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_progress), daily.progressPercent));
-            Label("Top/Right/Layout/SignIn/Btn/m_text", LanguageKey.home_check_in);
-            Label("Top/Right/Layout/DailyTask/Btn/m_text", LanguageKey.home_daily_tasks);
-            Label("Center/Layout/Top/m_text", LanguageKey.sudoku_title);
-            Label(Cards + "OtherGameBtn/m_text", LanguageKey.home_more_games);
-            Label(Cards + "DailyChallengeBtn/m_text", LanguageKey.daily_challenge);
-            Label(Cards + "DailyChallengeBtn/Go/m_text", LanguageKey.challenge_btn);
-            Label(Cards + "ContinueGameBtn/m_text", LanguageKey.continue_btn);
-            Label(Cards + "NewGameBtn/m_text", LanguageKey.new_game_btn);
+            _signInLabel.text = LocalizationHelper.GetLocalText(LanguageKey.home_check_in);
+            _tasksLabel.text = LocalizationHelper.GetLocalText(LanguageKey.home_daily_tasks);
+            _title.text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_title);
+            _otherGamesLabel.text = LocalizationHelper.GetLocalText(LanguageKey.home_more_games);
+            _dailyLabel.text = LocalizationHelper.GetLocalText(LanguageKey.daily_challenge);
+            _dailyGoLabel.text = LocalizationHelper.GetLocalText(LanguageKey.challenge_btn);
+            _continueLabel.text = LocalizationHelper.GetLocalText(LanguageKey.continue_btn);
+            _newGameLabel.text = LocalizationHelper.GetLocalText(LanguageKey.new_game_btn);
         }
 
         protected override void OnUpdate()
@@ -87,38 +97,36 @@ namespace GameLogic
             finally { _openingDifficulty = false; }
         }
 
-        private void Label(string path, string key) => FindChildComponent<TMP_Text>(path).text = LocalizationHelper.GetLocalText(key);
         private void Theme(string path, SudokuThemeRole role) => UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Graphic>(path), role);
 
         private void BindThemes()
         {
             Theme("Top/CoinRoot/Btn/m_num", SudokuThemeRole.Text);
-            foreach (string action in new[] { "SignIn", "DailyTask" })
-            {
-                Theme("Top/Right/Layout/" + action + "/Btn/icon", SudokuThemeRole.Accent);
-                Theme("Top/Right/Layout/" + action + "/Btn/m_text", SudokuThemeRole.Accent);
-            }
+            Theme("Top/Right/Layout/SignIn/Btn/icon", SudokuThemeRole.Accent);
+            Theme("Top/Right/Layout/DailyTask/Btn/icon", SudokuThemeRole.Accent);
+            UIThemeColor.Bind(_signInLabel, SudokuThemeRole.Accent);
+            UIThemeColor.Bind(_tasksLabel, SudokuThemeRole.Accent);
             Theme("Top/Right/Layout/ColorTheme/Btn/icon", SudokuThemeRole.Accent);
             Theme("Center/Layout/Top/icon", SudokuThemeRole.Accent);
-            Theme("Center/Layout/Top/m_text", SudokuThemeRole.Text);
+            UIThemeColor.Bind(_title, SudokuThemeRole.Text);
             Theme(Cards + "OtherGameBtn/bg", SudokuThemeRole.Matching);
-            Theme(Cards + "OtherGameBtn/m_text", SudokuThemeRole.Text);
+            UIThemeColor.Bind(_otherGamesLabel, SudokuThemeRole.Text);
             Theme(Cards + "OtherGameBtn/icon", SudokuThemeRole.Accent);
             Theme(Cards + "OtherGameBtn/iconGo", SudokuThemeRole.MutedText);
             Theme(Cards + "DailyChallengeBtn/bg", SudokuThemeRole.Related);
             Theme(Cards + "DailyChallengeBtn/bg/outline", SudokuThemeRole.Matching);
             Theme(Cards + "DailyChallengeBtn/icon", SudokuThemeRole.Accent);
-            Theme(Cards + "DailyChallengeBtn/m_text", SudokuThemeRole.Text);
-            Theme(Cards + "DailyChallengeBtn/m_des", SudokuThemeRole.MutedText);
+            UIThemeColor.Bind(_dailyLabel, SudokuThemeRole.Text);
+            UIThemeColor.Bind(_dailyInfo, SudokuThemeRole.MutedText);
             Theme(Cards + "DailyChallengeBtn/Go", SudokuThemeRole.Surface);
             Theme(Cards + "DailyChallengeBtn/Go/iconGo", SudokuThemeRole.Accent);
-            Theme(Cards + "DailyChallengeBtn/Go/m_text", SudokuThemeRole.Accent);
+            UIThemeColor.Bind(_dailyGoLabel, SudokuThemeRole.Accent);
             Theme(Cards + "ContinueGameBtn/bg", SudokuThemeRole.Accent);
-            Theme(Cards + "ContinueGameBtn/m_text", SudokuThemeRole.Surface);
-            Theme(Cards + "ContinueGameBtn/m_des", SudokuThemeRole.Surface);
+            UIThemeColor.Bind(_continueLabel, SudokuThemeRole.Surface);
+            UIThemeColor.Bind(_continueInfo, SudokuThemeRole.Surface);
             Theme(Cards + "ContinueGameBtn/iconTime", SudokuThemeRole.Surface);
             Theme(Cards + "NewGameBtn/bg", SudokuThemeRole.Accent);
-            Theme(Cards + "NewGameBtn/m_text", SudokuThemeRole.Accent);
+            UIThemeColor.Bind(_newGameLabel, SudokuThemeRole.Accent);
         }
     }
 }

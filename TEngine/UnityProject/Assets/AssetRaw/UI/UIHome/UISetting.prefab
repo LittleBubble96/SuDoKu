@@ -221,6 +221,30 @@ PrefabInstance:
       propertyPath: m_TargetGraphic
       value: 
       objectReference: {fileID: 135245963531196339}
+    - target: {fileID: 1487283664894239637, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_text
+      value: "\u4E2D\u6587"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1487283664894239637, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_fontSize
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 1487283664894239637, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: c1461094ef8eb5c4a97ffb729ea62685, type: 2}
+    - target: {fileID: 1487283664894239637, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: originalText
+      value: "\u4E2D\u6587"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1487283664894239637, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -3082275470797482477, guid: c1461094ef8eb5c4a97ffb729ea62685, type: 2}
+    - target: {fileID: 1487283664894239637, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1522680853466897688, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
       propertyPath: m_TargetGraphic
       value: 
@@ -344,6 +368,30 @@ PrefabInstance:
     - target: {fileID: 5151376109913567878, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 1.3168335
+      objectReference: {fileID: 0}
+    - target: {fileID: 5352846365794889958, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_text
+      value: "\u4E2D\u6587"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5352846365794889958, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_fontSize
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 5352846365794889958, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: c1461094ef8eb5c4a97ffb729ea62685, type: 2}
+    - target: {fileID: 5352846365794889958, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: originalText
+      value: "\u4E2D\u6587"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5352846365794889958, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -3082275470797482477, guid: c1461094ef8eb5c4a97ffb729ea62685, type: 2}
+    - target: {fileID: 5352846365794889958, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6053466553862944047, guid: 29707f725755009488b5d55fe6fd0b6b, type: 3}
       propertyPath: m_AnchorMax.y

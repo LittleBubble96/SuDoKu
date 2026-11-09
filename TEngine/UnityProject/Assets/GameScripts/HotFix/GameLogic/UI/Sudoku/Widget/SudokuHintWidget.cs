@@ -12,6 +12,8 @@ namespace GameLogic
         private XYButton _button;
         private Transform _countRoot, _coinRoot, _adRoot, _loading, _ready;
         private RectTransform _spinner;
+        private Animation _spinnerAnimation;
+        private Animator _spinnerAnimator;
         private TMP_Text _count, _coin;
         private TMP_Text _loadingText, _readyText;
         private CanvasGroup _display;
@@ -27,6 +29,8 @@ namespace GameLogic
             _loading = FindChild("Sign/m_Ad/Loading");
             _ready = FindChild("Sign/m_Ad/Ready");
             _spinner = FindChildComponent<RectTransform>("Sign/m_Ad/Loading/icon");
+            _spinnerAnimation = _spinner.GetComponent<Animation>();
+            _spinnerAnimator = _spinner.GetComponent<Animator>();
             _count = FindChildComponent<TMP_Text>("Sign/m_num/m_text");
             _coin = FindChildComponent<TMP_Text>("Sign/m_coin/m_text");
             _loadingText = FindChildComponent<TMP_Text>("Sign/m_Ad/Loading/m_text");
@@ -96,9 +100,8 @@ namespace GameLogic
         {
             if (_spinner.gameObject.activeInHierarchy && AdSystem.IsLoading(AdIds.Tip))
             {
-                var animation = _spinner.GetComponent<Animation>();
-                var animator = _spinner.GetComponent<Animator>();
-                if ((animation == null || !animation.enabled) && (animator == null || !animator.enabled))
+                if ((_spinnerAnimation == null || !_spinnerAnimation.enabled) &&
+                    (_spinnerAnimator == null || !_spinnerAnimator.enabled))
                     _spinner.Rotate(0, 0, -240f * Time.unscaledDeltaTime);
             }
         }

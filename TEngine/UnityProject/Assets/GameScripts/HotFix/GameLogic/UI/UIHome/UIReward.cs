@@ -24,9 +24,14 @@ namespace GameLogic
         public bool IsRevealComplete => !_revealing;
         public IReadOnlyList<RewardTokenItem> Items => _items;
 
+        private TMP_Text _title, _claimLabel, _doubleLabel;
+
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
+            _title = FindChildComponent<TMP_Text>("Center/Top/m_text");
+            _claimLabel = FindChildComponent<TMP_Text>(Content + "ActionBtn/GetBtn/m_text");
+            _doubleLabel = FindChildComponent<TMP_Text>(Content + "ActionBtn/GetDoubleBtn/m_text");
             _animation = new UIPopupAnimation(gameObject.GetComponent<CanvasGroup>(), FindChildComponent<RectTransform>("Center"));
             _area = FindChildComponent<RectTransform>(Content + "rewardArea");
             _gift = FindChildComponent<RectTransform>(Content + "gift/bg");
@@ -42,7 +47,7 @@ namespace GameLogic
                 text.fontSizeMax = text.fontSize; text.fontSizeMin = text.fontSize * .55f;
                 UIThemeColor.Bind(text, SudokuThemeRole.Surface);
             }
-            UIThemeColor.Bind(FindChildComponent<TMP_Text>(Content + "ActionBtn/GetBtn/m_text"), SudokuThemeRole.Accent);
+            UIThemeColor.Bind(_claimLabel, SudokuThemeRole.Accent);
             Theme(Content + "ActionBtn/GetBtn/bg", SudokuThemeRole.Surface);
             Theme(Content + "ActionBtn/GetBtn/bg_frame", SudokuThemeRole.Accent);
             Theme(Content + "ActionBtn/GetDoubleBtn/bg", SudokuThemeRole.Accent);
@@ -78,9 +83,9 @@ namespace GameLogic
         private void RefreshDisplay()
         {
             if (!IsOpen || _context == null) return;
-            Label("Center/Top/m_text", LanguageKey.reward_title);
-            Label(Content + "ActionBtn/GetBtn/m_text", LanguageKey.daily_gift_claim);
-            Label(Content + "ActionBtn/GetDoubleBtn/m_text", LanguageKey.reward_double);
+            _title.text = LocalizationHelper.GetLocalText(LanguageKey.reward_title);
+            _claimLabel.text = LocalizationHelper.GetLocalText(LanguageKey.daily_gift_claim);
+            _doubleLabel.text = LocalizationHelper.GetLocalText(LanguageKey.reward_double);
             foreach (var item in _items) item.RefreshLanguage();
             var state = AdSystem.GetState(AdIds.Settlement);
             _description.text = LocalizationHelper.GetLocalText(_adFailed ? LanguageKey.reward_ad_failed :
@@ -188,7 +193,6 @@ namespace GameLogic
         {
             _animation.Reset(); AdSystem.StateChanged -= OnAdStateChanged; base.OnDestroy();
         }
-        private void Label(string path, string key) => FindChildComponent<TMP_Text>(path).text = LocalizationHelper.GetLocalText(key);
         private void Theme(string path, SudokuThemeRole role) => UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>(path), role);
     }
 }

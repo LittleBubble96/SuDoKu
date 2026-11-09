@@ -67,6 +67,7 @@ namespace GameLogic.Sudoku
         private static void Save()
         {
             _save();
+            GameEvent.Send(EventDefine.SudokuSettingsChanged);
             GameEvent.Send(EventDefine.SudokuStateChanged);
         }
 
