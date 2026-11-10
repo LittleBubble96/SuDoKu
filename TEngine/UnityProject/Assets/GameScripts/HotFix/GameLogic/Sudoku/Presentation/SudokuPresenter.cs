@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cysharp.Threading.Tasks;
 using TEngine;
 using UnityEngine;
@@ -159,6 +159,9 @@ namespace GameLogic.Sudoku
             }
             else if (!game.HasNormalGame) return;
             var token = GameModule.Base.GetCancellationTokenOnDestroy();
+            UISudoku window;
+            UIGuide guide = null;
+            int windowVersion, levelRevision;
             IsNavigating = true;
             using (UIInteractionLock.Acquire())
             {
@@ -166,7 +169,7 @@ namespace GameLogic.Sudoku
                 {
                     var home = await GameModule.UI.GetUIAsyncAwait<UIHome>(token);
                     int homeVersion = home?.OpenVersion ?? 0;
-                    var window = await GameModule.UI.ShowUIAsyncAwait<UISudoku>(new SudokuContext(game));
+                    window = await GameModule.UI.ShowUIAsyncAwait<UISudoku>(new SudokuContext(game));
                     token.ThrowIfCancellationRequested();
                     if (window == null) throw new InvalidOperationException("数独界面加载失败。");
                     if (home != null && (!home.IsOpen || home.OpenVersion != homeVersion))
@@ -193,10 +196,10 @@ namespace GameLogic.Sudoku
                     GameModule.UI.CloseUI<UIReward>();
                     GameModule.UI.CloseUI<UISettlement>();
                     Coins?.RefreshView();
-                    // 从首页继续时解除此前局内的暂停，保留题面、笔记、撤销和用时。
-                    game.SetWindowActive(true);
-                    if (game.IsPaused) game.TogglePause();
-                    GameEvent.Send(EventDefine.SudokuStateChanged);
+                    windowVersion = window.OpenVersion;
+                    levelRevision = game.LevelRevision;
+                    if (!Cache.CacheData.hasShownInGameGuide)
+                        guide = await ShowFirstInGameGuideAsync(token);
                 }
                 catch
                 {
@@ -205,6 +208,40 @@ namespace GameLogic.Sudoku
                 }
                 finally { IsNavigating = false; }
             }
+
+            // Let the guide receive input after the navigation lock is released.
+            if (guide != null)
+                await UniTask.WaitUntil(() => !guide.Visible || !window.IsOpen || window.OpenVersion != windowVersion,
+                    cancellationToken: token);
+
+            if (!window.IsOpen || window.OpenVersion != windowVersion || game.LevelRevision != levelRevision) return;
+            game.SetWindowActive(true);
+            if (game.IsPaused) game.TogglePause();
+            GameEvent.Send(EventDefine.SudokuStateChanged);
+        }
+
+        private static async UniTask<UIGuide> ShowFirstInGameGuideAsync(System.Threading.CancellationToken token)
+        {
+            UIGuide guide;
+            try
+            {
+                guide = await GameModule.UI.ShowUIAsyncAwait<UIGuide>();
+            }
+            catch (OperationCanceledException) when (!token.IsCancellationRequested)
+            {
+                return null;
+            }
+            catch (Exception error) when (!(error is OperationCanceledException))
+            {
+                Debug.LogException(error);
+                return null;
+            }
+
+            token.ThrowIfCancellationRequested();
+            if (guide?.Visible != true) return null;
+            Cache.CacheData.hasShownInGameGuide = true;
+            Cache.Save();
+            return guide;
         }
 
         public static void SaveOnQuit()

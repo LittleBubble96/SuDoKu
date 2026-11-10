@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GameLogic.Sudoku;
 
@@ -33,6 +33,7 @@ namespace GameLogic.Data
 #endif
         public string activeDailyDate;
         public SudokuSettlementData settlement;
+        public bool hasShownInGameGuide;
         public int signInDays;
         public string signInDate;
         public DailyTaskData dailyTaskData = new DailyTaskData();

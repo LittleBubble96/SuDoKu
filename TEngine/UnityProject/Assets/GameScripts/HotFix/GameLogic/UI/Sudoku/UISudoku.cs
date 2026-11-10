@@ -116,6 +116,7 @@ namespace GameLogic
         }
         protected override void OnClose()
         {
+            GameModule.UI.CloseUI<UIGuide>();
             GameModule.UI.CloseUI<UIReward>();
             GameModule.UI.CloseUI<UISettlement>();
             GameModule.UI.CloseUI<UIPalette>();
