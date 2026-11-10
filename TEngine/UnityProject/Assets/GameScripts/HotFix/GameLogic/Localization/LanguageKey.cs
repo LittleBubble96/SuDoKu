@@ -8,7 +8,7 @@
 namespace GameLogic.Localization
 {
     /// <summary>
-    /// 多语言 Key 常量类（共 212 个 Key）。
+    /// 多语言 Key 常量类（共 220 个 Key）。
     /// </summary>
     public static class LanguageKey
     {
@@ -224,5 +224,13 @@ namespace GameLogic.Localization
         public const string setting_text_size_large = "setting_text_size_large";
         public const string setting_text_size_medium = "setting_text_size_medium";
         public const string setting_text_size_small = "setting_text_size_small";
+        public const string help_fill_blanks = "help_fill_blanks";
+        public const string help_each_row = "help_each_row";
+        public const string help_each_column = "help_each_column";
+        public const string help_each_box = "help_each_box";
+        public const string help_unique_digits = "help_unique_digits";
+        public const string help_notes_desc = "help_notes_desc";
+        public const string help_hint_desc = "help_hint_desc";
+        public const string help_got_it = "help_got_it";
     }
 }

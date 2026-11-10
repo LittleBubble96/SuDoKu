@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using GameConfig.language;
 using GameLogic.Localization;
 using GameLogic.Sudoku;
@@ -43,9 +44,24 @@ namespace GameLogic
                 if (OwnerWindow is UIHome home) home.SelectTab(0);
                 else GameModule.UI.HideUI<UISetting>();
             });
-            // 游戏说明尚无对应页面，先保留入口外观。
-            CreateWidget<XYButton>(Layout + "GameOther/RuleItem/btn").Interactable = false;
+            CreateWidget<XYButton>(Layout + "GameOther/RuleItem/btn").OnAddListener(() => OpenGuideAsync().Forget());
             BindThemes();
+        }
+
+        private async UniTask OpenGuideAsync()
+        {
+            var owner = OwnerWindow;
+            int version = owner.OpenVersion;
+            using (UIInteractionLock.Acquire())
+            {
+                try
+                {
+                    await GameModule.UI.ShowUIAsyncAwait<UIGuide>();
+                    if (!owner.IsOpen || owner.OpenVersion != version || !Visible)
+                        GameModule.UI.CloseUI<UIGuide>();
+                }
+                catch (System.OperationCanceledException) { }
+            }
         }
 
         private void ConfigureScrollContent()
@@ -169,8 +185,8 @@ namespace GameLogic
             }
             UIThemeColor.Bind(_relatedDescription, SudokuThemeRole.MutedText);
             Theme(Layout + "GameOther/LanguageItem/icon", SudokuThemeRole.Accent);
-            Theme(Layout + "GameOther/RuleItem/icon", SudokuThemeRole.MutedText);
-            UIThemeColor.Bind(_rulesTitle, SudokuThemeRole.MutedText);
+            Theme(Layout + "GameOther/RuleItem/icon", SudokuThemeRole.Accent);
+            UIThemeColor.Bind(_rulesTitle, SudokuThemeRole.Text);
             Theme(Layout + "GameAssist/TextSizeToggleItem/icon", SudokuThemeRole.Accent);
             BindDropdownThemes(Layout + "GameOther/LanguageItem/dropdown/");
             BindDropdownThemes(Layout + "GameAssist/TextSizeToggleItem/dropdown/");

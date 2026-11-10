@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ProjectConf:
     projectName: "\u4E5D\u5BAB\u586B\u6570\u6311\u6218"
-    Appid: wx308052a1ea617d67
+    Appid: wxec98a07840b3b67e
     CDN: 
     assetLoadType: 1
     compressDataPackage: 1
