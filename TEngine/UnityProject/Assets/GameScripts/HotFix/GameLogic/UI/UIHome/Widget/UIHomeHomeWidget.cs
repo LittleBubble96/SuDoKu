@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cysharp.Threading.Tasks;
 using GameLogic.Localization;
 using GameLogic.Sudoku;
@@ -36,10 +36,12 @@ namespace GameLogic
             _continue.OnAddListener(() => SudokuPresenter.ContinueGameAsync().Forget());
             CreateWidget<XYButton>(Cards + "DailyChallengeBtn").OnAddListener(() => (OwnerWindow as UIHome)?.SelectDailyDate(SudokuPresenter.Current.Today));
             CreateWidget<XYButton>(Cards + "NewGameBtn").OnAddListener(() => OpenDifficultyAsync().Forget());
+            CreateWidget<XYButton>(Cards + "OtherGameBtn").OnAddListener(() => OpenOtherGamesAsync().Forget());
             CreateWidget<XYButton>("Top/Right/Layout/ColorTheme/Btn")
                 .OnAddListener(() => SudokuPresenter.ShowPaletteAsync(OwnerWindow).Forget());
             CreateWidget<XYButton>("Top/Right/Layout/DailyTask/Btn")
                 .OnAddListener(() => SudokuPresenter.ShowDailyTaskAsync(OwnerWindow).Forget());
+            CreateWidget<XYButton>("Top/Right/Layout/GameClub/Btn").OnAddListener(GameSDK.SDK.OpenGameClub);
             CreateWidget<XYButton>("Top/Right/Layout/SignIn/Btn")
                 .OnAddListener(() => SudokuPresenter.ShowDailySignInAsync(OwnerWindow).Forget());
             BindThemes();
@@ -83,6 +85,22 @@ namespace GameLogic
             if (Visible && OwnerWindow.IsOpen && SudokuPresenter.Current != null && _displayDate != SudokuPresenter.Current.Today) RefreshDisplay();
         }
 
+        private async UniTask OpenOtherGamesAsync()
+        {
+            var owner = OwnerWindow;
+            int version = owner.OpenVersion;
+            using (UIInteractionLock.Acquire())
+            {
+                try
+                {
+                    await GameModule.UI.ShowUIAsyncAwait<UIOtherGame>();
+                    if (!owner.IsOpen || owner.OpenVersion != version || !Visible)
+                        GameModule.UI.CloseUI<UIOtherGame>();
+                }
+                catch (OperationCanceledException) { }
+            }
+        }
+
         private async UniTaskVoid OpenDifficultyAsync()
         {
             if (_openingDifficulty || SudokuPresenter.IsNavigating) return;
@@ -102,10 +120,6 @@ namespace GameLogic
         private void BindThemes()
         {
             Theme("Top/CoinRoot/Btn/m_num", SudokuThemeRole.Text);
-            Theme("Top/Right/Layout/SignIn/Btn/icon", SudokuThemeRole.Accent);
-            Theme("Top/Right/Layout/DailyTask/Btn/icon", SudokuThemeRole.Accent);
-            UIThemeColor.Bind(_signInLabel, SudokuThemeRole.Accent);
-            UIThemeColor.Bind(_tasksLabel, SudokuThemeRole.Accent);
             Theme("Top/Right/Layout/ColorTheme/Btn/icon", SudokuThemeRole.Accent);
             Theme("Center/Layout/Top/icon", SudokuThemeRole.Accent);
             UIThemeColor.Bind(_title, SudokuThemeRole.Text);

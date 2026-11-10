@@ -132,7 +132,7 @@ namespace GameSDK
         private const string PlayerPrefsOpenIdKey = "WX_openid";
 
         private const string GameCenterOpenLink =
-            "-SSEykJvFV3pORt5kTNpS-gRdTx2iixOqRRPWz1BBnl69Ttni0ZLetaZXdSifeYATwC6iKRakfy-6prIB-gkjUfjCAtcHiTCxM1bcnJbYR0-ySyYid8eeaXsY-nGOaapr01q8G1TZQMpj0HxwhGL1mQuWkh3AVgpBr3iLWw6rvKmYoovB9BGVAoipFp0WhSRL2E10raoOsWP_BlylMxH3ezmOzqgTGZguMmYcRV-LVPuHlxg9GZ6ZHK6w8Y12MNsWKRoFruMCFyeKCA4uKTqSZUtSDaFPIvXxZfPJ7t-YtwNVoEgolltTSJhZwLbMzoO-dzYquOABWuOgoo6A6YU-A";
+            "-SSEykJvFV3pORt5kTNpS2E11-BKl-yDwkVN7YbIrwh8mrf-jNsbrYF5YAUq8VwUNohREU1hHQqZcpWAy4XH1jQY2UsgiBWh1YrMP4lhVxguTjCy8itFafKwftjHeRoZbCY4CzWmYPdRSQpVPaLdLn5XdRGIzqZO2evCNsDBILfRCqg3Nf7eGR-RYCMtLDeSEh2RbdeBcwJlvH3ty3RNXqzdJsOnIMNp6c8evobp7RQm920OojrgU75wakxNXW6wBe80qPlxI7guUMwKYwgUYzJzOwognSfL7fu34IxtRF7adHz_7yJ3pMg51ko_xt8Dvk9Ej5tfBVZdX0K4fYmFLw";
         
         public string GetOpenId()
         {
@@ -144,6 +144,16 @@ namespace GameSDK
             WX.ShareAppMessage(new ShareAppMessageOption {
                 title=title,
                 query=$"inviter={GetOpenId()}&sid={Guid.NewGuid():N}"
+            });
+        }
+
+        public void NavigateToMiniGame(string appId)
+        {
+            WX.NavigateToMiniProgram(new NavigateToMiniProgramOption
+            {
+                appId = appId,
+                envVersion = "release",
+                fail = error => UnityEngine.Debug.LogWarning($"[OtherGame] {error.errMsg}")
             });
         }
 

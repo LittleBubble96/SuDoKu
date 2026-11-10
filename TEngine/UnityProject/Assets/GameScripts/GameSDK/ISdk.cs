@@ -11,6 +11,8 @@
 
         void ShareAppMessage(string title);
 
+        void NavigateToMiniGame(string appId);
+
         void CreateGameClubButton();
 
         void OpenGameClub();

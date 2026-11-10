@@ -44,6 +44,9 @@ namespace GameSDK
             Log.Info($"[Share] 分享 {title}");
         }
 
+        public void NavigateToMiniGame(string appId) =>
+            Log.Info($"[OtherGame] Editor preview, mini game destination: {appId}");
+
         public void CreateGameClubButton()
         {
             Log.Info($"[GameCenter] 打开游戏圈");

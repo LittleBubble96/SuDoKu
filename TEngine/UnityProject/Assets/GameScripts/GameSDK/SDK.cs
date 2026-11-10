@@ -51,6 +51,7 @@ namespace GameSDK
             return _sdk.CreateRewardedVideoAd(adId, onLoaded, onError, onClosed);
         }
         public static void ShareAppMessage(string title) => _sdk?.ShareAppMessage(title);
+        public static void NavigateToMiniGame(string appId) => _sdk?.NavigateToMiniGame(appId);
         public static void CreateGameClubButton() => _sdk?.CreateGameClubButton();
         public static void OpenGameClub() => _sdk?.OpenGameClub();
         public static void LoadRecommend() => _sdk?.LoadRecommend();
