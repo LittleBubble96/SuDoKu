@@ -15,13 +15,14 @@ namespace GameLogic
         private bool _openingDifficulty;
         private DateTime _displayDate;
 
-        private TMP_Text _signInLabel, _tasksLabel, _title, _otherGamesLabel, _dailyLabel, _dailyGoLabel, _continueLabel, _newGameLabel;
+        private TMP_Text _signInLabel, _tasksLabel, _gameClubLabel, _title, _otherGamesLabel, _dailyLabel, _dailyGoLabel, _continueLabel, _newGameLabel;
 
         protected override void ScriptGenerator()
         {
             base.ScriptGenerator();
             _signInLabel = FindChildComponent<TMP_Text>("Top/Right/Layout/SignIn/Btn/m_text");
             _tasksLabel = FindChildComponent<TMP_Text>("Top/Right/Layout/DailyTask/Btn/m_text");
+            _gameClubLabel = FindChildComponent<TMP_Text>("Top/Right/Layout/GameClub/Btn/m_text");
             _title = FindChildComponent<TMP_Text>("Center/Layout/Top/m_text");
             _otherGamesLabel = FindChildComponent<TMP_Text>(Cards + "OtherGameBtn/m_text");
             _dailyLabel = FindChildComponent<TMP_Text>(Cards + "DailyChallengeBtn/m_text");
@@ -72,6 +73,7 @@ namespace GameLogic
                     string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_progress), daily.progressPercent));
             _signInLabel.text = LocalizationHelper.GetLocalText(LanguageKey.home_check_in);
             _tasksLabel.text = LocalizationHelper.GetLocalText(LanguageKey.home_daily_tasks);
+            _gameClubLabel.text = LocalizationHelper.GetLocalText(LanguageKey.home_game_club);
             _title.text = LocalizationHelper.GetLocalText(LanguageKey.sudoku_title);
             _otherGamesLabel.text = LocalizationHelper.GetLocalText(LanguageKey.home_more_games);
             _dailyLabel.text = LocalizationHelper.GetLocalText(LanguageKey.daily_challenge);

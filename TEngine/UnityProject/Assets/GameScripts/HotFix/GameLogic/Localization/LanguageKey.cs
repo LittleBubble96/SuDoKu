@@ -8,7 +8,7 @@
 namespace GameLogic.Localization
 {
     /// <summary>
-    /// 多语言 Key 常量类（共 223 个 Key）。
+    /// 多语言 Key 常量类（共 224 个 Key）。
     /// </summary>
     public static class LanguageKey
     {
@@ -235,5 +235,6 @@ namespace GameLogic.Localization
         public const string more_games_character_hunt = "more_games_character_hunt";
         public const string more_games_character_desc = "more_games_character_desc";
         public const string more_games_play = "more_games_play";
+        public const string home_game_club = "home_game_club";
     }
 }
