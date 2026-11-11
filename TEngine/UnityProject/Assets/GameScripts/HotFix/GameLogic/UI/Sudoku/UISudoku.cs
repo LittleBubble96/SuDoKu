@@ -25,6 +25,8 @@ namespace GameLogic
         private bool _loadingPlayIcon, _destroyed;
         private readonly List<SudokuNumberWidget> _numbers = new List<SudokuNumberWidget>(9);
         private long _displaySecond = -1;
+        private bool _bannerRequested;
+        private bool _bannerUnlocked;
         private bool _openingSettings;
         private bool _openingSettlement;
         private string _shownSettlement;
@@ -121,6 +123,7 @@ namespace GameLogic
             GameModule.UI.CloseUI<UISettlement>();
             GameModule.UI.CloseUI<UIPalette>();
             GameModule.UI.CloseUI<UISetting>();
+            SetBannerVisible(false);
             _game?.SetWindowActive(false);
             AdSystem.ExitPage(AdIds.Tip);
             base.OnClose();
@@ -156,6 +159,15 @@ namespace GameLogic
         }
         private void RefreshState()
         {
+            _bannerUnlocked = false;
+            if (_game != null)
+            {
+                int wins = 0;
+                for (int difficulty = 0; difficulty < 6; difficulty++)
+                    wins += _game.Session.CompletedCount((SudokuDifficulty)difficulty);
+                _bannerUnlocked = wins >= AdIds.BannerUnlockWins;
+            }
+            RefreshBanner();
             if (_game == null || !IsBoardReady) return;
             _level.text = _game.IsDaily ? string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_selected_info),
                 _game.DailyDate.Month, _game.DailyDate.Day, SudokuUIFormatting.Difficulty(Session.Difficulty)) : SudokuUIFormatting.Difficulty(Session.Difficulty);
@@ -208,6 +220,7 @@ namespace GameLogic
         protected override void OnDestroy()
         {
             _destroyed = true;
+            GameSDK.SDK.DestroyBanner();
             if (_pauseIcon != null) _pauseIcon.sprite = _pauseSprite;
             if (_playSprite != null) GameModule.Resource.UnloadAsset(_playSprite);
             _playSprite = null;
@@ -220,8 +233,27 @@ namespace GameLogic
             _displaySecond = seconds;
             _time.text = SudokuUIFormatting.Time(_game.ElapsedSeconds);
         }
+        private void RefreshBanner()
+        {
+            SetBannerVisible(_bannerUnlocked && IsOpen && Visible && IsBoardReady &&
+                _game.CanInteract && !SudokuPresenter.IsNavigating && !UIInteractionLock.IsLocked &&
+                GameModule.UI.GetTopWindow((int)UILayer.UI) == WindowName &&
+                string.IsNullOrEmpty(GameModule.UI.GetTopWindow((int)UILayer.Top)) &&
+                string.IsNullOrEmpty(GameModule.UI.GetTopWindow((int)UILayer.Tips)));
+        }
+
+        private void SetBannerVisible(bool visible)
+        {
+            visible &= !string.IsNullOrWhiteSpace(AdIds.Banner);
+            if (_bannerRequested == visible) return;
+            _bannerRequested = visible;
+            if (visible) GameSDK.SDK.ShowBanner(AdIds.Banner);
+            else GameSDK.SDK.HideBanner();
+        }
+
         protected override void OnUpdate()
         {
+            RefreshBanner();
             if (_game == null || !IsBoardReady) return;
             if (IsOpen && _game.Session.IsComplete && _game.Settlement != null &&
                 _shownSettlement != _game.Settlement.id && !_openingSettlement && !SudokuPresenter.IsNavigating &&

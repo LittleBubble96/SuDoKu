@@ -62,6 +62,23 @@ namespace GameSDK
             Log.Info($"[ReportGameStart] 上报");
         }
 
+        public void ShowBanner(string adId) => Log.Info("[Banner] Editor show");
+        public void HideBanner() => Log.Info("[Banner] Editor hide");
+        public void DestroyBanner() => Log.Info("[Banner] Editor destroy");
+
+        private bool _interstitialReady;
+        public void PreloadInterstitial(string adId) => _interstitialReady = !string.IsNullOrWhiteSpace(adId);
+
+        public bool TryShowInterstitial(System.Action onFinished)
+        {
+            if (!_interstitialReady) return false;
+            Log.Info("[Interstitial] Editor preview, closed");
+            onFinished?.Invoke();
+            return true;
+        }
+
+        public void DestroyInterstitial() => _interstitialReady = false;
+
         private bool _recommendShown;
         public void UploadCompletedLevel(int levelId)
         {

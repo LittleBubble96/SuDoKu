@@ -18,6 +18,7 @@ namespace GameLogic.Sudoku
 
         public static async UniTask LaunchAsync()
         {
+            GameSDK.SDK.PreloadInterstitial(AdIds.Interstitial);
             var token = GameModule.Base.GetCancellationTokenOnDestroy();
             var tasks = new UniTask<SudokuPack>[6];
             for (int d = 0; d < 6; d++) tasks[d] = LoadPackAsync((SudokuDifficulty)d, token);
@@ -217,7 +218,21 @@ namespace GameLogic.Sudoku
             if (!window.IsOpen || window.OpenVersion != windowVersion || game.LevelRevision != levelRevision) return;
             game.SetWindowActive(true);
             if (game.IsPaused) game.TogglePause();
+            TryShowEntryInterstitial(game);
             GameEvent.Send(EventDefine.SudokuStateChanged);
+        }
+
+        private static void TryShowEntryInterstitial(SudokuGameController game)
+        {
+            if (string.IsNullOrWhiteSpace(AdIds.Interstitial)) return;
+            int wins = 0;
+            for (int difficulty = 0; difficulty < 6; difficulty++)
+                wins += game.Statistics.Get((SudokuDifficulty)difficulty).won;
+            if (wins < AdIds.InterstitialUnlockWins) return;
+
+            game.SetAdShowing(true);
+            if (!GameSDK.SDK.TryShowInterstitial(() => game.SetAdShowing(false)))
+                game.SetAdShowing(false);
         }
 
         private static async UniTask<UIGuide> ShowFirstInGameGuideAsync(System.Threading.CancellationToken token)
@@ -258,6 +273,7 @@ namespace GameLogic.Sudoku
             SudokuSettingsManager.Release();
             if (_bridge != null) UnityEngine.Object.Destroy(_bridge);
             _bridge = null; Current = null; Cache = null; DailySignIn = null; IsNavigating = false; _openingPalette = _openingDailySignIn = _openingDailyTask = false;
+            GameSDK.SDK.DestroyInterstitial();
         }
         public static void SetAudioVolumes(float music, float sound)
         {

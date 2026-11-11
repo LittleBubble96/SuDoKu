@@ -17,6 +17,14 @@
 
         void OpenGameClub();
 
+        void ShowBanner(string adId);
+        void HideBanner();
+        void DestroyBanner();
+
+        void PreloadInterstitial(string adId);
+        bool TryShowInterstitial(System.Action onFinished);
+        void DestroyInterstitial();
+
         void LoadRecommend();
         void ShowRecommend(System.Func<bool> canShow);
 

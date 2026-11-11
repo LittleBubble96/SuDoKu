@@ -6,5 +6,10 @@ namespace GameSDK
     public sealed class SDKRuntime : MonoBehaviour
     {
         private void Update() => SDK.Tick();
+        private void OnDestroy()
+        {
+            SDK.DestroyBanner();
+            SDK.DestroyInterstitial();
+        }
     }
 }

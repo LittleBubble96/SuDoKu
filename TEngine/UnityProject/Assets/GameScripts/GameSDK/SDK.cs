@@ -54,6 +54,12 @@ namespace GameSDK
         public static void NavigateToMiniGame(string appId) => _sdk?.NavigateToMiniGame(appId);
         public static void CreateGameClubButton() => _sdk?.CreateGameClubButton();
         public static void OpenGameClub() => _sdk?.OpenGameClub();
+        public static void ShowBanner(string adId) => _sdk?.ShowBanner(adId);
+        public static void HideBanner() => _sdk?.HideBanner();
+        public static void DestroyBanner() => _sdk?.DestroyBanner();
+        public static void PreloadInterstitial(string adId) => _sdk?.PreloadInterstitial(adId);
+        public static bool TryShowInterstitial(Action onFinished) => _sdk?.TryShowInterstitial(onFinished) ?? false;
+        public static void DestroyInterstitial() => _sdk?.DestroyInterstitial();
         public static void LoadRecommend() => _sdk?.LoadRecommend();
         public static void ShowRecommend(Func<bool> canShow) => _sdk?.ShowRecommend(canShow);
         public static void ReportGameStart() => _session.ReportGameStart();

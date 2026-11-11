@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using TEngine;
 using WeChatWASM;
 
 namespace GameSDK
 {
     public class WXSDK : ISdk
     {
+        private WXInterstitialAd _interstitial;
+        private string _interstitialId;
+        private bool _interstitialReady;
+        private Action _interstitialFinished;
+        private WXBannerAd _banner;
+        private string _bannerId;
+        private bool _bannerRequested;
         private bool _nativeReady;
         private int _loginAttempt;
         private int _pendingCompletedLevel;
@@ -66,7 +74,9 @@ namespace GameSDK
             {
                 if (attempt != _loginAttempt) return;
                 _nativeReady = true;
+                PreloadInterstitial(_interstitialId);
                 FlushCompletedLevel();
+                if (_bannerRequested) ShowBanner(_bannerId);
                 if (_recommendRequested) LoadRecommend();
                 try { login(); } catch (Exception e) { onFailure(e.Message); }
             });
@@ -127,6 +137,159 @@ namespace GameSDK
                 }
                 finally { _native.Destroy(); }
             }
+        }
+
+        public void ShowBanner(string adId)
+        {
+            if (string.IsNullOrWhiteSpace(adId)) return;
+            if (_bannerId != adId) DestroyBanner();
+            _bannerId = adId;
+            _bannerRequested = true;
+            if (!_nativeReady) return;
+            try
+            {
+                if (_banner == null)
+                {
+                    var window = WX.GetWindowInfo();
+                    _banner = WX.CreateBannerAd(new WXCreateBannerAdParam
+                    {
+                        adUnitId = adId,
+                        adIntervals = 30,
+                        style = new Style
+                        {
+                            left = 0,
+                            top = (int)window.windowHeight - 100,
+                            width = (int)window.windowWidth,
+                            height = 100
+                        }
+                    });
+                    _banner.OnResize(OnBannerResize);
+                    _banner.OnError(OnBannerError);
+                }
+                var banner = _banner;
+                banner.Show(_ =>
+                {
+                    // A pending native show may finish after leaving the board.
+                    if (ReferenceEquals(_banner, banner) && !_bannerRequested) banner.Hide();
+                }, error =>
+                {
+                    if (ReferenceEquals(_banner, banner))
+                        OnBannerError(new WXADErrorResponse { errMsg = error.errMsg });
+                });
+            }
+            catch (Exception error)
+            {
+                UnityEngine.Debug.LogWarning($"[Banner] show failed: {error.Message}");
+            }
+        }
+
+        private void OnBannerResize(WXADResizeResponse size)
+        {
+            if (_banner == null) return;
+            var window = WX.GetWindowInfo();
+            double bottom = window.safeArea == null ? window.windowHeight :
+                Math.Min(window.windowHeight, window.safeArea.bottom - window.screenTop);
+            _banner.style.left = (int)((window.windowWidth - size.width) / 2);
+            _banner.style.top = (int)Math.Max(0, bottom - size.height);
+        }
+
+        private void OnBannerError(WXADErrorResponse error)
+        {
+            _banner?.Hide();
+            UnityEngine.Debug.LogWarning($"[Banner] {error.errCode}: {error.errMsg}");
+        }
+
+        public void HideBanner()
+        {
+            _bannerRequested = false;
+            _banner?.Hide();
+        }
+
+        public void DestroyBanner()
+        {
+            _bannerRequested = false;
+            var banner = _banner;
+            _banner = null;
+            _bannerId = null;
+            if (banner == null) return;
+            banner.OffResize(OnBannerResize);
+            banner.OffError(OnBannerError);
+            banner.Destroy();
+        }
+
+        public void PreloadInterstitial(string adId)
+        {
+            if (string.IsNullOrWhiteSpace(adId)) return;
+            if (_interstitialId != adId) DestroyInterstitial();
+            _interstitialId = adId;
+            if (!_nativeReady || _interstitial != null) return;
+            try
+            {
+                // Creation loads the first ad; WeChat loads the next after closing.
+                _interstitial = WX.CreateInterstitialAd(new WXCreateInterstitialAdParam { adUnitId = adId });
+                _interstitial.OnLoad(OnInterstitialLoaded);
+                _interstitial.OnClose(FinishInterstitial);
+                _interstitial.OnError(OnInterstitialError);
+            }
+            catch (Exception error)
+            {
+                UnityEngine.Debug.LogWarning($"[Interstitial] preload failed: {error.Message}");
+            }
+        }
+
+        private void OnInterstitialLoaded(WXADLoadResponse _) => _interstitialReady = true;
+
+        public bool TryShowInterstitial(Action onFinished)
+        {
+            if (!_interstitialReady || _interstitialFinished != null) return false;
+            _interstitialReady = false;
+            _interstitialFinished = onFinished;
+            var ad = _interstitial;
+            try
+            {
+                ad.Show(null, error =>
+                {
+                    if (ReferenceEquals(_interstitial, ad))
+                        OnInterstitialError(new WXADErrorResponse { errMsg = error.errMsg });
+                });
+                return true;
+            }
+            catch (Exception error)
+            {
+                Log.Warning($"[Interstitial] show failed: {error.Message}");
+                FinishInterstitial();
+                return false;
+            }
+        }
+
+        private void OnInterstitialError(WXADErrorResponse error)
+        {
+            _interstitialReady = false;
+            Log.Warning($"[Interstitial] {error.errCode}: {error.errMsg}");
+            FinishInterstitial();
+        }
+
+        private void FinishInterstitial()
+        {
+            var finished = _interstitialFinished;
+            _interstitialFinished = null;
+            finished?.Invoke();
+        }
+
+        public void DestroyInterstitial()
+        {
+            var ad = _interstitial;
+            _interstitial = null;
+            _interstitialId = null;
+            _interstitialReady = false;
+            if (ad != null)
+            {
+                ad.OffLoad(OnInterstitialLoaded);
+                ad.OffClose(FinishInterstitial);
+                ad.OffError(OnInterstitialError);
+                ad.Destroy();
+            }
+            FinishInterstitial();
         }
 
         private const string PlayerPrefsOpenIdKey = "WX_openid";
@@ -227,7 +390,7 @@ namespace GameSDK
         private void CompletedLevelUploadFailed(int levelId, string message)
         {
             _completedLevelUploading = false;
-            UnityEngine.Debug.LogWarning($"[Leaderboard] ToLevel={levelId} 上传失败: {message}");
+            Log.Warning($"[Leaderboard] ToLevel={levelId} 上传失败: {message}");
             // 保留待上传值，下次通关再尝试；已有更高关卡等待时直接提交最新值。
             if (_pendingCompletedLevel > levelId) FlushCompletedLevel();
         }
@@ -242,7 +405,7 @@ namespace GameSDK
                 {
                     _recommendUnsupported = true;
                     _recommendCanShow = null;
-                    UnityEngine.Debug.LogWarning("[Recommend] 当前基础库不支持评价与推荐组件");
+                    Log.Warning("[Recommend] 当前基础库不支持评价与推荐组件");
                     return;
                 }
                 _recommendPageManager ??= WX.CreatePageManager();
@@ -294,7 +457,7 @@ namespace GameSDK
             _recommendLoading = false;
             _recommendShowing = false;
             _recommendCanShow = null;
-            UnityEngine.Debug.LogWarning($"[Recommend] {stage} failed: {message}");
+            Log.Warning($"[Recommend] {stage} failed: {message}");
         }
 
         public void ReportEvent(string eventId , Dictionary<string,string> data)
