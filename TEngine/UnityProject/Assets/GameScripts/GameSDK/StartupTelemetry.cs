@@ -18,18 +18,17 @@ namespace GameSDK
         }
         private static readonly Dictionary<int, StepState> States = new Dictionary<int, StepState>();
         private static readonly Stopwatch Clock = new Stopwatch();
-        private static string _startupId, _appVersion, _playMode;
+        private static string _startupId, _playMode;
         private static bool _completed;
         public static bool Enabled { get; set; } = true;
         public static string ResourceVersion { get; set; } = "";
 
-        public static void Begin(string appVersion, string playMode)
+        public static void Begin(string playMode)
         {
             States.Clear();
             _completed = false;
             ResourceVersion = "";
             _startupId = Guid.NewGuid().ToString("N");
-            _appVersion = appVersion;
             _playMode = playMode;
             Clock.Restart();
             Start(1);
@@ -73,7 +72,7 @@ namespace GameSDK
             if (!Enabled) return;
             long now = Clock.ElapsedMilliseconds;
             BiManager.StartupComplete.SetData(_startupId, 17, Steps[17], "success", now, 1,
-                _appVersion, ResourceVersion, _playMode, now).Report();
+                ResourceVersion, _playMode, now).Report();
         }
         private static void Report(int index, string status, StepState state,
             string reason = null, string errorCode = null, string errorMessage = null,
@@ -82,7 +81,7 @@ namespace GameSDK
             if (!Enabled) return;
             long now = Clock.ElapsedMilliseconds;
             BiManager.StartupStep.SetData(_startupId, index, Steps[index], status, now, state.Attempt,
-                _appVersion, ResourceVersion, _playMode, status == "start" ? -1 : now - state.StartedAt,
+                ResourceVersion, _playMode, status == "start" ? -1 : now - state.StartedAt,
                 reason, errorCode, errorMessage, downloadCount, downloadBytes).Report();
         }
     }

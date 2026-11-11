@@ -27,7 +27,7 @@ namespace Procedure
             base.OnEnter(procedureOwner);
             
             SDK.InitializeAndLogin();
-            StartupTelemetry.Begin(Application.version, _resourceModule.PlayMode.ToString());
+            StartupTelemetry.Begin(_resourceModule.PlayMode.ToString());
             //热更新UI初始化
             LauncherMgr.Initialize();
 

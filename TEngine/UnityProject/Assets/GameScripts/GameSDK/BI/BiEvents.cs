@@ -29,7 +29,6 @@ namespace GameSDK
         public string Status { get; private set; }
         public long ElapsedMs { get; private set; }
         public int Attempt { get; private set; }
-        public string AppVersion { get; private set; }
         public string ResourceVersion { get; private set; }
         public string PlayMode { get; private set; }
         public long DurationMs { get; private set; }
@@ -41,7 +40,7 @@ namespace GameSDK
 
         public Bi_StartupStep SetData(string startupId, int index, string step,
             string status, long elapsedMs, int attempt,
-            string appVersion, string resourceVersion, string playMode,
+            string resourceVersion, string playMode,
             long durationMs = -1, string reason = null, string errorCode = null,
             string errorMsg = null, int downloadCount = -1, long downloadBytes = -1)
         {
@@ -52,7 +51,6 @@ namespace GameSDK
             Status = status;
             ElapsedMs = elapsedMs;
             Attempt = attempt;
-            AppVersion = appVersion;
             ResourceVersion = resourceVersion;
             PlayMode = playMode;
             DurationMs = durationMs;
@@ -67,7 +65,6 @@ namespace GameSDK
             Put("status", Status);
             Put("elapsed_ms", ElapsedMs);
             Put("attempt", Attempt);
-            Put("app_version", AppVersion);
             Put("resource_version", ResourceVersion);
             Put("play_mode", PlayMode);
             if (DurationMs >= 0) Put("duration_ms", DurationMs);
@@ -89,14 +86,13 @@ namespace GameSDK
         public string Status { get; private set; }
         public long ElapsedMs { get; private set; }
         public int Attempt { get; private set; }
-        public string AppVersion { get; private set; }
         public string ResourceVersion { get; private set; }
         public string PlayMode { get; private set; }
         public long DurationMs { get; private set; }
 
         public Bi_StartupComplete SetData(string startupId, int index, string step,
             string status, long elapsedMs, int attempt,
-            string appVersion, string resourceVersion, string playMode, long durationMs)
+            string resourceVersion, string playMode, long durationMs)
         {
             Data.Clear();
             StartupId = startupId;
@@ -105,7 +101,6 @@ namespace GameSDK
             Status = status;
             ElapsedMs = elapsedMs;
             Attempt = attempt;
-            AppVersion = appVersion;
             ResourceVersion = resourceVersion;
             PlayMode = playMode;
             DurationMs = durationMs;
@@ -115,7 +110,6 @@ namespace GameSDK
             Put("status", Status);
             Put("elapsed_ms", ElapsedMs);
             Put("attempt", Attempt);
-            Put("app_version", AppVersion);
             Put("resource_version", ResourceVersion);
             Put("play_mode", PlayMode);
             Put("duration_ms", DurationMs);

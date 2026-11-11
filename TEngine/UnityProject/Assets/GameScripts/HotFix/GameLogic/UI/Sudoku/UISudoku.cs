@@ -132,7 +132,8 @@ namespace GameLogic
 
         private void RefreshLanguage()
         {
-            RefreshLabels(); RefreshState();
+            RefreshLabels(); 
+            RefreshState();
         }
         private void RefreshLabels()
         {

@@ -1,0 +1,347 @@
+[
+  {
+    "event_id": "sdk_login",
+    "event_name": "SDK登录",
+    "event_comment": "每次登录尝试的开始、成功或失败。",
+    "report_src": 0,
+    "event_key_list": [
+      "status",
+      "attempt",
+      "error_msg"
+    ]
+  },
+  {
+    "event_id": "startup_step",
+    "event_name": "启动步骤",
+    "event_comment": "启动步骤开始、结束或跳过。",
+    "report_src": 0,
+    "event_key_list": [
+      "startup_id",
+      "index",
+      "step",
+      "status",
+      "elapsed_ms",
+      "attempt",
+      "resource_version",
+      "play_mode",
+      "duration_ms",
+      "reason",
+      "error_code",
+      "error_msg",
+      "download_count",
+      "download_bytes"
+    ]
+  },
+  {
+    "event_id": "startup_complete",
+    "event_name": "启动完成",
+    "event_comment": "启动流程完成一次。",
+    "report_src": 0,
+    "event_key_list": [
+      "startup_id",
+      "index",
+      "step",
+      "status",
+      "elapsed_ms",
+      "attempt",
+      "resource_version",
+      "play_mode",
+      "duration_ms"
+    ]
+  },
+  {
+    "event_id": "sudoku_round_start",
+    "event_name": "数独开局",
+    "event_comment": "新题或重开成功提交一次。",
+    "report_src": 0,
+    "event_key_list": [
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date",
+      "duration_ms",
+      "progress_pct",
+      "mistake_count",
+      "hint_count",
+      "start_source"
+    ]
+  },
+  {
+    "event_id": "sudoku_round_resume",
+    "event_name": "继续数独对局",
+    "event_comment": "继续已有未完成普通题或每日挑战，每次成功进入一次。",
+    "report_src": 0,
+    "event_key_list": [
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date",
+      "duration_ms",
+      "progress_pct",
+      "mistake_count",
+      "hint_count"
+    ]
+  },
+  {
+    "event_id": "sudoku_round_complete",
+    "event_name": "数独通关",
+    "event_comment": "玩家首次完成本局结算一次。",
+    "report_src": 0,
+    "event_key_list": [
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date",
+      "duration_ms",
+      "progress_pct",
+      "mistake_count",
+      "hint_count",
+      "score",
+      "perfect",
+      "current_streak"
+    ]
+  },
+  {
+    "event_id": "sudoku_round_abandon",
+    "event_name": "放弃数独对局",
+    "event_comment": "未完成且计入统计的普通题被替换，或未完成题重开。使用被放弃的旧题数据。",
+    "report_src": 0,
+    "event_key_list": [
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date",
+      "duration_ms",
+      "progress_pct",
+      "mistake_count",
+      "hint_count",
+      "abandon_reason"
+    ]
+  },
+  {
+    "event_id": "sudoku_hint_used",
+    "event_name": "使用数独提示",
+    "event_comment": "正确数字实际写入成功后一次。",
+    "report_src": 0,
+    "event_key_list": [
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date",
+      "hint_source",
+      "ad_request_id"
+    ]
+  },
+  {
+    "event_id": "sudoku_guide",
+    "event_name": "游戏说明操作",
+    "event_comment": "说明页入场完成、玩家主动关闭分别一次。",
+    "report_src": 0,
+    "event_key_list": [
+      "guide_action",
+      "guide_source",
+      "round_id"
+    ]
+  },
+  {
+    "event_id": "daily_trophy_awarded",
+    "event_name": "获得每日挑战奖杯",
+    "event_comment": "通关（含 GM）达标新增一个奖杯记录时一次；已有奖杯不重复。",
+    "report_src": 0,
+    "event_key_list": [
+      "trophy_id",
+      "trophy_month",
+      "completed_days",
+      "required_days",
+      "award_date",
+      "award_source",
+      "round_id"
+    ]
+  },
+  {
+    "event_id": "ad_feature_unlocked",
+    "event_name": "广告功能解锁",
+    "event_comment": "Banner 或插屏首次达到实际阈值，标记与存档一起保留。",
+    "report_src": 0,
+    "event_key_list": [
+      "ad_feature",
+      "unlock_threshold",
+      "completed_normal_levels",
+      "completed_games",
+      "round_id"
+    ]
+  },
+  {
+    "event_id": "banner_impression",
+    "event_name": "Banner广告曝光",
+    "event_comment": "原生显示成功后一次，连续可见期间去重。",
+    "report_src": 0,
+    "event_key_list": [
+      "ad_unit_id",
+      "exposure_id",
+      "ad_placement",
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date"
+    ]
+  },
+  {
+    "event_id": "banner_visible_time",
+    "event_name": "Banner广告展示时长",
+    "event_comment": "连续可见每满 30 分钟发一段，停止可见时补剩余；0 毫秒不发。",
+    "report_src": 0,
+    "event_key_list": [
+      "ad_unit_id",
+      "exposure_id",
+      "segment_seq",
+      "visible_delta_ms",
+      "banner_report_reason",
+      "ad_placement",
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date"
+    ]
+  },
+  {
+    "event_id": "banner_error",
+    "event_name": "Banner广告错误",
+    "event_comment": "Banner 失败。一次显示请求中的原生错误与 Show 失败回调合并去重。",
+    "report_src": 0,
+    "event_key_list": [
+      "ad_unit_id",
+      "error_code",
+      "error_msg",
+      "ad_placement",
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date"
+    ]
+  },
+  {
+    "event_id": "rewarded_ad_show",
+    "event_name": "激励视频曝光",
+    "event_comment": "展示成功一次；内部重试不重复曝光。",
+    "report_src": 0,
+    "event_key_list": [
+      "ad_unit_id",
+      "ad_placement",
+      "ad_request_id",
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date"
+    ]
+  },
+  {
+    "event_id": "rewarded_ad_result",
+    "event_name": "激励视频结果",
+    "event_comment": "一次激励尝试最终结果一次，包含未就绪拒绝、失败及提前关闭。",
+    "report_src": 0,
+    "event_key_list": [
+      "ad_unit_id",
+      "ad_placement",
+      "ad_request_id",
+      "ad_was_shown",
+      "ad_result",
+      "ad_elapsed_ms",
+      "ad_failure_reason",
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date"
+    ]
+  },
+  {
+    "event_id": "interstitial_ad_show",
+    "event_name": "插屏广告曝光",
+    "event_comment": "已预加载插屏收到原生 Show 成功后一次。",
+    "report_src": 0,
+    "event_key_list": [
+      "ad_unit_id",
+      "ad_placement",
+      "ad_request_id",
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date"
+    ]
+  },
+  {
+    "event_id": "interstitial_ad_result",
+    "event_name": "插屏广告结果",
+    "event_comment": "已尝试展示的插屏关闭或失败一次。未加载完直接跳过，不算展示，也不生成请求结果。",
+    "report_src": 0,
+    "event_key_list": [
+      "ad_unit_id",
+      "ad_placement",
+      "ad_request_id",
+      "ad_was_shown",
+      "ad_result",
+      "ad_elapsed_ms",
+      "ad_failure_reason",
+      "round_id",
+      "difficulty",
+      "level_id",
+      "mode",
+      "challenge_date"
+    ]
+  },
+  {
+    "event_id": "reward_claimed",
+    "event_name": "奖励领取成功",
+    "event_comment": "金币或提示实际到账成功后一次，重复领取不发。",
+    "report_src": 0,
+    "event_key_list": [
+      "reward_source",
+      "claim_method",
+      "reward_multiplier",
+      "coins_granted",
+      "hints_granted",
+      "round_id",
+      "ad_request_id"
+    ]
+  },
+  {
+    "event_id": "home_entry_click",
+    "event_name": "首页入口点击",
+    "event_comment": "点击首页攻略、签到、每日任务、其他游戏、每日挑战卡片或底部每日挑战页签。",
+    "report_src": 0,
+    "event_key_list": [
+      "entry"
+    ]
+  },
+  {
+    "event_id": "other_game_click",
+    "event_name": "其他游戏点击",
+    "event_comment": "点击其他游戏条目的去玩。",
+    "report_src": 0,
+    "event_key_list": [
+      "target_game"
+    ]
+  },
+  {
+    "event_id": "other_game_navigate_result",
+    "event_name": "其他游戏跳转结果",
+    "event_comment": "微信跳转回调成功、取消或失败。",
+    "report_src": 0,
+    "event_key_list": [
+      "target_game",
+      "navigation_result",
+      "navigation_reason"
+    ]
+  }
+]
