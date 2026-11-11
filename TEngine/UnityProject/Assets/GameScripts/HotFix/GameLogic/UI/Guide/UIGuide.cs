@@ -15,6 +15,9 @@ namespace GameLogic
         private const string ConfirmButton = "AdClaimBtn";
 
         private UIPopupAnimation _animation;
+        private string _source, _roundId;
+        private int _reportedOpen;
+        private bool _dismissed;
         private (RTLTextMeshPro Label, string Key)[] _labels;
 
         protected override void ScriptGenerator()
@@ -60,12 +63,22 @@ namespace GameLogic
         protected override void OnRefresh()
         {
             base.OnRefresh();
+            _source = UserData as string ?? "settings";
+            var game = SudokuPresenter.Current;
+            _roundId = game != null && (_source == "first_game" || game.IsWindowActive) ? game.RoundId : null;
+            _dismissed = false;
             RefreshLabels();
         }
 
         internal override void OnLanguageChanged() => RefreshLabels();
 
-        protected override void OnInAnimation() => _animation.PlayIn(CompleteInAnimation);
+        protected override void OnInAnimation() => _animation.PlayIn(() =>
+        {
+            CompleteInAnimation();
+            if (_reportedOpen == OpenVersion) return;
+            _reportedOpen = OpenVersion;
+            GameSDK.BiManager.SudokuGuide.SetData("show", _source, _roundId).Report();
+        });
         protected override void OnOutAnimation() => _animation.PlayOut(CompleteOutAnimation);
 
         protected override void OnClose()
@@ -91,6 +104,12 @@ namespace GameLogic
         private void BindImage(string path, SudokuThemeRole role) =>
             UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>(Dialog + path), role);
 
-        private static void Dismiss() => GameModule.UI.HideUI<UIGuide>();
+        private void Dismiss()
+        {
+            if (_dismissed) return;
+            _dismissed = true;
+            GameSDK.BiManager.SudokuGuide.SetData("dismiss", _source, _roundId).Report();
+            GameModule.UI.HideUI<UIGuide>();
+        }
     }
 }

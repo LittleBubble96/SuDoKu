@@ -28,10 +28,17 @@ namespace GameLogic
             RewardedAds.TryGetValue(adId ?? string.Empty, out var flow) ? flow.State : RewardedAdState.Idle;
         public static bool IsAdAvailable(string adId) =>
             RewardedAds.TryGetValue(adId ?? string.Empty, out var flow) && flow.IsAdAvailable;
+        public static string LastRewardRequestId(string adId) =>
+            RewardedAds.TryGetValue(adId, out var flow) ? flow.LastRewardRequestId : null;
         public static bool IsLoading(string adId) => GetState(adId) == RewardedAdState.Loading;
         public static bool IsBusy(string adId) =>
             RewardedAds.TryGetValue(adId ?? string.Empty, out var flow) && flow.IsBusy;
         public static void Preload(string adId) => GetFlow(adId).Preload();
+        public static void EnterPage(string adId) => GetFlow(adId).EnterPage();
+        public static void ExitPage(string adId)
+        {
+            if (RewardedAds.TryGetValue(adId, out var flow)) flow.ExitPage();
+        }
         public static void EnterPage(params string[] adIds)
         {
             foreach (var id in new HashSet<string>(adIds)) GetFlow(id).EnterPage();

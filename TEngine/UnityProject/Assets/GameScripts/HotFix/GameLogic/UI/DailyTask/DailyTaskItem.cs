@@ -32,12 +32,6 @@ namespace GameLogic
             _claim.OnAddListener(() => _onClaim(_type));
             _go.OnAddListener(() => _onGo(_type));
             _fill = FindChildComponent<UnityEngine.UI.Image>("progressBg/progressFill");
-            _fill.type = UnityEngine.UI.Image.Type.Filled;
-            _fill.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
-            _fill.fillOrigin = 0;
-            _fill.rectTransform.anchorMin = Vector2.zero;
-            _fill.rectTransform.anchorMax = Vector2.one;
-            _fill.rectTransform.offsetMin = _fill.rectTransform.offsetMax = Vector2.zero;
             _reward = CreateWidget<DailyTaskRewardItem>("RewardItem");
             UIThemeColor.Bind(_title, SudokuThemeRole.Text);
             UIThemeColor.Bind(_progress, SudokuThemeRole.MutedText);
@@ -72,7 +66,7 @@ namespace GameLogic
             _title.text = LocalizationHelper.GetLocalText(_type == DailyTaskType.PlayOnce ?
                 LanguageKey.daily_gift_task_play_game : LanguageKey.daily_gift_task_daily_challenge);
             _progress.text = completed ? "1 / 1" : "0 / 1";
-            _fill.fillAmount = completed ? 1 : 0;
+            FillProgress(completed ? 1 : 0);
             _claim.Visible = completed;
             _go.Visible = !completed;
             _claim.Interactable = completed && !claimed && !busy;
@@ -85,5 +79,10 @@ namespace GameLogic
 
         private void Theme(string path, SudokuThemeRole role) =>
             UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>(path), role);
+
+        private void FillProgress(float progress)
+        {
+            _fill.rectTransform.sizeDelta = new Vector2(617.26f * Mathf.Clamp01(progress), _fill.rectTransform.sizeDelta.y);
+        }
     }
 }

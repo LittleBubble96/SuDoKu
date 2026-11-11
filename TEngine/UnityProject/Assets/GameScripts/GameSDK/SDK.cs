@@ -19,6 +19,8 @@ namespace GameSDK
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetSession()
         {
+            AdTelemetry.BannerHidden("destroy");
+            AdTelemetry.SetRound(null);
             _sdk = null;
             _session = NewSession();
         }
@@ -26,6 +28,7 @@ namespace GameSDK
         public static void InitializeAndLogin()
         {
             if (_sdk != null) return;
+            BiManager.Initialize();
 #if UNITY_EDITOR
             _sdk = new EditorSDK();
 #elif UNITY_WEBGL
@@ -40,7 +43,7 @@ namespace GameSDK
             _session.Initialize(_sdk);
         }
 
-        internal static void Tick() => _session.Tick();
+        internal static void Tick() { AdTelemetry.Tick(); _session.Tick(); }
         public static void RetryLogin() => _session.RetryLogin();
         public static void RetryPendingEvents() => _session.RetryPendingEvents();
         public static string GetOpenId() => OpenId;
@@ -51,7 +54,13 @@ namespace GameSDK
             return _sdk.CreateRewardedVideoAd(adId, onLoaded, onError, onClosed);
         }
         public static void ShareAppMessage(string title) => _sdk?.ShareAppMessage(title);
-        public static void NavigateToMiniGame(string appId) => _sdk?.NavigateToMiniGame(appId);
+        public static void NavigateToMiniGame(string appId)
+        {
+            var bi = BiManager.OtherGameClick;
+            bi.SetData(appId == "wx308052a1ea617d67" ? "xunzi" : appId);
+            bi.Report();
+            _sdk?.NavigateToMiniGame(appId);
+        }
         public static void CreateGameClubButton() => _sdk?.CreateGameClubButton();
         public static void OpenGameClub() => _sdk?.OpenGameClub();
         public static void ShowBanner(string adId) => _sdk?.ShowBanner(adId);

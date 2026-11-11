@@ -123,8 +123,8 @@ namespace GameLogic
                 var date = first.AddDays(i);
                 _days[i].Refresh(date, date.Month == ViewedMonth.Month && date.Year == ViewedMonth.Year, _lastToday, SelectedDate, game.GetDaily(date), SelectDate);
             }
-            var difficulty = record?.game != null ? (SudokuDifficulty)record.game.difficulty : SudokuDailyRules.Difficulty(SelectedDate);
-            _info.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_selected_info), SelectedDate.Month, SelectedDate.Day, SudokuUIFormatting.Difficulty(difficulty));
+            _info.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_selected_date),
+                SelectedDate.Month, SelectedDate.Day);
             _status.text = completed ? LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_complete) : record == null ? "0%" :
                 string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_progress), record.progressPercent);
             _statusDot.SetActive(record != null);

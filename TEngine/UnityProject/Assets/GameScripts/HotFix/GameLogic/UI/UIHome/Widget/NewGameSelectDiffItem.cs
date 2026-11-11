@@ -11,7 +11,7 @@ namespace GameLogic
         private XYButton _button;
         private TMP_Text _title, _description;
         private UIThemeColor _background, _titleColor, _descriptionColor;
-        private GameObject _lock, _selectRoot;
+        private GameObject _lock, _selectRoot, _progressRoot;
         private readonly UIThemeColor[] _progress = new UIThemeColor[SudokuSession.RequiredCompletions];
         private SudokuDifficulty _difficulty;
         private Action<SudokuDifficulty> _select;
@@ -39,6 +39,7 @@ namespace GameLogic
         {
             base.OnCreate();
             var template = FindChild("bg/Layout/ProgressItem");
+            _progressRoot = template.parent.gameObject;
             template.gameObject.SetActive(false);
             for (int i = 0; i < _progress.Length; i++)
             {
@@ -55,22 +56,30 @@ namespace GameLogic
             _select = select;
         }
 
-        public void RefreshDisplay(SudokuSession session, SudokuDifficulty selected)
+        public void RefreshDisplay(SudokuSession session, SudokuDifficulty selected, int played)
         {
             bool unlocked = session.IsUnlocked(_difficulty);
             bool isSelected = unlocked && selected == _difficulty;
-            int completed = Math.Min(SudokuSession.RequiredCompletions, session.CompletedCount(_difficulty));
+            int completed = unlocked ? 0 : Math.Min(SudokuSession.RequiredCompletions,
+                session.CompletedCount((SudokuDifficulty)((int)_difficulty - 1)));
             _button.Interactable = unlocked;
             _lock.SetActive(!unlocked);
+            _progressRoot.SetActive(!unlocked);
             _selectRoot.SetActive(isSelected);
             _title.text = SudokuUIFormatting.Difficulty(_difficulty);
-            _description.text = unlocked ? completed + "/" + SudokuSession.RequiredCompletions :
-                string.Format(LocalizationHelper.GetLocalText(LanguageKey.home_new_game_diff_des),
-                    SudokuUIFormatting.Difficulty((SudokuDifficulty)((int)_difficulty - 1)), SudokuSession.RequiredCompletions);
+            if (unlocked)
+                _description.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.home_new_game_played), played);
+            else
+            {
+                var previous = (SudokuDifficulty)((int)_difficulty - 1);
+                int remaining = Math.Max(0, SudokuSession.RequiredCompletions - session.CompletedCount(previous));
+                _description.text = string.Format(LocalizationHelper.GetLocalText(LanguageKey.home_new_game_diff_des),
+                    SudokuUIFormatting.Difficulty(previous), remaining);
+            }
             _background.SetRole(isSelected ? SudokuThemeRole.Accent : SudokuThemeRole.Matching);
             _titleColor.SetRole(!unlocked ? SudokuThemeRole.MutedText : isSelected ? SudokuThemeRole.Accent : SudokuThemeRole.Text);
             _descriptionColor.SetRole(isSelected ? SudokuThemeRole.Accent : SudokuThemeRole.MutedText);
-            for (int i = 0; i < _progress.Length; i++) _progress[i].SetRole(unlocked && i < completed ? SudokuThemeRole.Accent : SudokuThemeRole.Line);
+            for (int i = 0; i < _progress.Length; i++) _progress[i].SetRole(i < completed ? SudokuThemeRole.Accent : SudokuThemeRole.Line);
         }
     }
 }

@@ -143,10 +143,10 @@ namespace GameLogic.Sudoku
         }
 
         public static UniTask ContinueGameAsync() => OpenGameAsync(null, null);
-        public static UniTask StartNewGameAsync(SudokuDifficulty difficulty) => OpenGameAsync(difficulty, null);
+        public static UniTask StartNewGameAsync(SudokuDifficulty difficulty, string source = "new_game") => OpenGameAsync(difficulty, null, source);
         public static UniTask StartDailyChallengeAsync(DateTime date) => OpenGameAsync(null, date.Date);
 
-        private static async UniTask OpenGameAsync(SudokuDifficulty? difficulty, DateTime? dailyDate)
+        private static async UniTask OpenGameAsync(SudokuDifficulty? difficulty, DateTime? dailyDate, string source = "new_game")
         {
             if (IsNavigating || Current == null || Current.IsAdShowing) return;
             var game = Current;
@@ -181,7 +181,7 @@ namespace GameLogic.Sudoku
                     await UniTask.WaitUntil(() => window.IsBoardReady, cancellationToken: token);
                     // 资源和棋盘准备成功后才替换旧对局；加载失败不会丢失旧题。
                     bool opened = dailyDate.HasValue ? game.OpenDailyChallenge(dailyDate.Value) :
-                        difficulty.HasValue ? game.StartNewGame(difficulty.Value) : game.ContinueNormalGame();
+                        difficulty.HasValue ? game.StartNewGame(difficulty.Value, source) : game.ContinueNormalGame();
                     if (!opened)
                     {
                         GameModule.UI.CloseUI<UISudoku>();
@@ -240,7 +240,7 @@ namespace GameLogic.Sudoku
             UIGuide guide;
             try
             {
-                guide = await GameModule.UI.ShowUIAsyncAwait<UIGuide>();
+                guide = await GameModule.UI.ShowUIAsyncAwait<UIGuide>("first_game");
             }
             catch (OperationCanceledException) when (!token.IsCancellationRequested)
             {
@@ -268,6 +268,7 @@ namespace GameLogic.Sudoku
         {
             SaveOnQuit();
             AdSystem.Dispose();
+            GameSDK.AdTelemetry.SetRound(null);
             Coins?.Dispose(); Coins = null;
             SudokuThemeManager.Release();
             SudokuSettingsManager.Release();

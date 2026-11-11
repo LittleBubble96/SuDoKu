@@ -33,10 +33,15 @@ namespace GameLogic.Data
 #endif
         public string activeDailyDate;
         public SudokuSettlementData settlement;
+        public int settlementProgress;
+        public SudokuSettlementData settlementReward;
+        public int telemetryAdUnlockFlags;
         public bool hasShownInGameGuide;
         public int signInDays;
         public string signInDate;
         public DailyTaskData dailyTaskData = new DailyTaskData();
+        // 仅兼容旧缓存，读入后合并到 statistics.played，不再单独累计。
+        public int[] difficultyPlayed;
         public SudokuStatisticsData[] statistics = new SudokuStatisticsData[6];
         public GamePropData gamePropData = new GamePropData();
         public GameSettingsData gameSettingsData = new GameSettingsData();

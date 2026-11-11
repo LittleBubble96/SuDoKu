@@ -46,10 +46,7 @@ namespace Procedure
 
             _downloader = _resourceModule.CreateResourceDownloader();
 
-            StartupTelemetry.Success(5, new System.Collections.Generic.Dictionary<string, string> {
-                { "download_count", _downloader.TotalDownloadCount.ToString(System.Globalization.CultureInfo.InvariantCulture) },
-                { "download_bytes", _downloader.TotalDownloadBytes.ToString(System.Globalization.CultureInfo.InvariantCulture) }
-            });
+            StartupTelemetry.Success(5, _downloader.TotalDownloadCount, _downloader.TotalDownloadBytes);
             if (_downloader.TotalDownloadCount == 0)
             {
                 StartupTelemetry.Skip(6, "no_patch");

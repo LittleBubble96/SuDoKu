@@ -169,8 +169,8 @@ namespace GameLogic
             }
             RefreshBanner();
             if (_game == null || !IsBoardReady) return;
-            _level.text = _game.IsDaily ? string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_selected_info),
-                _game.DailyDate.Month, _game.DailyDate.Day, SudokuUIFormatting.Difficulty(Session.Difficulty)) : SudokuUIFormatting.Difficulty(Session.Difficulty);
+            _level.text = _game.IsDaily ? string.Format(LocalizationHelper.GetLocalText(LanguageKey.daily_selected_date),
+                _game.DailyDate.Month, _game.DailyDate.Day) : SudokuUIFormatting.Difficulty(Session.Difficulty);
             int filled = 0;
             for (int i = 0; i < 81; i++) if (Session.Value(i) != 0) filled++;
             _progress.text = Session.IsComplete ? LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_complete) : string.Format(LocalizationHelper.GetLocalText(LanguageKey.sudoku_ui_progress), filled);
@@ -248,7 +248,13 @@ namespace GameLogic
             if (_bannerRequested == visible) return;
             _bannerRequested = visible;
             if (visible) GameSDK.SDK.ShowBanner(AdIds.Banner);
-            else GameSDK.SDK.HideBanner();
+            else
+            {
+                string reason = _game.IsSuspended ? "background" : !IsOpen || !_game.IsWindowActive ? "leave_round" :
+                    _game.Session.IsComplete ? "round_complete" : _game.IsPaused ? "pause" : "covered";
+                GameSDK.AdTelemetry.BannerHidden(reason);
+                GameSDK.SDK.HideBanner();
+            }
         }
 
         protected override void OnUpdate()

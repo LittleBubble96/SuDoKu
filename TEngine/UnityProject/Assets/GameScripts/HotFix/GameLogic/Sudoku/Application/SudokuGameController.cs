@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TEngine;
@@ -11,21 +11,29 @@ namespace GameLogic.Sudoku
     {
         private readonly SudokuPack[] _packs;
         public const int HintCoinCost = 100;
+        public const int SettlementRequiredWins = 6;
         private readonly GameCacheManager _cache;
         private readonly GameCacheData _data;
         private readonly Func<DateTime> _clock;
         private readonly Dictionary<string, SudokuDailySaveData> _daily = new Dictionary<string, SudokuDailySaveData>();
         private bool _hasActiveGame, _normalValid, _normalComplete;
-        private bool _statisticsCounted, _hadMistake, _gmAssisted;
+        private bool _statisticsCounted, _hadMistake;
         private bool _completionProcessed;
         private int _mistakeCount, _hintCount;
         private readonly SudokuScoringRules[] _scoring;
         public SudokuSettlementData Settlement => _data.settlement;
+        public int SettlementProgress => _data.settlementProgress;
+        public int SettlementProgressBefore { get; private set; }
+        public SudokuSettlementData SettlementReward => _data.settlementReward;
+        public bool CanClaimSettlementReward => SettlementProgress >= SettlementRequiredWins &&
+            SettlementReward != null && !SettlementReward.IsClaimed;
+        public string RoundId { get; private set; }
         public int MistakeCount => _mistakeCount;
         public int HintCount => _hintCount;
         public SudokuSession Session { get; private set; }
         public SudokuTrophyManager Trophies { get; }
         public SudokuStatisticsManager Statistics { get; }
+        public int PlayedCount(SudokuDifficulty difficulty) => Statistics.Get(difficulty).played;
         public DailyTaskManager DailyTasks { get; }
         public string Message { get; private set; }
         public int LevelRevision { get; private set; }
@@ -53,6 +61,7 @@ namespace GameLogic.Sudoku
             _cache = cache;
             _data = cache?.CacheData ?? new GameCacheData();
             _data.InitAll();
+            SettlementProgressBefore = _data.settlementProgress;
             _scoring = SudokuScoringRules.Load(settlementConfigs);
             Statistics = new SudokuStatisticsManager(_data);
             _clock = clock ?? (() => NetTimeSystem.Instance.GetNetTime());
@@ -66,6 +75,14 @@ namespace GameLogic.Sudoku
                 RestorePlayState(saved);
             }
             else Session.BeginLevel(SudokuDifficulty.Quick, 0); // 首页占位，不分配新题、不推进游标。
+            // 合并旧版难度页独立计数；以后只维护一份已玩次数。
+            for (int d = 0; d < 6; d++)
+            {
+                var stats = Statistics.Get((SudokuDifficulty)d);
+                int legacy = _data.difficultyPlayed != null && d < _data.difficultyPlayed.Length ? _data.difficultyPlayed[d] : 0;
+                stats.played = Math.Max(stats.played, Math.Max(legacy, Session.CompletedCount((SudokuDifficulty)d)));
+            }
+            _data.difficultyPlayed = null;
             InitializePools(saved);
             foreach (var entry in _data.dailyChallenges)
                 if (entry != null && SudokuDailyRules.TryParseDate(entry.date, out _) && entry.game != null &&
@@ -91,11 +108,12 @@ namespace GameLogic.Sudoku
             Trophies = new SudokuTrophyManager(trophyConfigs, _data, () => Today);
             DailyTasks = new DailyTaskManager(_data, () => Today, SaveGameProgress);
             var todayChallenge = GetDaily(Today);
-            if (todayChallenge?.completed == true && todayChallenge.game.gmAssisted == false)
+            if (todayChallenge?.completed == true)
                 DailyTasks.RecordCompletion(true, Today);
             if (Trophies.RefreshAwards()) _cache?.Save();
-            // 上次在结算/广告期间退出或进程终止，重新启动时补基础奖励，不回放旧结算。
-            TryClaimSettlement(_data.settlement, false);
+            CheckAdUnlocks(false);
+            if (_hasActiveGame) SudokuTelemetry.SetAdRound(this);
+            _cache?.Save();
         }
 
         public bool OpenLevel(SudokuDifficulty difficulty, int index)
@@ -116,14 +134,14 @@ namespace GameLogic.Sudoku
 
         public int PeekNextIndex(SudokuDifficulty difficulty) => _data.sudokuPools[(int)difficulty].nextIndex;
 
-        public bool StartNewGame(SudokuDifficulty difficulty)
+        public bool StartNewGame(SudokuDifficulty difficulty, string source = "new_game")
         {
             if (!Session.IsUnlocked(difficulty)) return false;
             int index = PeekNextIndex(difficulty);
             var candidate = NewSession();
             try { candidate.BeginLevel(difficulty, index); }
             catch (Exception error) when (error is ArgumentException || error is InvalidOperationException) { SetMessage(error.Message); return false; }
-            CommitGame(candidate, null, null, difficulty);
+            CommitGame(candidate, null, null, difficulty, source);
             SetMessage("");
             return true;
         }
@@ -132,7 +150,7 @@ namespace GameLogic.Sudoku
         {
             if (!_normalValid) return false;
             if (_normalComplete) return StartNewGame(NormalDifficulty);
-            if (!IsDaily && _hasActiveGame) return true;
+            if (!IsDaily && _hasActiveGame) { ReportRoundResume(); return true; }
             var candidate = NewSession();
             if (!candidate.TryRestore(_data.sudokuSaveData)) return false;
             CommitGame(candidate, null, _data.sudokuSaveData);
@@ -160,7 +178,7 @@ namespace GameLogic.Sudoku
         {
             date = date.Date;
             if (!CanOpenDaily(date)) return false;
-            if (IsDaily && _hasActiveGame && DailyDate == date) return true;
+            if (IsDaily && _hasActiveGame && DailyDate == date) { ReportRoundResume(); return true; }
             var record = GetDaily(date);
             var candidate = NewSession();
             SudokuDifficulty difficulty;
@@ -188,14 +206,16 @@ namespace GameLogic.Sudoku
             return candidate;
         }
 
-        private void CommitGame(SudokuSession candidate, SudokuDailySaveData daily, SudokuSaveData saved, SudokuDifficulty? consumedPool = null)
+        private void CommitGame(SudokuSession candidate, SudokuDailySaveData daily, SudokuSaveData saved, SudokuDifficulty? consumedPool = null, string source = "new_game")
         {
-            TryClaimSettlement(Settlement, false);
             _data.settlement = null;
             CaptureActiveGame();
             // 新普通对局会替换旧普通对局；切换到每日挑战或继续旧题只暂停。
             if (daily == null && saved == null && _normalValid && !_normalComplete && _data.sudokuSaveData.statisticsCounted)
+            {
+                ReportAbandon(_data.sudokuSaveData, false, null, "replaced");
                 Statistics.Abandon((SudokuDifficulty)_data.sudokuSaveData.difficulty);
+            }
             Session = candidate; _hasActiveGame = true; IsDaily = daily != null;
             DailyDate = IsDaily ? DateTime.ParseExact(daily.date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) : default;
             _data.activeDailyDate = daily?.date;
@@ -205,15 +225,19 @@ namespace GameLogic.Sudoku
             LevelRevision++; ResetPlayState();
             if (saved != null) RestorePlayState(saved);
             else BeginStatistics();
+            SudokuTelemetry.SetAdRound(this);
             SaveGameProgress();
+            if (saved == null) ReportRoundStart(IsDaily ? "daily_challenge" : source);
+            else ReportRoundResume();
         }
 
         private void RestorePlayState(SudokuSaveData saved)
         {
+            RoundId = saved.roundId ?? (saved.roundId = Guid.NewGuid().ToString("N"));
             ElapsedSeconds = double.IsNaN(saved.elapsedSeconds) || double.IsInfinity(saved.elapsedSeconds) ? 0 : Math.Max(0, Math.Min(315360000, saved.elapsedSeconds));
             SelectedCell = saved.selectedCell >= 0 && saved.selectedCell < 81 ? saved.selectedCell : -1;
             NoteMode = saved.noteMode;
-            _statisticsCounted = saved.statisticsCounted; _hadMistake = saved.hadMistake; _gmAssisted = saved.gmAssisted;
+            _statisticsCounted = saved.statisticsCounted; _hadMistake = saved.hadMistake;
             _mistakeCount = Math.Max(saved.hadMistake ? 1 : 0, saved.mistakeCount);
             _hintCount = Math.Max(0, saved.hintCount); _completionProcessed = saved.completionProcessed;
         }
@@ -242,7 +266,7 @@ namespace GameLogic.Sudoku
 
         public void NextLevel()
         {
-            if (!IsDaily) StartNewGame(Session.Difficulty);
+            if (!IsDaily) StartNewGame(Session.Difficulty, "next_round");
         }
 
         public void PreviousLevel() { if (!IsDaily) OpenLevel(Session.Difficulty, Math.Max(0, Session.LevelIndex - 1)); }
@@ -250,9 +274,15 @@ namespace GameLogic.Sudoku
         public void Restart()
         {
             if (!_hasActiveGame || IsDaily && Session.IsComplete) return;
-            TryClaimSettlement(Settlement, false); _data.settlement = null;
-            if (_statisticsCounted && !Session.IsComplete) Statistics.Abandon(Session.Difficulty);
-            Session.Restart(); LevelRevision++; ResetPlayState(); BeginStatistics(); SaveGameProgress(); SetMessage("本题已重开。");
+            _data.settlement = null;
+            if (_statisticsCounted && !Session.IsComplete)
+            {
+                ReportAbandon(Session.Capture(), IsDaily, IsDaily ? SudokuDailyRules.DateKey(DailyDate) : null, "restart");
+                Statistics.Abandon(Session.Difficulty);
+            }
+            Session.Restart(); LevelRevision++; ResetPlayState(); BeginStatistics();
+            SudokuTelemetry.SetAdRound(this);
+            SaveGameProgress(); ReportRoundStart("restart"); SetMessage("本题已重开。");
         }
 
         public bool EnterDigit(int cell, int digit, bool notes)
@@ -264,7 +294,7 @@ namespace GameLogic.Sudoku
             var completedBefore = Session.CompletedRegions(cell);
             if (!Session.SetDigit(cell, digit, notes)) return false;
             if (!notes && digit != 0 && !Session.IsCorrect(cell, digit)) { _hadMistake = true; _mistakeCount++; }
-            CompletePlayerGame();
+            CompleteGame();
             var newlyCompleted = Session.CompletedRegions(cell) & ~completedBefore;
             SaveGameProgress();
             if (Session.IsComplete && !IsDaily)
@@ -280,8 +310,9 @@ namespace GameLogic.Sudoku
 
         private void ResetPlayState()
         {
+            RoundId = Guid.NewGuid().ToString("N");
             ElapsedSeconds = 0; SelectedCell = -1; NoteMode = false; IsPaused = false;
-            _statisticsCounted = _hadMistake = _gmAssisted = false;
+            _statisticsCounted = _hadMistake = false;
             _mistakeCount = _hintCount = 0; _completionProcessed = false;
         }
         public void SelectCell(int index)
@@ -306,6 +337,8 @@ namespace GameLogic.Sudoku
         }
         public void SetSuspended(bool suspended)
         {
+            if (IsSuspended == suspended) return;
+            if (suspended) GameSDK.AdTelemetry.BannerHidden("background");
             IsSuspended = suspended;
             if (suspended) SaveGameProgress();
             GameEvent.Send(EventDefine.SudokuStateChanged);
@@ -340,7 +373,13 @@ namespace GameLogic.Sudoku
             var completedBefore = Session.CompletedRegions(cell);
             if (!Session.ApplyHint(cell)) return false;
             _hintCount++;
-            CompletePlayerGame();
+            var bi = GameSDK.BiManager.SudokuHintUsed;
+            bi.SetData(RoundId, (int)Session.Difficulty, Session.LevelIndex + 1, IsDaily ? "daily" : "normal",
+                IsDaily ? SudokuDailyRules.DateKey(DailyDate) : null,
+                byCount ? "inventory" : byCoin ? "coins" : "rewarded_ad",
+                !byCount && !byCoin ? AdSystem.LastRewardRequestId(AdIds.Tip) : null);
+            bi.Report();
+            CompleteGame();
             var newlyCompleted = Session.CompletedRegions(cell) & ~completedBefore;
             if (byCount) Props.tipCount--;
             else if (byCoin) Props.coinCount -= HintCoinCost;
@@ -356,37 +395,58 @@ namespace GameLogic.Sudoku
             Statistics.Begin(Session.Difficulty);
         }
 
-        private void CompletePlayerGame()
+        private void CompleteGame()
         {
-            // 只在玩家落子/提示使对局完成时结算；存档和读档不会重复结算。
+            // 玩家操作或 GM 使本局首次完成时结算；存档和读档不会重复结算。
             if (!Session.IsComplete || _completionProcessed) return;
             _completionProcessed = true;
-            if (_statisticsCounted) Statistics.Complete(Session.Difficulty, ElapsedSeconds, !_hadMistake);
-            if (!_gmAssisted) DailyTasks.RecordCompletion(IsDaily, DailyDate);
-            if (_gmAssisted) return;
+            if (!_statisticsCounted)
+            {
+                _statisticsCounted = true;
+                Statistics.Begin(Session.Difficulty);
+                Statistics.AddTime(Session.Difficulty, ElapsedSeconds);
+            }
+            Statistics.Complete(Session.Difficulty, ElapsedSeconds, !_hadMistake);
+            DailyTasks.RecordCompletion(IsDaily, DailyDate);
             var rule = _scoring[(int)Session.Difficulty];
             int score = rule.Calculate(ElapsedSeconds, _mistakeCount, _hintCount);
             var stats = Statistics.Get(Session.Difficulty);
             stats.bestScore = Math.Max(stats.bestScore, score);
             _data.settlement = new SudokuSettlementData
             {
-                id = Guid.NewGuid().ToString("N"), difficulty = (int)Session.Difficulty,
+                id = Guid.NewGuid().ToString("N"), roundId = RoundId, difficulty = (int)Session.Difficulty,
                 score = score, bestScore = stats.bestScore, seconds = ElapsedSeconds,
                 bestSeconds = stats.won > 0 ? stats.bestSeconds : ElapsedSeconds,
                 mistakes = _mistakeCount, hints = _hintCount, daily = IsDaily,
                 dailyDate = IsDaily ? SudokuDailyRules.DateKey(DailyDate) : null,
                 coins = rule.Coins, tips = rule.Tips
             };
+            SettlementProgressBefore = SettlementProgress;
+            // 宝箱满额后保留原奖励，领取前不进入下一轮累计。
+            if (!CanClaimSettlementReward)
+            {
+                _data.settlementProgress++;
+                if (_data.settlementProgress == SettlementRequiredWins)
+                    _data.settlementReward = Settlement;
+            }
+            ReportRoundComplete();
+            CheckAdUnlocks(true);
         }
 
-        public bool TryClaimSettlement(SudokuSettlementData result, bool doubled)
+        public bool TryClaimSettlement(SudokuSettlementData result, bool doubled, string claimMethod = "auto")
         {
-            if (result == null || !ReferenceEquals(result, Settlement) || result.IsClaimed) return false;
+            if (!CanClaimSettlementReward || !ReferenceEquals(result, SettlementReward)) return false;
             int multiplier = doubled ? 2 : 1;
+            int previousCoins = Props.coinCount, previousHints = Props.tipCount;
             Props.coinCount = (int)Math.Min(int.MaxValue, (long)Props.coinCount + Math.Max(0, result.coins) * (long)multiplier);
             Props.tipCount = (int)Math.Min(int.MaxValue, (long)Props.tipCount + Math.Max(0, result.tips) * (long)multiplier);
             result.claimedMultiplier = multiplier;
+            _data.settlementReward = null;
+            _data.settlementProgress = 0;
             SaveGameProgress();
+            GameSDK.BiManager.RewardClaimed.SetData("settlement", doubled ? "rewarded_ad" : claimMethod, multiplier,
+                Props.coinCount - previousCoins, Props.tipCount - previousHints, result.roundId,
+                doubled ? AdSystem.LastRewardRequestId(AdIds.Settlement) : null).Report();
             GameEvent.Send(EventDefine.SudokuStateChanged);
             return true;
         }
@@ -400,7 +460,7 @@ namespace GameLogic.Sudoku
         public void SaveGameProgress()
         {
             CaptureActiveGame();
-            bool trophiesChanged = Trophies.RefreshAwards();
+            bool trophiesChanged = Trophies.RefreshAwards(IsDaily && _completionProcessed ? "challenge_complete" : "reconcile", RoundId);
             _cache?.Save();
             if (trophiesChanged) GameEvent.Send(EventDefine.SudokuTrophiesChanged);
         }
@@ -409,8 +469,9 @@ namespace GameLogic.Sudoku
         {
             if (!_hasActiveGame) return;
             var data = Session.Capture();
+            data.roundId = RoundId; data.progressPercent = Session.ProgressPercent;
             data.elapsedSeconds = ElapsedSeconds; data.selectedCell = SelectedCell; data.noteMode = NoteMode;
-            data.statisticsCounted = _statisticsCounted; data.hadMistake = _hadMistake; data.gmAssisted = _gmAssisted;
+            data.statisticsCounted = _statisticsCounted; data.hadMistake = _hadMistake;
             data.mistakeCount = _mistakeCount; data.hintCount = _hintCount; data.completionProcessed = _completionProcessed;
             if (IsDaily)
             {
@@ -421,6 +482,62 @@ namespace GameLogic.Sudoku
             {
                 _data.sudokuSaveData = data; _normalValid = true; _normalComplete = Session.IsComplete;
             }
+        }
+
+        private void ReportRoundStart(string source)
+        {
+            GameSDK.BiManager.SudokuRoundStart.SetData(RoundId, (int)Session.Difficulty, Session.LevelIndex + 1, IsDaily ? "daily" : "normal",
+                IsDaily ? SudokuDailyRules.DateKey(DailyDate) : null,
+                SudokuTelemetry.Milliseconds(ElapsedSeconds), Session.ProgressPercent, _mistakeCount, _hintCount, source).Report();
+        }
+
+        private void ReportRoundResume()
+        {
+            GameSDK.BiManager.SudokuRoundResume.SetData(RoundId, (int)Session.Difficulty, Session.LevelIndex + 1, IsDaily ? "daily" : "normal",
+                IsDaily ? SudokuDailyRules.DateKey(DailyDate) : null,
+                SudokuTelemetry.Milliseconds(ElapsedSeconds), Session.ProgressPercent, _mistakeCount, _hintCount).Report();
+        }
+
+        private void ReportRoundComplete()
+        {
+            GameSDK.BiManager.SudokuRoundComplete.SetData(RoundId, (int)Session.Difficulty, Session.LevelIndex + 1, IsDaily ? "daily" : "normal",
+                IsDaily ? SudokuDailyRules.DateKey(DailyDate) : null,
+                SudokuTelemetry.Milliseconds(ElapsedSeconds), Session.ProgressPercent, _mistakeCount, _hintCount, Settlement.score, _hadMistake ? 0 : 1, Statistics.Get(Session.Difficulty).currentStreak).Report();
+        }
+
+        private void ReportAbandon(SudokuSaveData saved, bool daily, string date, string reason)
+        {
+            bool active = daily || !IsDaily;
+            if (active ? !_statisticsCounted : !saved.statisticsCounted) return;
+            string id = active ? RoundId : saved.roundId;
+            if (string.IsNullOrEmpty(id)) id = saved.roundId = Guid.NewGuid().ToString("N");
+            var bi = GameSDK.BiManager.SudokuRoundAbandon;
+            bi.SetData(id, saved.difficulty, saved.puzzleIndex + 1, daily ? "daily" : "normal", daily ? date : null,
+                SudokuTelemetry.Milliseconds(active ? ElapsedSeconds : saved.elapsedSeconds),
+                active ? Session.ProgressPercent : saved.progressPercent,
+                active ? _mistakeCount : saved.mistakeCount, active ? _hintCount : saved.hintCount, reason);
+            bi.Report();
+        }
+
+        private void CheckAdUnlocks(bool fromRound)
+        {
+            int normal = 0, wins = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                normal += Session.CompletedCount((SudokuDifficulty)i);
+                wins += Statistics.Get((SudokuDifficulty)i).won;
+            }
+            ReportAdUnlock(1, "banner", AdIds.BannerUnlockWins, normal, normal, fromRound);
+            ReportAdUnlock(2, "interstitial", AdIds.InterstitialUnlockWins, wins, normal, fromRound);
+        }
+
+        private void ReportAdUnlock(int flag, string feature, int threshold, int wins, int normal, bool fromRound)
+        {
+            if ((_data.telemetryAdUnlockFlags & flag) != 0 || wins < threshold) return;
+            _data.telemetryAdUnlockFlags |= flag;
+            var bi = GameSDK.BiManager.AdFeatureUnlocked;
+            bi.SetData(feature, threshold, normal, wins, fromRound ? RoundId : null);
+            bi.Report();
         }
 
         public void SetMessage(string message)
@@ -473,28 +590,32 @@ namespace GameLogic.Sudoku
             Session = new SudokuSession(_packs); Session.BeginLevel(SudokuDifficulty.Quick, 0);
             _hasActiveGame = _normalValid = true; _normalComplete = IsDaily = false;
             DailyDate = default; _data.activeDailyDate = null;
-            _data.settlement = null;
+            _data.settlement = _data.settlementReward = null;
+            _data.settlementProgress = 0;
             _data.dailyChallenges.Clear(); _daily.Clear(); InitializePools(null);
             Trophies.ClearAwards(); Statistics.Clear();
+            _data.difficultyPlayed = null;
             _data.sudokuPools[0].nextIndex = 1 % _packs[0].Count;
             LevelRevision++; ResetPlayState(); SaveGameProgress(); SetMessage("[GM] 数独进度已重置，仅快速档开放。");
         }
         public void DebugComplete()
         {
-            ExcludeStatistics(); Session.DebugComplete(); SaveGameProgress(); SetMessage("[GM] 本关已通关，解锁进度按不同题累计。");
+            EnsureDebugRound(); Session.DebugComplete(); CompleteGame();
+            SaveGameProgress(); SetMessage("[GM] 本关已通关，解锁进度按不同题累计。");
         }
         public void DebugFillNext()
         {
-            ExcludeStatistics(); bool filled = Session.DebugFillNext(); SaveGameProgress();
+            EnsureDebugRound(); bool filled = Session.DebugFillNext(); CompleteGame(); SaveGameProgress();
             SetMessage(filled ? "[GM] 已填入一个正确数字。" : "[GM] 本关已完成。");
         }
-        private void ExcludeStatistics()
+        private void EnsureDebugRound()
         {
-            if (Session.IsComplete) return;
-            _gmAssisted = true;
-            if (!_statisticsCounted) return;
-            Statistics.Exclude(Session.Difficulty, ElapsedSeconds);
-            _statisticsCounted = false;
+            if (!_hasActiveGame) StartNewGame(Session.Difficulty);
+            if (Session.IsComplete || _statisticsCounted) return;
+            _statisticsCounted = true;
+            Statistics.Begin(Session.Difficulty);
+            Statistics.AddTime(Session.Difficulty, ElapsedSeconds);
+            ReportRoundStart("new_game");
         }
         public void DebugSetProps(int hints, int coins)
         {

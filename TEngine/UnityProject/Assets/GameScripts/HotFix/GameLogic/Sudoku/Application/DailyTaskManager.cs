@@ -61,6 +61,8 @@ namespace GameLogic.Sudoku
             int multiplier = doubled ? 2 : 1;
             reward = new DailyTaskReward(FreeCoins * multiplier, FreeTips * multiplier);
             Grant(reward);
+            GameSDK.BiManager.RewardClaimed.SetData("daily_free", doubled ? "rewarded_ad" : "manual", multiplier, reward.Coins, reward.Tips,
+                requestId: doubled ? AdSystem.LastRewardRequestId(AdIds.DailyTask) : null).Report();
             return true;
         }
 
@@ -80,6 +82,8 @@ namespace GameLogic.Sudoku
                 reward = new DailyTaskReward(0, ChallengeTips);
             }
             Grant(reward);
+            GameSDK.BiManager.RewardClaimed.SetData(type == DailyTaskType.PlayOnce ? "daily_play_task" : "daily_challenge_task",
+                "manual", 1, reward.Coins, reward.Tips).Report();
             return true;
         }
 

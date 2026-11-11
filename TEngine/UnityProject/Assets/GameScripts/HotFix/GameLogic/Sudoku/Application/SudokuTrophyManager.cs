@@ -83,7 +83,7 @@ namespace GameLogic.Sudoku
         }
 
         // 控制器在读档后和保存进度时调用，与每日记录在同一次缓存写入中持久化。
-        internal bool RefreshAwards()
+        internal bool RefreshAwards(string source = "reconcile", string roundId = null)
         {
             if (_configs.Count == 0) return false;
             var today = _clock().Date; var counts = CompletedByMonth(today); bool changed = false;
@@ -92,6 +92,20 @@ namespace GameLogic.Sudoku
                 if (_awards.ContainsKey(config.Id) || new DateTime(config.Year, config.Month, 1) > today) continue;
                 if (CompletedDays(config, counts) < RequiredDays(config)) continue;
                 GrantAward(config.Id, today);
+                var dates = new HashSet<DateTime>();
+                foreach (var record in _data.dailyChallenges)
+                    if (record?.completed == true &&
+                        SudokuDailyRules.TryParseDate(record.date, out var date) && date <= today &&
+                        date.Year == config.Year && date.Month == config.Month) dates.Add(date);
+                if (dates.Count >= RequiredDays(config))
+                {
+                    var bi = GameSDK.BiManager.DailyTrophyAwarded;
+                    bi.SetData(config.Id,
+                        new DateTime(config.Year, config.Month, 1).ToString("yyyy-MM", System.Globalization.CultureInfo.InvariantCulture),
+                        dates.Count, RequiredDays(config), SudokuDailyRules.DateKey(today), source,
+                        source == "challenge_complete" ? roundId : null);
+                    bi.Report();
+                }
                 changed = true;
             }
             return changed;

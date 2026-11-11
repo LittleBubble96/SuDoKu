@@ -153,10 +153,10 @@ namespace GameLogic
             }
         }
 
-        private void GrantReward(bool doubled)
+        private void GrantReward(bool doubled, string claimMethod = "manual")
         {
             Vector3 origin = _items[_manager.DisplayDay - 1].RewardPosition;
-            if (!_manager.TryClaim(doubled, out var reward)) return;
+            if (!_manager.TryClaim(doubled, out var reward, claimMethod)) return;
             RewardEffectPlayer.PlayAsync(reward.IsCoin, reward.Amount, origin).Forget();
         }
 
@@ -167,7 +167,7 @@ namespace GameLogic
         {
             _popupAnimation.Reset();
             // 框架关闭也算普通领取；管理类的每日标记避免与按钮路径重复发奖。
-            if (SudokuPresenter.DailySignIn != null && gameObject != null) GrantReward(false);
+            if (SudokuPresenter.DailySignIn != null && gameObject != null) GrantReward(false, "auto");
             AdSystem.ExitPage(AdIds.DailySignIn);
             base.OnClose();
         }

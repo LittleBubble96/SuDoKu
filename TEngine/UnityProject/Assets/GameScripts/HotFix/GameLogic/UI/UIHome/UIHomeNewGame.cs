@@ -97,7 +97,9 @@ namespace GameLogic
                     break;
                 }
             _start.Interactable = _game.Session.IsUnlocked(SelectedDifficulty) && !SudokuPresenter.IsNavigating;
-            foreach (var item in _items) item.RefreshDisplay(_game.Session, SelectedDifficulty);
+            for (int i = 0; i < _items.Count; i++)
+                _items[i].RefreshDisplay(_game.Session, SelectedDifficulty,
+                    _game.PlayedCount((SudokuDifficulty)i));
         }
 
         private async UniTaskVoid StartGameAsync()

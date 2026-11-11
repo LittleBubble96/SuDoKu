@@ -1,4 +1,4 @@
-﻿using TEngine;
+using TEngine;
 
 namespace GameSDK
 {
@@ -44,8 +44,13 @@ namespace GameSDK
             Log.Info($"[Share] 分享 {title}");
         }
 
-        public void NavigateToMiniGame(string appId) =>
+        public void NavigateToMiniGame(string appId)
+        {
             Log.Info($"[OtherGame] Editor preview, mini game destination: {appId}");
+            var bi = BiManager.OtherGameNavigateResult;
+            bi.SetData(appId == "wx308052a1ea617d67" ? "xunzi" : appId, "success");
+            bi.Report();
+        }
 
         public void CreateGameClubButton()
         {
@@ -62,9 +67,9 @@ namespace GameSDK
             Log.Info($"[ReportGameStart] 上报");
         }
 
-        public void ShowBanner(string adId) => Log.Info("[Banner] Editor show");
-        public void HideBanner() => Log.Info("[Banner] Editor hide");
-        public void DestroyBanner() => Log.Info("[Banner] Editor destroy");
+        public void ShowBanner(string adId) { AdTelemetry.BannerShown(adId); Log.Info("[Banner] Editor show"); }
+        public void HideBanner() { AdTelemetry.BannerHidden("hide"); Log.Info("[Banner] Editor hide"); }
+        public void DestroyBanner() { AdTelemetry.BannerHidden("destroy"); Log.Info("[Banner] Editor destroy"); }
 
         private bool _interstitialReady;
         public void PreloadInterstitial(string adId) => _interstitialReady = !string.IsNullOrWhiteSpace(adId);
@@ -72,6 +77,8 @@ namespace GameSDK
         public bool TryShowInterstitial(System.Action onFinished)
         {
             if (!_interstitialReady) return false;
+            var telemetry = new AdTelemetry.Attempt("interstitial_ad", "editor", "board_interstitial");
+            telemetry.Shown(); telemetry.Finish("closed");
             Log.Info("[Interstitial] Editor preview, closed");
             onFinished?.Invoke();
             return true;

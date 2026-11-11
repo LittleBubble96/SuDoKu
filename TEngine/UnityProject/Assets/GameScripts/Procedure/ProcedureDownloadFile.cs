@@ -64,10 +64,7 @@ namespace Procedure
                 StartupTelemetry.Fail(6, "download_failed", downloader.Error);
                 return;
             }
-            StartupTelemetry.Success(6, new System.Collections.Generic.Dictionary<string, string> {
-                { "download_count", downloader.TotalDownloadCount.ToString(System.Globalization.CultureInfo.InvariantCulture) },
-                { "download_bytes", downloader.TotalDownloadBytes.ToString(System.Globalization.CultureInfo.InvariantCulture) }
-            });
+            StartupTelemetry.Success(6, downloader.TotalDownloadCount, downloader.TotalDownloadBytes);
 
             ChangeState<ProcedureDownloadOver>(_procedureOwner);
         }

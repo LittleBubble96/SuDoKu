@@ -128,8 +128,8 @@ namespace GameLogic
             string[] values =
             {
                 data.played.ToString(), data.won.ToString(), data.WinRate.ToString("0.#", CultureInfo.InvariantCulture) + "%",
-                data.perfectWins.ToString(), data.won == 0 ? "--:--" : SudokuUIFormatting.Time(data.bestSeconds),
-                data.won == 0 ? "--:--" : SudokuUIFormatting.Time(data.AverageSeconds), SudokuUIFormatting.Time(data.totalSeconds),
+                data.perfectWins.ToString(), data.won == 0 ? "00:00" : SudokuUIFormatting.Time(data.bestSeconds),
+                data.won == 0 ? "00:00" : SudokuUIFormatting.Time(data.AverageSeconds), SudokuUIFormatting.Time(data.totalSeconds),
                 data.currentStreak.ToString(), data.bestStreak.ToString()
             };
             for (int i = 0; i < _rows.Count; i++) _rows[i].RefreshDisplay(values[i]);

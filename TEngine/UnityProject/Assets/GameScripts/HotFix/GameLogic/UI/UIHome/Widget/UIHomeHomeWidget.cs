@@ -35,16 +35,16 @@ namespace GameLogic
             _dailyInfo = FindChildComponent<TMP_Text>(Cards + "DailyChallengeBtn/m_des");
             _continue = CreateWidget<XYButton>(Cards + "ContinueGameBtn");
             _continue.OnAddListener(() => SudokuPresenter.ContinueGameAsync().Forget());
-            CreateWidget<XYButton>(Cards + "DailyChallengeBtn").OnAddListener(() => (OwnerWindow as UIHome)?.SelectDailyDate(SudokuPresenter.Current.Today));
+            CreateWidget<XYButton>(Cards + "DailyChallengeBtn").OnAddListener(() => ClickEntry("daily_challenge", () => (OwnerWindow as UIHome)?.SelectDailyDate(SudokuPresenter.Current.Today)));
             CreateWidget<XYButton>(Cards + "NewGameBtn").OnAddListener(() => OpenDifficultyAsync().Forget());
-            CreateWidget<XYButton>(Cards + "OtherGameBtn").OnAddListener(() => OpenOtherGamesAsync().Forget());
+            CreateWidget<XYButton>(Cards + "OtherGameBtn").OnAddListener(() => ClickEntry("other_games", () => OpenOtherGamesAsync().Forget()));
             CreateWidget<XYButton>("Top/Right/Layout/ColorTheme/Btn")
                 .OnAddListener(() => SudokuPresenter.ShowPaletteAsync(OwnerWindow).Forget());
             CreateWidget<XYButton>("Top/Right/Layout/DailyTask/Btn")
-                .OnAddListener(() => SudokuPresenter.ShowDailyTaskAsync(OwnerWindow).Forget());
-            CreateWidget<XYButton>("Top/Right/Layout/GameClub/Btn").OnAddListener(GameSDK.SDK.OpenGameClub);
+                .OnAddListener(() => ClickEntry("daily_task", () => SudokuPresenter.ShowDailyTaskAsync(OwnerWindow).Forget()));
+            CreateWidget<XYButton>("Top/Right/Layout/GameClub/Btn").OnAddListener(() => ClickEntry("game_club", GameSDK.SDK.OpenGameClub));
             CreateWidget<XYButton>("Top/Right/Layout/SignIn/Btn")
-                .OnAddListener(() => SudokuPresenter.ShowDailySignInAsync(OwnerWindow).Forget());
+                .OnAddListener(() => ClickEntry("sign_in", () => SudokuPresenter.ShowDailySignInAsync(OwnerWindow).Forget()));
             BindThemes();
         }
 
@@ -87,6 +87,8 @@ namespace GameLogic
             if (Visible && OwnerWindow.IsOpen && SudokuPresenter.Current != null && _displayDate != SudokuPresenter.Current.Today) RefreshDisplay();
         }
 
+        private static void ClickEntry(string entry, Action action) { GameSDK.BiManager.HomeEntryClick.SetData(entry).Report(); action(); }
+
         private async UniTask OpenOtherGamesAsync()
         {
             var owner = OwnerWindow;
@@ -123,6 +125,9 @@ namespace GameLogic
         {
             Theme("Top/CoinRoot/Btn/m_num", SudokuThemeRole.Text);
             Theme("Top/Right/Layout/ColorTheme/Btn/icon", SudokuThemeRole.Accent);
+            Theme("Top/Right/Layout/GameClub/Btn/icon", SudokuThemeRole.Accent);
+            Theme("Top/Right/Layout/SignIn/Btn/icon", SudokuThemeRole.Accent);
+            Theme("Top/Right/Layout/DailyTask/Btn/icon", SudokuThemeRole.Accent);
             Theme("Center/Layout/Top/icon", SudokuThemeRole.Accent);
             UIThemeColor.Bind(_title, SudokuThemeRole.Text);
             Theme(Cards + "OtherGameBtn/bg", SudokuThemeRole.Matching);

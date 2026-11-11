@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 
 namespace GameSDK
 {
-    /// <summary>启动层与热更层共用的启动漏斗；主线程调用，经统一 SDK 登录门禁上报。</summary>
     public static class StartupTelemetry
     {
         private static readonly string[] Steps = { "", "launch", "init_package", "request_version",
@@ -20,9 +18,7 @@ namespace GameSDK
         }
         private static readonly Dictionary<int, StepState> States = new Dictionary<int, StepState>();
         private static readonly Stopwatch Clock = new Stopwatch();
-        private static string _startupId;
-        private static string _appVersion;
-        private static string _playMode;
+        private static string _startupId, _appVersion, _playMode;
         private static bool _completed;
         public static bool Enabled { get; set; } = true;
         public static string ResourceVersion { get; set; } = "";
@@ -38,70 +34,56 @@ namespace GameSDK
             Clock.Restart();
             Start(1);
         }
-
         public static void Start(int index)
         {
             if (_startupId == null || _completed || index < 1 || index >= 17 || index == 10) return;
-            if (!States.TryGetValue(index, out var state))
-                States[index] = state = new StepState();
+            if (!States.TryGetValue(index, out var state)) States[index] = state = new StepState();
             if (state.Running) return;
             state.Attempt++;
             state.StartedAt = Clock.ElapsedMilliseconds;
             state.Running = true;
             Report(index, "start", state);
         }
+        public static void Success(int index) => Finish(index, "success");
+        public static void Success(int index, int downloadCount, long downloadBytes) =>
+            Finish(index, "success", downloadCount: downloadCount, downloadBytes: downloadBytes);
+        public static void Fail(int index, string code, string message) =>
+            Finish(index, "fail", code ?? "",
+                string.IsNullOrEmpty(message) ? "" : message.Substring(0, Math.Min(256, message.Length)));
 
-        public static void Success(int index, Dictionary<string, string> extra = null)
-        {
-            Finish(index, "success", extra);
-        }
-
-        public static void Fail(int index, string code, string message)
-        {
-            Finish(index, "fail", new Dictionary<string, string> {
-                { "error_code", code ?? "" },
-                { "error_msg", string.IsNullOrEmpty(message) ? "" : message.Substring(0, Math.Min(256, message.Length)) }
-            });
-        }
-
-        private static void Finish(int index, string status, Dictionary<string, string> extra)
+        private static void Finish(int index, string status,
+            string errorCode = null, string errorMessage = null, int downloadCount = -1, long downloadBytes = -1)
         {
             if (_completed || !States.TryGetValue(index, out var state) || !state.Running) return;
             state.Running = false;
-            Report(index, status, state, extra);
+            Report(index, status, state, errorCode: errorCode, errorMessage: errorMessage,
+                downloadCount: downloadCount, downloadBytes: downloadBytes);
         }
-
         public static void Skip(int index, string reason)
         {
             if (_startupId == null || _completed || index < 1 || index >= 17 || index == 10 || States.ContainsKey(index)) return;
             var state = new StepState { StartedAt = Clock.ElapsedMilliseconds };
             States[index] = state;
-            Report(index, "skip", state, new Dictionary<string, string> { { "reason", reason } });
+            Report(index, "skip", state, reason: reason);
         }
-
         public static void Complete()
         {
             if (_startupId == null || _completed) return;
             _completed = true;
-            Report(17, "success", new StepState { Attempt = 1 }, null, "startup_complete");
+            if (!Enabled) return;
+            long now = Clock.ElapsedMilliseconds;
+            BiManager.StartupComplete.SetData(_startupId, 17, Steps[17], "success", now, 1,
+                _appVersion, ResourceVersion, _playMode, now).Report();
         }
-
         private static void Report(int index, string status, StepState state,
-            Dictionary<string, string> extra = null, string eventName = "startup_step")
+            string reason = null, string errorCode = null, string errorMessage = null,
+            int downloadCount = -1, long downloadBytes = -1)
         {
             if (!Enabled) return;
             long now = Clock.ElapsedMilliseconds;
-            var data = new Dictionary<string, string> {
-                { "startup_id", _startupId }, { "index", index.ToString(CultureInfo.InvariantCulture) },
-                { "step", Steps[index] }, { "status", status },
-                { "elapsed_ms", now.ToString(CultureInfo.InvariantCulture) },
-                { "attempt", state.Attempt.ToString(CultureInfo.InvariantCulture) },
-                { "app_version", _appVersion ?? "" }, { "resource_version", ResourceVersion ?? "" },
-                { "play_mode", _playMode ?? "" }
-            };
-            if (status != "start") data["duration_ms"] = (now - state.StartedAt).ToString(CultureInfo.InvariantCulture);
-            if (extra != null) foreach (var pair in extra) data[pair.Key] = pair.Value ?? "";
-            SDK.ReportEvent(eventName, data);
+            BiManager.StartupStep.SetData(_startupId, index, Steps[index], status, now, state.Attempt,
+                _appVersion, ResourceVersion, _playMode, status == "start" ? -1 : now - state.StartedAt,
+                reason, errorCode, errorMessage, downloadCount, downloadBytes).Report();
         }
     }
 }

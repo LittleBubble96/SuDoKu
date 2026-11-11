@@ -1,34 +1,35 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace GameSDK
 {
     public enum SdkLoginState { NotStarted, LoggingIn, LoggedIn, Failed }
 
-    /// <summary>主线程使用。登录门禁、FIFO 缓存及有限重试的唯一所有者。</summary>
+    /// <summary>主线程使用。正常直发，登录前或失败事件保留快照并有限重试。</summary>
     internal sealed class SdkSession
     {
         private sealed class Event
         {
             public string Name;
-            public Dictionary<string, string> Data;
+            public readonly Dictionary<string, string> Data = new Dictionary<string, string>(20);
             public int Failures;
             public bool NativeGameStart;
         }
         private readonly Queue<Event> _pending = new Queue<Event>();
+        private readonly Stack<Event> _available = new Stack<Event>();
+        private readonly Dictionary<string, string> _sendData = new Dictionary<string, string>(20);
         private readonly Func<double> _now;
         private readonly Action<string> _warn;
-        private readonly string _sessionId = Guid.NewGuid().ToString("N");
         private ISdk _platform;
         private int _generation;
         private int _attempt;
         private int _cycleAttempts;
-        private long _sequence;
         private double _loginDeadline;
         private double _retryLoginAt = double.PositiveInfinity;
         private double _retryReportAt;
         private bool _flushing;
+        private int _reportBudget = 8;
+        public const int ReportsPerTick = 8;
         public SdkLoginState LoginState { get; private set; }
         public bool IsLoggedIn => LoginState == SdkLoginState.LoggedIn;
         public string OpenId { get; private set; } = "";
@@ -82,36 +83,57 @@ namespace GameSDK
         }
         private void LoginEvent(string status, string error)
         {
-            ReportEvent("sdk_login", new Dictionary<string, string> {
-                { "status", status }, { "attempt", _attempt.ToString(CultureInfo.InvariantCulture) },
-                { "error_msg", string.IsNullOrEmpty(error) ? "" : error.Substring(0, Math.Min(256, error.Length)) }
-            });
+            var bi = BiManager.SdkLogin;
+            bi.SetData(status, _attempt,
+                string.IsNullOrEmpty(error) ? "" : error.Substring(0, Math.Min(256, error.Length)));
+            ReportEvent(bi.EventName, bi.Data);
         }
-        /// <returns>已接收至本地发送队列，不代表服务端确认。</returns>
-        public bool ReportEvent(string name, Dictionary<string, string> data)
-            => Enqueue(name, data, false);
+        /// <returns>接口已调用或已保留待发送快照，不代表服务端确认。</returns>
+        public bool ReportEvent(string name, Dictionary<string, string> data) => Send(name, data, false);
+        public bool ReportGameStart() => Send("native_game_start", null, true);
 
-        public bool ReportGameStart() => Enqueue("native_game_start", null, true);
-
-        private bool Enqueue(string name, Dictionary<string, string> data, bool nativeGameStart)
+        private bool Send(string name, Dictionary<string, string> data, bool nativeGameStart)
         {
             if (string.IsNullOrWhiteSpace(name)) return false;
-            if (_pending.Count >= 512) { _warn("[BI] Queue full; dropped new event: " + name); return false; }
-            var copy = new Dictionary<string, string>();
-            if (data != null) foreach (var pair in data)
+            // 有积压时维持顺序；补发每帧最多 8 条，不限制正常直发。
+            if (!IsLoggedIn || _flushing || _pending.Count > 0)
             {
-                if (string.IsNullOrWhiteSpace(pair.Key)) return false;
-                copy.Add(pair.Key, pair.Value ?? "");
+                bool accepted = Enqueue(name, data, nativeGameStart);
+                Flush();
+                return accepted;
             }
-            copy["sdk_session_id"] = _sessionId;
-            copy["event_seq"] = (++_sequence).ToString(CultureInfo.InvariantCulture);
-            copy["event_time_ms"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture);
-            _pending.Enqueue(new Event { Name = name, Data = copy, NativeGameStart = nativeGameStart });
-            Flush();
+            try
+            {
+                // 微信同步序列化，编辑器同步读取；返回后即可复用 Data。
+                if (nativeGameStart) _platform.ReportGameStart();
+                else _platform.ReportEvent(name, data);
+                return true;
+            }
+            catch (Exception e)
+            {
+                if (!Enqueue(name, data, nativeGameStart)) return false;
+                _pending.Peek().Failures = 1;
+                _retryReportAt = _now() + 2;
+                _warn("[BI] Report failed; event retained: " + e.Message);
+                return true;
+            }
+        }
+        private bool Enqueue(string name, Dictionary<string, string> data, bool nativeGameStart)
+        {
+            if (_pending.Count >= 512) { _warn("[BI] Queue full; dropped new event: " + name); return false; }
+            var item = _available.Count > 0 ? _available.Pop() : new Event();
+            item.Data.Clear();
+            if (data != null)
+                foreach (var pair in data) item.Data.Add(pair.Key, pair.Value ?? "");
+            item.Name = name;
+            item.NativeGameStart = nativeGameStart;
+            item.Failures = 0;
+            _pending.Enqueue(item);
             return true;
         }
         public void Tick()
         {
+            _reportBudget = ReportsPerTick;
             if (LoginState == SdkLoginState.LoggingIn && _now() >= _loginDeadline)
                 LoginFailed(_generation, "login_timeout");
             if (LoginState == SdkLoginState.Failed && _now() >= _retryLoginAt) StartLogin();
@@ -125,18 +147,23 @@ namespace GameSDK
         }
         private void Flush()
         {
-            if (!IsLoggedIn || _flushing || _now() < _retryReportAt) return;
+            if (_pending.Count == 0 || _reportBudget == 0 || !IsLoggedIn || _flushing || _now() < _retryReportAt) return;
             _flushing = true;
             try
             {
-                int budget = 512;
-                while (_pending.Count > 0 && budget-- > 0)
+                while (_pending.Count > 0 && _reportBudget > 0)
                 {
+                    _reportBudget--;
                     var item = _pending.Peek();
                     try
                     {
                         if (item.NativeGameStart) _platform.ReportGameStart();
-                        else _platform.ReportEvent(item.Name, new Dictionary<string, string>(item.Data));
+                        else
+                        {
+                            _sendData.Clear();
+                            foreach (var pair in item.Data) _sendData.Add(pair.Key, pair.Value);
+                            _platform.ReportEvent(item.Name, _sendData);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -145,7 +172,11 @@ namespace GameSDK
                         _warn("[BI] Report failed; event retained: " + e.Message);
                         break;
                     }
+                    finally { _sendData.Clear(); }
                     _pending.Dequeue();
+                    item.Data.Clear();
+                    item.Name = null;
+                    _available.Push(item);
                     _retryReportAt = 0;
                 }
             }

@@ -37,7 +37,7 @@ namespace GameLogic.Sudoku
         public int DisplayDay => ClaimedToday ? CompletedInCycle : CompletedInCycle + 1;
         public static SignInReward GetReward(int day) => Rewards[day - 1];
 
-        public bool TryClaim(bool doubled, out SignInReward reward)
+        public bool TryClaim(bool doubled, out SignInReward reward, string claimMethod = "manual")
         {
             reward = default;
             if (ClaimedToday) return false;
@@ -49,6 +49,9 @@ namespace GameLogic.Sudoku
             data.signInDate = TodayKey;
             // 奖励、进度和当天标记在同一份快照内保存。
             _cache.Save();
+            GameSDK.BiManager.RewardClaimed.SetData("sign_in", doubled ? "rewarded_ad" : claimMethod, doubled ? 2 : 1,
+                reward.IsCoin ? reward.Amount : 0, reward.IsCoin ? 0 : reward.Amount,
+                requestId: doubled ? AdSystem.LastRewardRequestId(AdIds.DailySignIn) : null).Report();
             GameEvent.Send(EventDefine.SudokuStateChanged);
             return true;
         }

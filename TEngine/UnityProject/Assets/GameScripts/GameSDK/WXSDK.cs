@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TEngine;
 using WeChatWASM;
@@ -11,6 +11,8 @@ namespace GameSDK
         private string _interstitialId;
         private bool _interstitialReady;
         private Action _interstitialFinished;
+        private AdTelemetry.Attempt _interstitialTelemetry;
+        private bool _bannerErrorReported;
         private WXBannerAd _banner;
         private string _bannerId;
         private bool _bannerRequested;
@@ -93,6 +95,7 @@ namespace GameSDK
         {
             private readonly WXRewardedVideoAd _native;
             private readonly string _adId;
+            [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
             private void Trace(string message) => TEngine.Log.Info($"[AdSDK][{_adId}] {message}");
             private readonly Action<WXADLoadResponse> _loaded;
             private readonly Action<WXADErrorResponse> _error;
@@ -145,6 +148,7 @@ namespace GameSDK
             if (_bannerId != adId) DestroyBanner();
             _bannerId = adId;
             _bannerRequested = true;
+            _bannerErrorReported = false;
             if (!_nativeReady) return;
             try
             {
@@ -170,7 +174,9 @@ namespace GameSDK
                 banner.Show(_ =>
                 {
                     // A pending native show may finish after leaving the board.
-                    if (ReferenceEquals(_banner, banner) && !_bannerRequested) banner.Hide();
+                    if (!ReferenceEquals(_banner, banner)) return;
+                    if (!_bannerRequested) banner.Hide();
+                    else AdTelemetry.BannerShown(adId);
                 }, error =>
                 {
                     if (ReferenceEquals(_banner, banner))
@@ -179,7 +185,7 @@ namespace GameSDK
             }
             catch (Exception error)
             {
-                UnityEngine.Debug.LogWarning($"[Banner] show failed: {error.Message}");
+                OnBannerError(new WXADErrorResponse { errMsg = error.Message });
             }
         }
 
@@ -195,18 +201,26 @@ namespace GameSDK
 
         private void OnBannerError(WXADErrorResponse error)
         {
+            if (!_bannerErrorReported)
+            {
+                _bannerErrorReported = true;
+                AdTelemetry.BannerError(_bannerId, error.errCode.ToString(System.Globalization.CultureInfo.InvariantCulture), error.errMsg);
+            }
+            AdTelemetry.BannerHidden("ad_error");
             _banner?.Hide();
             UnityEngine.Debug.LogWarning($"[Banner] {error.errCode}: {error.errMsg}");
         }
 
         public void HideBanner()
         {
+            AdTelemetry.BannerHidden("hide");
             _bannerRequested = false;
             _banner?.Hide();
         }
 
         public void DestroyBanner()
         {
+            AdTelemetry.BannerHidden("destroy");
             _bannerRequested = false;
             var banner = _banner;
             _banner = null;
@@ -228,7 +242,7 @@ namespace GameSDK
                 // Creation loads the first ad; WeChat loads the next after closing.
                 _interstitial = WX.CreateInterstitialAd(new WXCreateInterstitialAdParam { adUnitId = adId });
                 _interstitial.OnLoad(OnInterstitialLoaded);
-                _interstitial.OnClose(FinishInterstitial);
+                _interstitial.OnClose(OnInterstitialClosed);
                 _interstitial.OnError(OnInterstitialError);
             }
             catch (Exception error)
@@ -245,11 +259,12 @@ namespace GameSDK
             _interstitialReady = false;
             _interstitialFinished = onFinished;
             var ad = _interstitial;
+            var telemetry = _interstitialTelemetry = new AdTelemetry.Attempt("interstitial_ad", _interstitialId, "board_interstitial");
             try
             {
-                ad.Show(null, error =>
+                ad.Show(_ => telemetry.Shown(), error =>
                 {
-                    if (ReferenceEquals(_interstitial, ad))
+                    if (ReferenceEquals(_interstitial, ad) && ReferenceEquals(_interstitialTelemetry, telemetry))
                         OnInterstitialError(new WXADErrorResponse { errMsg = error.errMsg });
                 });
                 return true;
@@ -257,6 +272,7 @@ namespace GameSDK
             catch (Exception error)
             {
                 Log.Warning($"[Interstitial] show failed: {error.Message}");
+                _interstitialTelemetry?.Finish("failed", "sdk_error");
                 FinishInterstitial();
                 return false;
             }
@@ -265,12 +281,20 @@ namespace GameSDK
         private void OnInterstitialError(WXADErrorResponse error)
         {
             _interstitialReady = false;
+            _interstitialTelemetry?.Finish("failed", "sdk_error");
             Log.Warning($"[Interstitial] {error.errCode}: {error.errMsg}");
+            FinishInterstitial();
+        }
+
+        private void OnInterstitialClosed()
+        {
+            _interstitialTelemetry?.Finish("closed");
             FinishInterstitial();
         }
 
         private void FinishInterstitial()
         {
+            _interstitialTelemetry = null;
             var finished = _interstitialFinished;
             _interstitialFinished = null;
             finished?.Invoke();
@@ -278,6 +302,7 @@ namespace GameSDK
 
         public void DestroyInterstitial()
         {
+            _interstitialTelemetry?.Finish("failed", "destroy");
             var ad = _interstitial;
             _interstitial = null;
             _interstitialId = null;
@@ -285,7 +310,7 @@ namespace GameSDK
             if (ad != null)
             {
                 ad.OffLoad(OnInterstitialLoaded);
-                ad.OffClose(FinishInterstitial);
+                ad.OffClose(OnInterstitialClosed);
                 ad.OffError(OnInterstitialError);
                 ad.Destroy();
             }
@@ -312,12 +337,25 @@ namespace GameSDK
 
         public void NavigateToMiniGame(string appId)
         {
+            string target = appId == "wx308052a1ea617d67" ? "xunzi" : appId;
             WX.NavigateToMiniProgram(new NavigateToMiniProgramOption
             {
                 appId = appId,
                 envVersion = "release",
-                fail = error => UnityEngine.Debug.LogWarning($"[OtherGame] {error.errMsg}")
+                success = _ => ReportNavigation(target, "success"),
+                fail = error => {
+                    bool canceled = error.errMsg != null && error.errMsg.IndexOf("cancel", StringComparison.OrdinalIgnoreCase) >= 0;
+                    ReportNavigation(target, canceled ? "cancel" : "failed", canceled ? "canceled" : "sdk_error");
+                    UnityEngine.Debug.LogWarning($"[OtherGame] {error.errMsg}");
+                }
             });
+        }
+
+        private static void ReportNavigation(string target, string result, string reason = null)
+        {
+            var bi = BiManager.OtherGameNavigateResult;
+            bi.SetData(target, result, reason);
+            bi.Report();
         }
 
         public void CreateGameClubButton()

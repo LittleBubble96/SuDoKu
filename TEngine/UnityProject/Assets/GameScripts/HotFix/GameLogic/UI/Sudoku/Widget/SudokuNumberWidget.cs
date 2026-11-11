@@ -34,11 +34,13 @@ namespace GameLogic
         public void SetInteractable(bool interactable) => _button.Interactable = interactable;
         public void RefreshDisplay(bool interactable, int remaining, GameSettingsData settings)
         {
-            SetInteractable(interactable);
+            bool visible = remaining > 0;
+            _number.enabled = visible;
+            SetInteractable(interactable && visible);
             _numberColor.SetRole(settings.dimCompletedDigits && remaining == 0 ? SudokuThemeRole.MutedText : SudokuThemeRole.Accent);
             if (_remaining != null)
             {
-                _remaining.gameObject.SetActive(settings.showRemainingCount);
+                _remaining.gameObject.SetActive(settings.showRemainingCount && visible);
                 _remaining.text = remaining.ToString();
             }
         }

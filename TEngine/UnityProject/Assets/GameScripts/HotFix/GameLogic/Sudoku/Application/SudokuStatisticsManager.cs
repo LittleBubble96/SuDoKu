@@ -25,14 +25,6 @@ namespace GameLogic.Sudoku
             data.bestStreak = Math.Max(data.bestStreak, data.currentStreak);
         }
 
-        // GM 填题会排除整局，避免改变已玩次数、胜率和累计用时。
-        public void Exclude(SudokuDifficulty difficulty, double seconds)
-        {
-            var data = Get(difficulty);
-            data.played--;
-            data.totalSeconds = Math.Max(0, data.totalSeconds - seconds);
-        }
-
         public void Clear()
         {
             for (int i = 0; i < _data.Length; i++) _data[i] = new SudokuStatisticsData();

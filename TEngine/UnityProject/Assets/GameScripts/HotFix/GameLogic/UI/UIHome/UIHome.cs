@@ -46,7 +46,7 @@ namespace GameLogic
             {
                 int tab = i;
                 string path = "Panel/Bottom/Layout/" + TabNames[i];
-                CreateWidget<XYButton>(path + "/root").OnAddListener(() => SelectTab(tab));
+                CreateWidget<XYButton>(path + "/root").OnAddListener(() => { if (tab == 1) GameSDK.BiManager.HomeEntryClick.SetData("daily_challenge").Report(); SelectTab(tab); });
                 _tabIcons[i] = UIThemeColor.Bind(FindChildComponent<UnityEngine.UI.Image>(path + "/root/icon"), SudokuThemeRole.MutedText);
                 _tabLabels[i] = FindChildComponent<TMP_Text>(path + "/root/m_text");
                 _tabColors[i] = UIThemeColor.Bind(_tabLabels[i], SudokuThemeRole.MutedText);

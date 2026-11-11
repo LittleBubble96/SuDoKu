@@ -40,7 +40,7 @@ namespace GameLogic
             _double = CreateWidget<XYButton>(Content + "ActionBtn/GetDoubleBtn");
             _close = CreateWidget<XYButton>("CloseBtn");
             _claim.OnAddListener(ClaimDirect); _double.OnAddListener(() => ClaimDoubleAsync().Forget());
-            _close.OnAddListener(ClaimDirect);
+            _close.OnAddListener(() => GameModule.UI.HideUI<UIReward>());
             foreach (var text in gameObject.GetComponentsInChildren<TMP_Text>(true))
             {
                 text.raycastTarget = false; text.enableAutoSizing = true;
@@ -91,7 +91,8 @@ namespace GameLogic
             _description.text = LocalizationHelper.GetLocalText(_adFailed ? LanguageKey.reward_ad_failed :
                 state == RewardedAdState.Loading ? LanguageKey.reward_ad_loading :
                 state == RewardedAdState.Failed ? LanguageKey.reward_ad_retry : LanguageKey.reward_double_desc);
-            bool canClaim = !_claiming && !_context.Result.IsClaimed;
+            bool canClaim = !_claiming && _context.Game.CanClaimSettlementReward &&
+                ReferenceEquals(_context.Result, _context.Game.SettlementReward);
             _close.Interactable = !_claiming;
             _claim.Interactable = canClaim && !_revealing;
             _double.Interactable = canClaim && !_revealing && state != RewardedAdState.Loading && state != RewardedAdState.Showing;
@@ -166,7 +167,7 @@ namespace GameLogic
             try
             {
                 bool rewarded = await AdSystem.ShowRewardedAdAsync(AdIds.Settlement);
-                if (!IsOpen || OpenVersion != version || !ReferenceEquals(context.Result, context.Game.Settlement)) return;
+                if (!IsOpen || OpenVersion != version || !ReferenceEquals(context.Result, context.Game.SettlementReward)) return;
                 if (rewarded) { Grant(true); GameModule.UI.HideUI<UIReward>(); }
                 else _adFailed = true;
             }
@@ -177,15 +178,15 @@ namespace GameLogic
                 if (IsOpen && OpenVersion == version) { _claiming = false; RefreshDisplay(); }
             }
         }
-        private void Grant(bool doubled)
+        private void Grant(bool doubled, string claimMethod = "manual")
         {
-            if (_context?.Game.TryClaimSettlement(_context.Result, doubled) == true) SudokuPresenter.Coins?.PlayGainAnimation();
+            if (_context?.Game.TryClaimSettlement(_context.Result, doubled, claimMethod) == true) SudokuPresenter.Coins?.PlayGainAnimation();
         }
         private void OnAdStateChanged(string id) { if (id == AdIds.Settlement) RefreshDisplay(); }
         protected override void OnOutAnimation() => _animation.PlayOut(CompleteOutAnimation);
         protected override void OnClose()
         {
-            _animation.Reset(); Grant(false); AdSystem.ExitPage(AdIds.Settlement);
+            _animation.Reset(); AdSystem.ExitPage(AdIds.Settlement);
             foreach (var item in _items) item.ResetMotion();
             base.OnClose();
         }

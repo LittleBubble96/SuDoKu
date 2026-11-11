@@ -22,16 +22,21 @@ namespace GameLogic
         public bool IsAdAvailable => !_disposed && State == RewardedAdState.Ready && _request == null;
         public bool IsLoading => State == RewardedAdState.Loading;
         public bool IsBusy => _request != null;
+        public string LastRewardRequestId { get; private set; }
+        private string Placement => _adId == AdIds.Tip ? "hint" : _adId == AdIds.DailySignIn ? "sign_in" :
+            _adId == AdIds.DailyTask ? "daily_task" : "settlement";
         private static double Now => (double)Stopwatch.GetTimestamp() / Stopwatch.Frequency;
         private sealed class Request
         {
-            public readonly string BiId = Guid.NewGuid().ToString("N");
+            public AdTelemetry.Attempt Telemetry;
+            public string BiId => Telemetry.Id;
             public double Started;
             public bool Shown, Retried;
             public IDisposable InputLock;
             public readonly UniTaskCompletionSource<bool> Result = new UniTaskCompletionSource<bool>();
         }
 
+        [Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         private void Trace(string name, string status, string reason = "", Request request = null, double duration = 0)
         {
             Log.Info($"[Ad][{_adId}][instance={_instanceVersion}][request={request?.BiId}][load={_loadId}] {name} {status} {reason} duration={duration:F3}s");
@@ -39,14 +44,15 @@ namespace GameLogic
 
         private void SetState(RewardedAdState state)
         {
-            Log.Info($"[Ad][{_adId}] state {State} -> {state}");
+            if (State == state) return;
+            Trace("state", state.ToString());
             State = state;
             AdSystem.NotifyStateChanged(_adId);
         }
         private bool IsCurrent(int version)
         {
             if (!_disposed && version == _instanceVersion) return true;
-            Log.Info($"[Ad][{_adId}] ignored stale callback instance={version}, current={_instanceVersion}");
+            Trace("stale_callback", "ignored");
             return false;
         }
         public void EnterPage() { _pageActive = true; _retryCount = 0; Preload(); }
@@ -59,8 +65,10 @@ namespace GameLogic
         {
             if (_disposed || IsBusy || IsLoading || IsAdAvailable) return;
             int load = ++_loadVersion;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             _loadId = Guid.NewGuid().ToString("N");
             _loadStarted = Now;
+#endif
             _loadPending = true;
             SetState(RewardedAdState.Loading);
             Trace("ad_load", "start");
@@ -126,8 +134,13 @@ namespace GameLogic
         }
         public async UniTask<bool> ShowRewardedAdAsync()
         {
-            if (!IsAdAvailable) { Log.Info($"[Ad][{_adId}] show rejected state={State}"); return false; }
-            var request = new Request { Started = Now, InputLock = UIInteractionLock.Acquire() };
+            if (!IsAdAvailable)
+            {
+                new AdTelemetry.Attempt("rewarded_ad", _adId, Placement).Finish("failed", "not_ready");
+                return false;
+            }
+            var request = new Request { Started = Now, InputLock = UIInteractionLock.Acquire(),
+                Telemetry = new AdTelemetry.Attempt("rewarded_ad", _adId, Placement) };
             _request = request;
             SetState(RewardedAdState.Showing);
             Trace("ad_request", "start", "", request);
@@ -152,6 +165,7 @@ namespace GameLogic
             {
                 if (_request != request || request.Shown) return;
                 request.Shown = true;
+                request.Telemetry.Shown();
                 Trace("ad_show", "success", "", request, Now - request.Started);
             }, error =>
             {
@@ -197,6 +211,12 @@ namespace GameLogic
         {
             if (_request != request) return;
             _request = null;
+            string outcome = rewarded ? "completed" : request.Shown && reason == "interrupted" ? "interrupted" : "failed";
+            string failure = rewarded ? "" : reason == "interrupted" ? "user_close" :
+                reason == "page_exit" ? "page_exit" : reason == "show_callback_timeout" ? "show_timeout" :
+                reason == "close_callback_timeout" ? "close_timeout" : "sdk_error";
+            request.Telemetry.Finish(outcome, failure);
+            if (rewarded) LastRewardRequestId = request.BiId;
             Trace("ad_result", rewarded ? "rewarded" : "failed", reason, request, Now - request.Started);
             ReleaseInputLock(request);
             if (resetNative) ResetNative();

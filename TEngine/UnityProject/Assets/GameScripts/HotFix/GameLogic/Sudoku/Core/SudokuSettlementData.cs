@@ -6,7 +6,7 @@ namespace GameLogic.Sudoku
     [Serializable]
     public sealed class SudokuSettlementData
     {
-        public string id;
+        public string id, roundId;
         public int difficulty, score, bestScore, mistakes, hints, coins, tips;
         public double seconds, bestSeconds;
         public bool daily;
