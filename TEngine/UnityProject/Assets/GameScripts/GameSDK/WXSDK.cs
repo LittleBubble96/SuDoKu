@@ -155,6 +155,7 @@ namespace GameSDK
                 if (_banner == null)
                 {
                     var window = WX.GetWindowInfo();
+                    int width = (int)(window.windowWidth * 0.6f);
                     _banner = WX.CreateBannerAd(new WXCreateBannerAdParam
                     {
                         adUnitId = adId,
@@ -162,17 +163,18 @@ namespace GameSDK
                         style = new Style
                         {
                             left = 0,
-                            top = (int)window.windowHeight - 100,
-                            width = (int)window.windowWidth,
-                            height = 100
+                            top = (int)window.windowHeight - 70,
+                            width = width,
                         }
                     });
+                    Log.Info($"[Banner] create adId={adId} width={width} window=({window.windowWidth},{window.windowHeight})");
                     _banner.OnResize(OnBannerResize);
                     _banner.OnError(OnBannerError);
                 }
                 var banner = _banner;
                 banner.Show(_ =>
                 {
+                    Log.Info($"[Banner] show adId={adId}");
                     // A pending native show may finish after leaving the board.
                     if (!ReferenceEquals(_banner, banner)) return;
                     if (!_bannerRequested) banner.Hide();
@@ -213,6 +215,7 @@ namespace GameSDK
 
         public void HideBanner()
         {
+            Log.Info($"[Banner] hide adId={_bannerId}");
             AdTelemetry.BannerHidden("hide");
             _bannerRequested = false;
             _banner?.Hide();

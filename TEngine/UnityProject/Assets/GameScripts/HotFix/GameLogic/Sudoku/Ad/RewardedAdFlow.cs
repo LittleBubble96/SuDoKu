@@ -31,7 +31,7 @@ namespace GameLogic
             public AdTelemetry.Attempt Telemetry;
             public string BiId => Telemetry.Id;
             public double Started;
-            public bool Shown, Retried;
+            public bool Shown, Retried, Overlay = true;
             public IDisposable InputLock;
             public readonly UniTaskCompletionSource<bool> Result = new UniTaskCompletionSource<bool>();
         }
@@ -142,6 +142,7 @@ namespace GameLogic
             var request = new Request { Started = Now, InputLock = UIInteractionLock.Acquire(),
                 Telemetry = new AdTelemetry.Attempt("rewarded_ad", _adId, Placement) };
             _request = request;
+            AdSystem.OpenOverlay(request.BiId);
             SetState(RewardedAdState.Showing);
             Trace("ad_request", "start", "", request);
             WatchRequestAsync(request).Forget();
@@ -152,8 +153,8 @@ namespace GameLogic
         {
             try
             {
-                await UniTask.Yield();
-                if (_request != request) return;
+                await GameModule.UI.ShowUIAsyncAwait<UIAd>(request.BiId);
+                if (_request != request || !request.Overlay) return;
                 ShowNative(request);
             }
             catch (Exception error) { Finish(request, false, true, "open_or_show_exception: " + error.Message); }
@@ -196,16 +197,20 @@ namespace GameLogic
         {
             await UniTask.Delay(TimeSpan.FromSeconds(AdSystem.LoadingTimeoutSeconds), DelayType.Realtime);
             if (_request != request) return;
+            CloseOverlay(request);
             if (!request.Shown) { Finish(request, false, true, "show_callback_timeout"); return; }
             // 正常视频可超过15秒；展示成功但永远没有close/error，也必须有限时结束请求。
             double remaining = AdSystem.CloseCallbackTimeoutSeconds - (Now - request.Started);
             if (remaining > 0) await UniTask.Delay(TimeSpan.FromSeconds(remaining), DelayType.Realtime);
             if (_request == request) Finish(request, false, true, "close_callback_timeout");
         }
-        private void ReleaseInputLock(Request request)
+        private void CloseOverlay(Request request)
         {
+            if (!request.Overlay) return;
+            request.Overlay = false;
             request.InputLock?.Dispose();
             request.InputLock = null;
+            AdSystem.CloseOverlay(request.BiId);
         }
         private void Finish(Request request, bool rewarded, bool resetNative, string reason)
         {
@@ -218,7 +223,7 @@ namespace GameLogic
             request.Telemetry.Finish(outcome, failure);
             if (rewarded) LastRewardRequestId = request.BiId;
             Trace("ad_result", rewarded ? "rewarded" : "failed", reason, request, Now - request.Started);
-            ReleaseInputLock(request);
+            CloseOverlay(request);
             if (resetNative) ResetNative();
             SetState(RewardedAdState.Idle);
             request.Result.TrySetResult(rewarded);

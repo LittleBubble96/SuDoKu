@@ -13,6 +13,15 @@ namespace GameLogic
         public static event Action<string> StateChanged;
         private static readonly Dictionary<string, RewardedAdFlow> RewardedAds = new Dictionary<string, RewardedAdFlow>();
         public const float CloseCallbackTimeoutSeconds = 60f;
+        private static readonly HashSet<string> OverlayRequests = new HashSet<string>();
+        public static bool HasOverlay => OverlayRequests.Count > 0;
+
+        internal static void OpenOverlay(string requestId) => OverlayRequests.Add(requestId);
+        internal static void CloseOverlay(string requestId)
+        {
+            OverlayRequests.Remove(requestId);
+            if (!HasOverlay) GameModule.UI.CloseUI<UIAd>();
+        }
 
         private static RewardedAdFlow GetFlow(string adId)
         {
@@ -60,6 +69,8 @@ namespace GameLogic
         {
             foreach (var flow in RewardedAds.Values) flow.Dispose();
             RewardedAds.Clear();
+            OverlayRequests.Clear();
+            GameModule.UI.CloseUI<UIAd>();
         }
         internal static void NotifyStateChanged(string adId) => StateChanged?.Invoke(adId);
     }

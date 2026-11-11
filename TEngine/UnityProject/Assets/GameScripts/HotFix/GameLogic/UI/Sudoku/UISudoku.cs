@@ -7,6 +7,7 @@ using TEngine;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace GameLogic
 {
@@ -16,6 +17,9 @@ namespace GameLogic
         private const string LayoutPath = "Panel/Layout/";
         private SudokuGameController _game;
         private SudokuBoardWidget _board;
+        private RectTransform _boardRect;
+        private RectTransform _layoutRect;
+        private VerticalLayoutGroup _verticalLayoutGroup;
         private SudokuHintWidget _hint;
         private XYButton _undo, _clear, _notes, _pause;
         private TMP_Text _level, _progress, _time, _noteState;
@@ -46,8 +50,11 @@ namespace GameLogic
             _progress = FindChildComponent<TMP_Text>(LayoutPath + "Board/SudoInfoPanel/Progress");
             _time = FindChildComponent<TMP_Text>(LayoutPath + "Board/SudoInfoPanel/m_time");
             _noteState = FindChildComponent<TMP_Text>(LayoutPath + "PropArea/NoteBtn/Toggle/m_text");
+            _boardRect = FindChildComponent<RectTransform>(LayoutPath + "Board");
             _noteStateColor = _noteState.GetComponent<UIThemeColor>();
             _pauseIcon = FindChildComponent<UnityEngine.UI.Image>(LayoutPath + "Top/StopBtn/Icon");
+            _layoutRect = FindChildComponent<RectTransform>(LayoutPath);
+            _verticalLayoutGroup = _layoutRect.GetComponent<VerticalLayoutGroup>();
             _pauseIcon.preserveAspect = true;
             _pauseSprite = _pauseIcon.sprite;
             UIThemeColor.Bind(_pauseIcon, SudokuThemeRole.Text);
@@ -104,7 +111,25 @@ namespace GameLogic
             RefreshState();
             RefreshPauseIcon();
             LoadPlayIconAsync().Forget();
+            AdapterUI();
         }
+
+        //适配
+        private void AdapterUI()
+        {
+            //1.layout 最大高度为 1850
+            float layoutH = _layoutRect.rect.height;
+            float offsetLayout = layoutH - 1950;
+            offsetLayout = Mathf.Max(offsetLayout, 0f);
+            _verticalLayoutGroup.padding.bottom = (int)offsetLayout;
+            layoutH = _layoutRect.rect.height;
+            //2.获取board 高度
+            float boardH = layoutH * (4.9f / (1 + 1 + 0.7f + 4.9f));
+            float scale = boardH / 1080f;
+            scale = Mathf.Min(scale, 1f);
+            _board.transform.localScale = new Vector3(scale, scale, 1f);
+        }
+
         private void RefreshLanguage()
         {
             RefreshLabels(); RefreshState();
